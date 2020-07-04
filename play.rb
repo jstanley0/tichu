@@ -3,31 +3,37 @@ require_relative 'card'
 class Play
   attr_accessor :cards, :rank
 
-  def initialize(cards, rank)
+  def initialize(cards, rank = nil)
     @cards = cards
     @rank = rank
   end
 
-  def self.identify(cards, prev_play)
-    if cards.size == 1
-      # phoenix is not used as a wildcard
-      play = identify_single(cards, prev_play)
-      return play if play
-    else
-      pindex = cards.index { |c| c.unsubstituted_phoenix? }
-      if pindex
-        # try wildcard substitutions
-        sub_cards = cards.dup
-        (2..Card::ACE).reverse_each do |rank|
-          sub_cards[pindex].rank = rank
-          play = identify_multi(sub_cards, prev_play)
-          return play if play
-        end
-      else
-        # no phoenix present
-        play = identify_multi(cards, prev_play)
-        return play if play
+  def self.enumerate(hand, prev_play, wish_rank)
+    plays = []
+    [Pass, Dog, Single, Pair, Triple, Straight, Ladder, FullHouse, Bomb].each do |play_klass|
+      plays.concat play_klass.enumerate(hand, prev_play)
+    end
+
+    if wish_rank
+      wish_fulfilling_plays = plays.select { |play| play.cards.select(&:normal?).map(&:rank).include?(wish_rank) }
+      if wish_fulfilling_plays.any?
+        plays = wish_fulfilling_plays
       end
+    end
+
+    plays.index_by(&:type)
+  end
+
+  def self.with_phoenix_substitution(hand)
+    phoenix = hand.find(&:phoenix?)
+    if phoenix
+      (2..Card::ACE).each do |replacement_rank|
+        phoenix.substitute!(replacement_rank)
+        yield hand
+      end
+      phoenix.unsubstitute!
+    else
+      yield hand
     end
   end
 
@@ -38,162 +44,150 @@ class Play
   def size
     @cards.size
   end
+end
 
-
-  private
-
-  def identify_single(cards, prev_play)
-    Dog.build(cards, prev_play) ||
-      Single.build(cards, prev_play)
+class Pass < Play
+  def self.enumerate(cards, prev_play)
+    return [Pass.new([])] if prev_play
   end
-
-  def identify_multi(cards, prev_play)
-    Bomb.build(cards, prev_play) ||
-      Pair.build(cards, prev_play) ||
-      Triple.build(cards, prev_play) ||
-      Straight.build(cards, prev_play) ||
-      Ladder.build(cards, prev_play) ||
-      FullHouse.build(cards, prev_play)
-  end
-
 end
 
 class Dog < Play
-  def self.build(cards, prev_play)
-    return unless cards.size == 1 && cards[0].rank == Card::DOG && prev_play.nil?
-    Dog.new(cards, Card::DOG)
+  def self.enumerate(cards, prev_play)
+    return [] if prev_play
+    dogs = cards.select(&:dog?) # there's only one but a play has an array of cards so
+    return [Dog.new(dogs)] if dogs.any?
   end
 end
 
-# since the phoenix behaves oddly with singles, provide it unsubstituted to this matcher
 class Single < Play
-  def self.build(cards, prev_play)
-    return unless cards.size == 1
-    return if cards[0].substituted_phoenix?
-
-    rank = cards[0].rank
-    return if rank == Card::DOG
-
-    if prev_play
-      return unless prev_play.is_a?(Single)
-      if rank == Card::PHOENIX
-        return if prev_play.rank == Card::DRAGON
-        rank = prev_play.rank + 0.5
+  def self.enumerate(hand, prev_play)
+    plays = []
+    return plays unless prev_play.nil? || prev_play.is_a?(Single)
+    hand.each do |card|
+      next if card.dog?
+      rank = if card.phoenix?
+        if prev_play
+          prev_play.rank + 0.5
+        else
+          1.5
+        end
       else
-        return unless rank > prev_play.rank
+        card.rank
       end
-    else
-      if rank == Card::PHOENIX
-        rank = 1.5
-      end
+      next if prev_play&.rank >= rank
+      plays << Single.new([card], rank)
     end
-
-    Single.new(cards, rank)
+    plays
   end
-
 end
-
-# to simplify logic, the following matchers do not expect to see an unsubstituted phoenix
-# you need to try with each possible wildcard substitution, because I am lazy
 
 class Pair < Play
-  def self.build(cards, prev_play)
-    return unless cards.size == 2 && Card::matched_rank?(cards)
-    rank = cards[0].rank
-
-    if prev_play
-      return unless prev_play.is_a?(Pair)
-      return unless rank > prev_play.rank
+  def self.enumerate(h, prev_play)
+    plays = []
+    return plays unless prev_play.nil? || prev_play.is_a?(Pair)
+    return plays unless h.size >= 2
+    with_phoenix_substitution(h) do |hand|
+      Card.groups(hand, 2).each do |cards|
+        rank = cards[0].rank
+        next if prev_play&.rank >= rank
+        plays << Pair.new(cards, rank)
+      end
     end
-
-    Pair.new(cards, rank)
+    plays
   end
-
 end
 
 class Triple < Play
-  def self.build(cards, prev_play)
-    return unless cards.size == 3 && Card::matched_rank?(cards)
-    rank = cards[0].rank
-
-    if prev_play
-      return unless prev_play.is_a?(Triple)
-      return unless rank > prev_play.rank
+  def self.enumerate(h, prev_play)
+    plays = []
+    return plays unless prev_play.nil? || prev_play.is_a?(Triple)
+    return plays unless h.size >= 3
+    with_phoenix_substitution(h) do |hand|
+      Card.groups(hand, 3).each do |cards|
+        rank = cards[0].rank
+        next if prev_play&.rank >= rank
+        plays << Triple.new(cards, rank)
+      end
     end
-
-    Triple.new(cards, rank)
+    plays
   end
-
 end
 
 class Straight < Play
-  def self.build(cards, prev_play)
-    return unless cards.size >= 5 && Card::sequence?(cards)
-    rank = cards.map(&:rank).max
-
-    if prev_play
-      return unless prev_play.is_a?(Straight)
-      return unless cards.size == prev_play.size
-      return unless rank > prev_play.rank
+  def self.enumerate(h, prev_play)
+    plays = []
+    return plays unless prev_play.nil? || prev_play.is_a?(Straight)
+    return plays unless h.size >= 5
+    min_size = prev_play&.size || 5
+    max_size = prev_play&.size || 14
+    with_phoenix_substitution(h) do |hand|
+      Card.sequences(hand, min_size, max_size).each do |cards|
+        rank = cards[-1].rank
+        next if prev_play&.rank >= rank
+        plays << Straight.new(cards, rank)
+      end
     end
-
-    Straight.new(cards.sort_by(&:rank), rank)
+    plays
   end
-
 end
 
 class Ladder < Play
-  def self.build(cards, prev_play)
-    return unless cards.size.even? && cards.size >= 4
-    unique_rank_cards = cards.uniq(&:rank)
-    return unless unique_rank_cards.size == cards.size / 2
-    return unless Card::sequence?(unique_rank_cards)
-
-    rank = cards.map(&:rank).max
-    if prev_play
-      return unless prev_play.is_a?(Ladder)
-      return unless prev_play.size == cards.size
-      return unless rank > prev_play.rank
+  def self.enumerate(h, prev_play)
+    plays = []
+    return plays unless prev_play.nil? || prev_play.is_a?(Ladder)
+    return plays unless h.size >= 4
+    min_size = prev_play&.size || 4
+    max_size = prev_play&.size || 14
+    with_phoenix_substitution(h) do |hand|
+      pairs = Card.groups(hand, 2)
+      ranks = pairs.map { |cards| cards[0] }
+      Card.sequences(ranks, min_size / 2, max_size / 2).each do |half_ladder|
+        play_cards = half_ladder.map(&:rank).map { |rank| pairs.find { |p| p[0].rank == rank } }.flatten
+        plays << Ladder.new(play_cards, play_cards[-1].rank)
+      end
     end
-
-    Ladder.new(cards.sort_by(&:rank), rank)
+    plays
   end
-
 end
 
 class FullHouse < Play
-  def self.build(cards, prev_play)
-    return unless cards.size == 5
-    # groups = e.g. [[3G, 3B], [5R, 5G, 5B]]
-    groups = cards.group_by(&:rank).values.sort_by(&:size)
-    return unless groups.size == 2 && groups[0].size == 2
-    rank = groups[1][0].rank
-    if prev_play
-      return unless prev_play.is_a?(FullHouse)
-      return unless rank > prev_play.rank
+  def self.enumerate(h, prev_play)
+    plays = []
+    return plays unless prev_play.nil? || prev_play.is_a?(FullHouse)
+    return plays unless h.size >= 5
+    with_phoenix_substitution(h) do |hand|
+      trips = Card.groups(hand, 3)
+      pairs = Card.groups(hand, 2)
+      combos = trips.product(pairs).reject { |combo| combo[0][0].rank == combo[1][0].rank }
+      combos.each do |combo|
+        rank = combo[0][0].rank
+        next if prev_play&.rank >= rank
+        # when making a full house out of two pairs plus a phoenix, use the phoenix with the higher rank
+        if combo[0].any?(&:substituted_phoenix?)
+          next if rank < combo[1][0].rank
+        end
+        plays << FullHouse.new(combo.flatten, rank)
+      end
     end
-
-    FullHouse.new(groups[1] + groups[0], rank)
+    plays
   end
-
 end
 
 class Bomb < Play
-  def self.match?(cards)
-    return unless cards.size >= 4
-    return if cards.any? { |card| card.phoenix? }
-    if Card::sequence?(cards)
-      return unless cards.size >= 5
-      return unless Card::matched_suit?(cards)
-    else
-      return unless Card::matched_rank?(cards)
+  def self.enumerate(hand, prev_play)
+    plays = []
+    prev_bomb = prev_play&.is_a?(Bomb) && prev_play
+    Card.groups(hand, 4).each do |cards|
+      rank = cards[0].rank
+      next if prev_bomb&.rank >= rank
+      plays << Bomb.new(cards, rank)
     end
-    rank = cards.size * 100 + cards.map(&:rank).max
-    if prev_play
-      return if prev_play.is_a?(Bomb) && rank <= prev_play.rank
+    Card.sequences(hand, 5, 14, match_suit: true).each do |cards|
+      rank = cards.size * 100 + cards[-1].rank
+      next if prev_bomb&.rank >= rank
+      plays << Bomb.new(cards, rank)
     end
-
-    Bomb.new(cards.sort_by(&:rank), rank)
+    plays
   end
-
 end
