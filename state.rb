@@ -1,3 +1,5 @@
 class State
-  attr_accessor :players, :wish_rank, :turn, :scores
+  attr_reader :passing_cards, :players, :wish_rank, :turn, :scores
+
+
 end

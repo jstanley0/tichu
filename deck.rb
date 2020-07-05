@@ -15,7 +15,9 @@ class Deck
   def self.deal!(players)
     raise "wrong number of players" unless players.size == 4
     cards = DECK.shuffle
-
+    players.each do |player|
+      player.assign_hand!(cards.shift(14))
+    end
 
   end
 

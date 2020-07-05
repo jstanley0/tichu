@@ -183,7 +183,7 @@ class Bomb < Play
       next if prev_bomb&.rank >= rank
       plays << Bomb.new(cards, rank)
     end
-    Card.sequences(hand, 5, 14, match_suit: true).each do |cards|
+    Card.flush_sequences(hand, 5, 14).each do |cards|
       rank = cards.size * 100 + cards[-1].rank
       next if prev_bomb&.rank >= rank
       plays << Bomb.new(cards, rank)

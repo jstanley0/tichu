@@ -20,12 +20,53 @@ class Card
 
   # return each group of size having matched rank
   def self.groups(hand, size)
-
+    groups = []
+    hand.group_by(&:rank).each_value do |cards|
+      next if cards.size < size
+      groups.concat cards.combination(size)
+    end
+    groups
   end
 
-  # return each sequence of increasing rank in the given size ranges, optionally matching suit
-  def self.sequences(hand, min_size, max_size, match_suit: false)
+  def self.sequences(hand, min_size, max_size)
+    groups = hand.reject { |card| card.dragon? || card.dog? }.group_by(&:rank)
+    return [] if groups.empty?
 
+    # find all sequences of rank greater than or equal to the min_size
+    ranks = groups.keys.sort
+    rank_seqs = []
+    current_sequence = [ranks.shift]
+    ranks.each do |rank|
+      if rank == current_sequence[-1] + 1
+        current_sequence << rank
+      else
+        rank_seqs << current_sequence if current_sequence.size >= min_size
+        current_sequence = [rank]
+      end
+    end
+    rank_seqs << current_sequence if current_sequence.size >= min_size
+
+    # enumerate all subsequences in the desired size range
+    card_sequences = []
+    rank_seqs.each do |rank_seq|
+      for size in min_size..max_size
+        rank_seq.each_cons(size) do |rank_subseq|
+          card_groups = rank_subseq.map { |rank| groups[rank] }
+          first_card_group = card_groups.shift
+          card_sequences.concat(first_card_group.product(card_groups))
+        end
+      end
+    end
+
+    card_sequences
+  end
+
+  def self.flush_sequences(hand, min_size, max_size)
+    sequences = []
+    hand.group_by(&:suit).each_value do |monochromatic_cards|
+      sequences.concat Card.sequences(monochromatic_cards, min_size, max_size)
+    end
+    sequences
   end
 
   def phoenix?
