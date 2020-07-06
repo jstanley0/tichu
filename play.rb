@@ -8,6 +8,14 @@ class Play
     @rank = rank
   end
 
+  def to_h
+    {
+      type: self.class.name,
+      rank: rank,
+      cards: Card.serialize(cards)
+    }
+  end
+
   def self.enumerate(hand, prev_play, wish_rank)
     plays = []
     [Pass, Dog, Single, Pair, Triple, Straight, Ladder, FullHouse, Bomb].each do |play_klass|

@@ -18,6 +18,14 @@ class Card
     @rank = rank
   end
 
+  def self.deserialize(card_or_array)
+    if card_or_array.is_a?(Array)
+      card_or_array.map { |s| deserialize(s) }
+    else
+      from_string(card_or_array)
+    end
+  end
+
   # return each group of size having matched rank
   def self.groups(hand, size)
     groups = []
@@ -67,6 +75,10 @@ class Card
       sequences.concat Card.sequences(monochromatic_cards, min_size, max_size)
     end
     sequences
+  end
+
+  def self.serialize(cards)
+    cards.map(&:to_s)
   end
 
   def phoenix?
@@ -141,5 +153,36 @@ class Card
     else
       @rank.to_s
     end
+  end
+
+  def self.rank_from_string(rank_string)
+    case @rank
+    when 'D'
+      DRAGON
+    when 'P'
+      PHOENIX
+    when 'd'
+      DOG
+    when 'A'
+      ACE
+    when 'K'
+      KING
+    when 'Q'
+      QUEEN
+    when 'J'
+      JACK
+    else
+      rank_string.to_i
+    end
+  end
+
+  def self.suit_from_string(suit_string)
+    return 0 if suit_string.empty?
+    "rgbk".index(suit_string) + 1
+  end
+
+  def self.from_string(s)
+    suit, rank = s.match(/([rgbk]?)(.+)/)
+    self.class.new(suit_from_string(suit), rank_from_string(rank))
   end
 end
