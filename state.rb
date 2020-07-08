@@ -3,7 +3,7 @@ require 'json'
 
 class State
   # state is one of: :joining, :passing, :playing, :over
-  attr_reader :id, :state, :players, :wish_rank, :turn, :scores, :end_score
+  attr_reader :id, :state, :players, :prev_play, :wish_rank, :turn, :scores, :end_score
 
   def initialize(end_score: 1000)
     @state = :joining
@@ -43,9 +43,10 @@ class State
       return
     end
 
-    json = JSON.parse(data)
-    command = json['command']
     begin
+      json = JSON.parse(data)
+      command = json['command']
+
       case state
       when :joining
         wat!(command, websocket)
@@ -55,7 +56,8 @@ class State
           player.uncover_last_6!
           send_global_update
         when 'pass_cards'
-          player.pass_cards!(json['pass'])
+          player.pass_cards!(json['pass_cards'])
+          perform_passes! if players.all?(&:passed_cards?)
           send_global_update
         when 'grand_tichu'
           player.call_grand_tichu!
@@ -90,6 +92,33 @@ class State
     websocket.send({error: "invalid command #{command} in state #{state}"}.to_json)
   end
 
+  def perform_passes!
+    players.each_with_index do |player, i|
+      player.cards_to_pass.each_with_index do |card, j|
+        players[(i + j + 1) % 4].accept_card(card, from_player: player.id)
+      end
+    end
+
+    start_round!
+  end
+
+  def start_round!
+    @state = :playing
+    @turn = players.find_index { |player| player.cards.find { |card| card.rank == 1 } }
+    start_turn!
+  end
+
+  def start_turn!
+    players.each_with_index do |player, index|
+      possible_plays = if @turn == index
+        Play.enumerate(player.hand, prev_play, wish_rank)
+      else
+        Play.enumerate_bombs(player.hand, prev_play)
+      end
+      player.set_possible_plays!(possible_plays)
+    end
+  end
+
   def make_play!(player_index, play)
 
   end
@@ -105,6 +134,7 @@ class State
     Deck.deal!(@players)
     @state = :passing
     @wish_rank = nil
+    @prev_play = nil
     @turn = nil
   end
 

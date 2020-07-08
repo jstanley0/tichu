@@ -15,13 +15,16 @@ class Play
     end
 
     if wish_rank
-      wish_fulfilling_plays = plays.select { |play| play.cards.select(&:normal?).map(&:rank).include?(wish_rank) }
-      if wish_fulfilling_plays.any?
-        plays = wish_fulfilling_plays
+      if plays.any? { |play| play.fulfills_wish?(wish_rank) }
+        plays = plays.select { |play| play.is_a?(Bomb) || play.fulfills_wish?(wish_rank) }
       end
     end
 
     plays.index_by(&:type)
+  end
+
+  def self.enumerate_bombs(hand, prev_play)
+    {'Bomb' => Bomb.enumerate(hand, prev_play)}
   end
 
   def self.with_phoenix_substitution(hand)
@@ -38,11 +41,16 @@ class Play
   end
 
   def type
-    self.class_name
+    self.class.name
   end
 
   def size
     @cards.size
+  end
+
+  def fulfills_wish?(wish_rank)
+    # normal? precludes a phoenix from being required to support a wish
+    cards.any? { |card| card.normal? && card.rank == wish_rank }
   end
 
   def to_h
