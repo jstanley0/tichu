@@ -3,7 +3,7 @@ require 'json'
 
 class State
   # state is one of: :joining, :passing, :playing, :over
-  attr_reader :id, :state, :players, :plays, :wish_rank, :turn, :scores, :end_score
+  attr_reader :id, :state, :players, :plays, :tricks, :wish_rank, :turn, :scores, :out_order, :end_score
 
   def initialize(end_score: 1000)
     @state = :joining
@@ -123,7 +123,37 @@ class State
     cards = Card.deserialize(play)
     play = players[player_index].find_play(cards)
     raise "invalid play" unless play
+    players[player_index].make_play!(play)
+    if players[player_index].hand.empty?
+      @out_order << player_index
+    end
+    @plays << play
+    next_trick if play.is_a?(Dog)
+    next_turn!(player_index, play.is_a?(Dog) ? 2 : 1)
+  end
 
+  def next_trick
+    @tricks << @plays
+    @plays = []
+  end
+
+  def next_turn!(player_index, offset = 1)
+    if round_over?
+      finish_round!
+    else
+      @turn = (player_index + offset) % 4
+      while players[player_index].hand.empty?
+        @turn = (player_index + 1) % 4
+      end
+    end
+  end
+
+  def round_over?
+    out_order.size == 3 || one_two_finish?
+  end
+
+  def one_two_finish?
+    out_order == [0, 2] || out_order == [2, 0] || out_order == [1, 3] || out_order == [3, 1]
   end
 
   def send_global_update
@@ -138,7 +168,33 @@ class State
     @state = :passing
     @wish_rank = nil
     @plays = []
+    @tricks = []
+    @out_order = []
     @turn = nil
+  end
+
+  def finish_round!
+    update_scores!
+    if scores[0] != scores[1] && (scores[0] >= end_score || scores[1] >= end_score)
+      @state = :over
+    else
+      init_round
+    end
+  end
+
+  def update_scores!
+    score_tichus!
+    if one_two_finish?
+      scores[out_order[0] % 2] += 200
+    else
+      # lol I haven't implemented trick-taking yet :P
+    end
+  end
+
+  def score_tichus!
+    players.each_with_index do |player, index|
+      scores[index % 2] += player.tichu * ((index == out_order[0]) ? 1 : -1)
+    end
   end
 
   def to_h(for_player: nil)

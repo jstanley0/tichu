@@ -81,7 +81,8 @@ class Player
   end
 
   def make_play!(play)
-
+    remove_cards!(play.cards)
+    @plays << play
   end
 
   def remove_cards!(cards)
