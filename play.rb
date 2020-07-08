@@ -8,14 +8,6 @@ class Play
     @rank = rank
   end
 
-  def to_h
-    {
-      type: self.class.name,
-      rank: rank,
-      cards: Card.serialize(cards)
-    }
-  end
-
   def self.enumerate(hand, prev_play, wish_rank)
     plays = []
     [Pass, Dog, Single, Pair, Triple, Straight, Ladder, FullHouse, Bomb].each do |play_klass|
@@ -51,6 +43,14 @@ class Play
 
   def size
     @cards.size
+  end
+
+  def to_h
+    { cards: Card.serialize(cards), rank: rank }
+  end
+
+  def self.serialize_plays(enumerated_plays)
+    enumerated_plays.transform_values { |play| play.to_h }
   end
 end
 
