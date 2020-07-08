@@ -233,8 +233,9 @@ class State
       scores[out_order[0] % 2] += 200
     else
       loser_index = [0, 1, 2, 3] - out_order
-      raise "there can be only one loser" unless loser_index.size = 1
+      raise "there can be only one loser" unless loser_index.size == 1
 
+      old_total = scores[0] + scores[1]
       players.each_index do |i|
         trick_points = players[i].tricks.map(&:points).inject(:+)
         if i == loser_index
@@ -248,6 +249,8 @@ class State
           scores[i % 2] += trick_points
         end
       end
+      new_total = scores[0] + scores[1]
+      raise "apparently I can't count" unless new_total == old_total + 100
     end
   end
 
@@ -258,9 +261,10 @@ class State
   end
 
   def to_h(for_player: nil)
-    h = {
+    {
       id: id,
-      scores: scores,
+      scores: rotate_scores(for_player),
+      players: rotate_players(for_player).map { |player| player.to_h(complete: player.id == for_player) },
       end_score: end_score,
       state: state,
       wish_rank: Card.rank_string(wish_rank),
@@ -268,20 +272,18 @@ class State
       trick_winner: trick_winner ? players[trick_winner].id : nil,
       dragon_trick: dragon_trick
     }
-    h[:players] = if for_player
-      # every player sees herself in the first slot
-      rotate_players(for_player).map { |player| player.to_h(complete: player.id == for_player) },
-    else
-      # an observer sees things from the perspective of the player to start the game
-      players.map { |player| player.to_h(complete: false) }
-    end
-    h
   end
 
   def rotate_players(for_player)
-    ix = players.find_index { |p| p.id == for_player }
-    raise "bad player id #{for_player}" unless ix
-    players.rotate(ix)
+    players.rotate(player_index(for_player))
+  end
+
+  def rotate_scores(for_player)
+    scores.rotate(player_index(for_player) % 2)
+  end
+
+  def player_index(for_player)
+    players.find_index { |p| p.id == for_player } || 0
   end
 
   def self.new_id
