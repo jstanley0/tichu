@@ -118,6 +118,10 @@ class Card
     @rank == DOG
   end
 
+  def sparrow?
+    @rank == 1
+  end
+
   def normal?
     @rank >= 2 && @rank <= ACE && @suit != 0
   end

@@ -85,6 +85,10 @@ class Player
     @plays << play
   end
 
+  def take_trick!(trick)
+    @tricks << trick
+  end
+
   def remove_cards!(cards)
     raise "you tried to use a card you don't have" unless (cards - hand).empty?
     @hand -= cards

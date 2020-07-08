@@ -1,5 +1,6 @@
 require 'securerandom'
 require 'json'
+require_relative 'play'
 
 class State
   # state is one of: :joining, :passing, :playing, :over
@@ -104,7 +105,7 @@ class State
 
   def start_round!
     @state = :playing
-    @turn = players.find_index { |player| player.cards.find { |card| card.rank == 1 } }
+    @turn = players.find_index { |player| player.cards.find(&:sparrow?) }
     start_turn!
   end
 
@@ -127,13 +128,16 @@ class State
     if players[player_index].hand.empty?
       @out_order << player_index
     end
-    @plays << play
+    @plays << play.tag(player_index)
+    if play.cards.include?(&:sparrow?)
+      # TODO handle the wish. do we want to prompt the user or do we just require the wish to be sent with the play?
+    end
     next_trick if play.is_a?(Dog)
     next_turn!(player_index, play.is_a?(Dog) ? 2 : 1)
   end
 
   def next_trick
-    @tricks << @plays
+    @tricks << plays
     @plays = []
   end
 
@@ -141,10 +145,37 @@ class State
     if round_over?
       finish_round!
     else
-      @turn = (player_index + offset) % 4
-      while players[player_index].hand.empty?
-        @turn = (player_index + 1) % 4
+      if plays.last.is_a?(Pass)
+        trick_winner_index = find_trick_winner
+        if trick_winner_index
+          # TODO need to figure out a way to put a couple seconds' delay here to give time for bombs
+          # TODO TODO it's worse than that; if the winning trick has the dragon, we have to prompt that player
+          players[trick_winner_index].take_trick!(plays)
+          @turn = trick_winner_index
+          skip_finished_players
+          return
+        end
       end
+
+      @turn = (player_index + offset) % 4
+      skip_finished_players
+    end
+  end
+
+  def find_trick_winner
+    # I am having trouble wrapping my brain around this, because some players may be out and may have gone out
+    # before or during the last trick. This is "if the last N plays were passes, the trick winner is the player
+    # who played the last non-Pass play". but what is N?
+
+
+  end
+
+  def skip_finished_players
+    sanity_count = 0
+    while players[@turn].hand.empty?
+      @turn = (@turn + 1) % 4
+      sanity_count += 1
+      raise "all players are out; how did that happen?" if sanity_count == 4
     end
   end
 

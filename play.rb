@@ -1,11 +1,12 @@
 require_relative 'card'
 
 class Play
-  attr_accessor :cards, :rank
+  attr_accessor :cards, :rank, :player_index
 
   def initialize(cards, rank = nil)
     @cards = cards
     @rank = rank
+    @player_index = nil
   end
 
   def self.enumerate(hand, prev_play, wish_rank)
@@ -27,6 +28,11 @@ class Play
     {'Bomb' => Bomb.enumerate(hand, prev_play)}
   end
 
+  def tag(player_index)
+    @player_index = player_index
+    self
+  end
+
   def self.with_phoenix_substitution(hand)
     phoenix = hand.find(&:phoenix?)
     if phoenix
@@ -46,6 +52,10 @@ class Play
 
   def size
     @cards.size
+  end
+
+  def points
+    cards.map(&:points).inject(:+)
   end
 
   def match?(cards)
