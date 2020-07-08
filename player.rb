@@ -40,7 +40,6 @@ class Player
       hand_size: hand.size,
       tichu: tichu,
       points_taken: tricks.map(&:points).inject(:+),
-      last_play: plays.last&.to_h,
       passed_cards: cards_to_pass.any?
     }
     if complete

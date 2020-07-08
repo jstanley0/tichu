@@ -4,7 +4,8 @@ require_relative 'play'
 
 class State
   # state is one of: :joining, :passing, :playing, :over
-  attr_reader :id, :state, :players, :plays, :tricks, :wish_rank, :turn, :scores, :out_order, :end_score
+  attr_reader :id, :state, :players, :plays, :tricks, :wish_rank, :turn,
+              :scores, :out_order, :end_score, :trick_winner, :dragon_trick
 
   def initialize(end_score: 1000)
     @state = :joining
@@ -57,7 +58,7 @@ class State
           player.uncover_last_6!
           send_global_update
         when 'pass_cards'
-          player.pass_cards!(json['pass_cards'])
+          player.pass_cards!(json['cards'])
           perform_passes! if players.all?(&:passed_cards?)
           send_global_update
         when 'grand_tichu'
@@ -74,8 +75,10 @@ class State
         when 'tichu'
           player.call_tichu!
           send_global_update
+        when 'claim_trick'
+          claim_trick!(player_index, json['to_player'])
         when 'play'
-          make_play!(player_index, json['play'])
+          make_play!(player_index, json['cards'], json['wished_rank'])
           send_global_update
         else
           wat!(command, websocket)
@@ -110,6 +113,21 @@ class State
   end
 
   def start_turn!
+    last_frd_play = plays.reverse_each.find { |play| !play.is_a?(Pass) }
+    loop do
+      if last_frd_play&.player_index == @turn
+        # if a player is in the position of playing over her own play, then she's winning the trick...
+        # now we wait for her to claim the trick, or for someone to bomb it
+        @trick_winner = @turn
+        @dragon_trick = last_frd_play.cards.any?(&:dragon?)
+        @turn = :limbo
+      else
+        # if the player has gone out, proceed to the next player
+        break if players[@turn].hand.any?
+        @turn = (@turn + 1) % 4
+      end
+    end
+
     players.each_with_index do |player, index|
       possible_plays = if @turn == index
         Play.enumerate(player.hand, plays.last, wish_rank)
@@ -120,7 +138,7 @@ class State
     end
   end
 
-  def make_play!(player_index, play)
+  def make_play!(player_index, play, wished_rank)
     cards = Card.deserialize(play)
     play = players[player_index].find_play(cards)
     raise "invalid play" unless play
@@ -129,56 +147,50 @@ class State
       @out_order << player_index
     end
     @plays << play.tag(player_index)
-    if play.cards.include?(&:sparrow?)
-      # TODO handle the wish. do we want to prompt the user or do we just require the wish to be sent with the play?
+
+    if play.cards.any?(&:sparrow?) && wished_rank && !wished_rank.empty?
+      chosen_rank = Card.rank_from_string(wished_rank)
+      raise "invalid wished_rank #{wished_rank}" if !chosen_rank || chosen_rank < 2 || chosen_rank > Card::ACE
+      @wish_rank = chosen_rank
+    elsif wish_rank
+      @wish_rank = nil if play.fulfills_wish?(@wish_rank)
     end
+
     next_trick if play.is_a?(Dog)
     next_turn!(player_index, play.is_a?(Dog) ? 2 : 1)
+  end
+
+  def claim_trick!(claiming_player_index, give_to_player_id)
+    raise "you didn't win the trick" if claiming_player_index != trick_winner
+    if dragon_trick && give_to_player_id && give_to_player_id.size > 0
+      dest_index = players.find_index { |player| player.id == give_to_player_id }
+      raise "bad give_to_player_id" unless dest_index
+      raise "can't give the trick to your teammate" if dest_index.even? == claiming_player_index.even?
+      players[dest_index].take_trick!(plays)
+    else
+      raise "you have to give away the trick" if dragon_trick
+      players[claiming_player_index].take_trick!(plays)
+    end
+    next_trick
+    @turn = claiming_player_index
+    start_turn!
   end
 
   def next_trick
     @tricks << plays
     @plays = []
+    @trick_winner = nil
+    @dragon_trick = false
   end
 
   def next_turn!(player_index, offset = 1)
     if round_over?
       finish_round!
     else
-      if plays.last.is_a?(Pass)
-        trick_winner_index = find_trick_winner
-        if trick_winner_index
-          # TODO need to figure out a way to put a couple seconds' delay here to give time for bombs
-          # TODO TODO it's worse than that; if the winning trick has the dragon, we have to prompt that player
-          players[trick_winner_index].take_trick!(plays)
-          @turn = trick_winner_index
-          skip_finished_players
-          return
-        end
-      end
-
       @turn = (player_index + offset) % 4
-      skip_finished_players
+      start_turn!
     end
   end
-
-  def find_trick_winner
-    # I am having trouble wrapping my brain around this, because some players may be out and may have gone out
-    # before or during the last trick. This is "if the last N plays were passes, the trick winner is the player
-    # who played the last non-Pass play". but what is N?
-
-
-  end
-
-  def skip_finished_players
-    sanity_count = 0
-    while players[@turn].hand.empty?
-      @turn = (@turn + 1) % 4
-      sanity_count += 1
-      raise "all players are out; how did that happen?" if sanity_count == 4
-    end
-  end
-
   def round_over?
     out_order.size == 3 || one_two_finish?
   end
@@ -201,6 +213,8 @@ class State
     @plays = []
     @tricks = []
     @out_order = []
+    @trick_winner = nil
+    @dragon_trick = false
     @turn = nil
   end
 
@@ -218,7 +232,22 @@ class State
     if one_two_finish?
       scores[out_order[0] % 2] += 200
     else
-      # lol I haven't implemented trick-taking yet :P
+      loser_index = [0, 1, 2, 3] - out_order
+      raise "there can be only one loser" unless loser_index.size = 1
+
+      players.each_index do |i|
+        trick_points = players[i].tricks.map(&:points).inject(:+)
+        if i == loser_index
+          # tricks go to whoever went out first
+          scores[out_order[0] % 2] += trick_points
+
+          # the hand goes to the opponents
+          scores[(i + 1) % 2] += players[i].hand.map(&:points).inject(:+)
+        else
+          raise "a non-losing player's hand should be empty at this point" unless players[i].hand.empty?
+          scores[i % 2] += trick_points
+        end
+      end
     end
   end
 
@@ -234,8 +263,10 @@ class State
       scores: scores,
       end_score: end_score,
       state: state,
-      wish_rank: wish_rank,
-      turn: turn ? players[turn].id : nil
+      wish_rank: Card.rank_string(wish_rank),
+      turn: turn.is_a?(Numeric) ? players[turn].id : nil,
+      trick_winner: trick_winner ? players[trick_winner].id : nil,
+      dragon_trick: dragon_trick
     }
     h[:players] = if for_player
       # every player sees herself in the first slot

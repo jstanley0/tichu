@@ -143,11 +143,19 @@ class Card
   end
 
   def suit_string
-    ['', 'r', 'g', 'b', 'k'][@suit]
+    Card.suit_string(@suit)
   end
 
   def rank_string
-    case @rank
+    Card.rank_string(@rank)
+  end
+
+  def self.suit_string(suit)
+    ['', 'r', 'g', 'b', 'k'][suit]
+  end
+
+  def self.rank_string(rank)
+    case rank
     when DRAGON
       'D'
     when PHOENIX
