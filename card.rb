@@ -18,6 +18,14 @@ class Card
     @rank = rank
   end
 
+  def ==(rhs)
+    self.suit == rhs.suit && self.rank == rhs.rank
+  end
+
+  def <=>(rhs)
+    (self.suit * 100 + self.rank) <=> (rhs.suit * 100 + rhs.rank)
+  end
+
   def self.deserialize(card_or_array)
     if card_or_array.is_a?(Array)
       card_or_array.map { |s| deserialize(s) }

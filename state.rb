@@ -3,7 +3,7 @@ require 'json'
 
 class State
   # state is one of: :joining, :passing, :playing, :over
-  attr_reader :id, :state, :players, :prev_play, :wish_rank, :turn, :scores, :end_score
+  attr_reader :id, :state, :players, :plays, :wish_rank, :turn, :scores, :end_score
 
   def initialize(end_score: 1000)
     @state = :joining
@@ -111,15 +111,18 @@ class State
   def start_turn!
     players.each_with_index do |player, index|
       possible_plays = if @turn == index
-        Play.enumerate(player.hand, prev_play, wish_rank)
+        Play.enumerate(player.hand, plays.last, wish_rank)
       else
-        Play.enumerate_bombs(player.hand, prev_play)
+        Play.enumerate_bombs(player.hand, plays.last)
       end
       player.set_possible_plays!(possible_plays)
     end
   end
 
   def make_play!(player_index, play)
+    cards = Card.deserialize(play)
+    play = players[player_index].find_play(cards)
+    raise "invalid play" unless play
 
   end
 
@@ -134,7 +137,7 @@ class State
     Deck.deal!(@players)
     @state = :passing
     @wish_rank = nil
-    @prev_play = nil
+    @plays = []
     @turn = nil
   end
 

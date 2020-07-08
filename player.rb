@@ -29,6 +29,10 @@ class Player
     @possible_plays = play_hash
   end
 
+  def find_play(cards)
+    possible_plays.find { |play| play.match?(cards) }
+  end
+
   def to_h(complete: true)
     h = {
       id: id,

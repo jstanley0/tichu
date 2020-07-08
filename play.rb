@@ -48,6 +48,10 @@ class Play
     @cards.size
   end
 
+  def match?(cards)
+    @cards.sort == cards.sort
+  end
+
   def fulfills_wish?(wish_rank)
     # normal? precludes a phoenix from being required to support a wish
     cards.any? { |card| card.normal? && card.rank == wish_rank }
