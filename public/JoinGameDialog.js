@@ -1,33 +1,33 @@
 function JoinGameDialog(_props) {
-  const { Container, Form, Button, Col } = ReactBootstrap
+  const { useState } = React
+  const { Typography, Container, TextField, Button, Grid } = MaterialUI
 
-  const getName = () => {
-    return document.getElementById('JoinGameDialog__Name').value
-  }
+  const [name, setName] = useState('')
+  const [gameCode, setGameCode] = useState('')
 
-  const startGame = () => {
-
-  }
-  const joinGame = () => {
+  const handlePlay = () => {
 
   }
 
-  return <Container fluid="md">
-    <Form>
-      <Form.Row className="m-2 mb-4 mt-5" >
-        <Form.Control type="text" id="JoinGameDialog__Name" placeholder="Name"/>
-      </Form.Row>
-      <Form.Row>
-        <Col md="auto">
-          <Button className="m-2" onClick={startGame} variant="primary">Start Game</Button>
-        </Col>
-        <Col md={{offset: 1}}>
-          <Form.Control className="m-2" type="text" id="JoinGameDialog__GameCode" placeholder="Game code"/>
-        </Col>
-        <Col md="auto">
-          <Button className="m-2" onClick={joinGame} variant="primary">Join Game</Button>
-        </Col>
-      </Form.Row>
-    </Form>
+  return <Container maxWidth="sm">
+    <Typography align="center" gutterBottom={true} variant="h1">Terrible Tichu</Typography>
+    <form noValidate>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <TextField fullWidth label="Name" onChange={event => setName(event.target.value)}/>
+        </Grid>
+        <Grid item xs>
+          <TextField fullWidth label="Game code" onChange={event => setGameCode(event.target.value)}/>
+        </Grid>
+        <Grid item xs={4}>
+          <Button variant="contained"
+                  color="primary"
+                  disabled={name.length == 0}
+                  onClick={handlePlay}>
+            {gameCode.length > 0 ? 'Join Game' : 'Start Game'}
+          </Button>
+        </Grid>
+      </Grid>
+    </form>
   </Container>
 }
