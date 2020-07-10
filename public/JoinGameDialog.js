@@ -4,9 +4,17 @@ function JoinGameDialog(_props) {
 
   const [name, setName] = useState('')
   const [gameCode, setGameCode] = useState('')
+  const [error, setError] = useState(null)
 
-  const handlePlay = () => {
-
+  const startGame = () => {
+    const url = gameCode ? '/join' : '/new'
+    axios.post(url, null, { params: { name: name, game_id: gameCode } })
+      .then(response => {
+        Connect(response.data.game_id, response.data.player_id, response.data.token)
+      })
+      .catch(error => {
+        setError(error.toString())
+      })
   }
 
   return <Container maxWidth="xs">
@@ -23,10 +31,13 @@ function JoinGameDialog(_props) {
         <Grid item xs={12}>
           <Button variant="contained"
                   color="primary"
-                  disabled={name.length == 0}
-                  onClick={handlePlay}>
+                  disabled={name.length === 0}
+                  onClick={startGame}>
             {gameCode.length > 0 ? 'Join Game' : 'Start Game'}
           </Button>
+        </Grid>
+        <Grid item xs={12}>
+          { <Typography color="error">{error}</Typography> }
         </Grid>
       </Grid>
     </form>

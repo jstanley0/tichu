@@ -7,7 +7,7 @@ class Player
   def initialize(name)
     @name = name
     @id = State.new_id
-    @token = State.new_id
+    @token = State.new_id # a secret id that prevents other players from connecting as you
   end
 
   def assign_hand!(cards)
@@ -43,7 +43,6 @@ class Player
       passed_cards: cards_to_pass.any?
     }
     if complete
-      h[:token] = token
       h[:hand] = Card.serialize(hand)
       h[:possible_plays] = Play.serialize_plays(@possible_plays)
     end

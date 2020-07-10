@@ -1,7 +1,11 @@
 require 'sinatra'
 require 'sinatra-websocket'
+require 'active_support'
+require 'active_support/core_ext'
+require 'byebug'
 
 require_relative 'state'
+require_relative 'player'
 
 $games = {}
 
@@ -10,7 +14,7 @@ get '/' do
 end
 
 post '/new' do
-  halt 400, 'missing required parameter `name`' unless params['name']&.length > 0
+  halt 400, 'missing required parameter `name`' unless params['name'].present?
 
   game = State.new(end_score: (params['end_score'] || 1000).to_i)
   $games[game.id] = game
@@ -18,13 +22,13 @@ post '/new' do
   player = Player.new(params['name'])
   game.add_player!(player)
 
-  { game_id: game.id, player_id: player.id }.to_json
+  { game_id: game.id, player_id: player.id, token: player.token }.to_json
 end
 
 post '/join' do
-  halt 400, 'missing required parameter `name`' unless params['name']&.length > 0
+  halt 400, 'missing required parameter `name`' unless params['name'].present?
   game_id = params['game_id']
-  halt 400, 'missing required parameter `game_id`' unless game_id&.length > 0
+  halt 400, 'missing required parameter `game_id`' unless game_id.present?
   game = $games[game_id]
   halt 400, 'invalid game_id' unless game
   halt 403, 'game is full' if game.players.size >= 4
@@ -32,13 +36,13 @@ post '/join' do
   player = Player.new(params['name'])
   game.add_player!(player)
 
-  { game_id: game.id, player_id: player.id }.to_json
+  { game_id: game.id, player_id: player.id, token: player.token }.to_json
 end
 
 post '/connect' do
   halt 400, 'this is a websocket endpoint' unless request.websocket?
   game_id = params['game_id']
-  halt 400, 'missing required parameter `game_id`' unless game_id&.length > 0
+  halt 400, 'missing required parameter `game_id`' unless game_id.present?
   game = $games[game_id]
   halt 400, 'invalid game_id' unless game
 
@@ -47,6 +51,10 @@ post '/connect' do
     player = game.players.find { |player| player.id == player_id }
     halt 400, 'invalid player_id' unless player
   end
+
+  token = params['token']
+  halt 400, 'missing required parameter `token`' unless token.present?
+  halt 403, 'incorrect token' unless token == player.token
 
   request.websocket do |ws|
     ws.onopen do
