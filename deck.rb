@@ -14,7 +14,7 @@ class Deck
   ).flatten.freeze
 
   def self.deal!(players)
-    raise TichuError, "wrong number of players" unless players.size == 4
+    raise "wrong number of players" unless players.size == 4
     cards = DECK.shuffle
     players.each do |player|
       player.assign_hand!(cards.shift(14))

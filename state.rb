@@ -245,7 +245,7 @@ class State
       scores[out_order[0] % 2] += 200
     else
       loser_index = [0, 1, 2, 3] - out_order
-      raise TichuError, "there can be only one loser" unless loser_index.size == 1
+      raise "there can be only one loser" unless loser_index.size == 1
 
       old_total = scores[0] + scores[1]
       players.each_index do |i|
@@ -257,12 +257,12 @@ class State
           # the hand goes to the opponents
           scores[(i + 1) % 2] += players[i].hand.map(&:points).inject(:+)
         else
-          raise TichuError, "a non-losing player's hand should be empty at this point" unless players[i].hand.empty?
+          raise "a non-losing player's hand should be empty at this point" unless players[i].hand.empty?
           scores[i % 2] += trick_points
         end
       end
       new_total = scores[0] + scores[1]
-      raise TichuError, "apparently I can't count" unless new_total == old_total + 100
+      raise "apparently I can't count" unless new_total == old_total + 100
     end
   end
 
