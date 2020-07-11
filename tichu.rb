@@ -22,7 +22,7 @@ post '/new' do
   player = Player.new(params['name'])
   game.add_player!(player)
 
-  { game_id: game.id, player_id: player.id, token: player.token }.to_json
+  { game_id: game.id, player_id: player.id }.to_json
 end
 
 post '/join' do
@@ -36,7 +36,7 @@ post '/join' do
   player = Player.new(params['name'])
   game.add_player!(player)
 
-  { game_id: game.id, player_id: player.id, token: player.token }.to_json
+  { game_id: game.id, player_id: player.id }.to_json
 end
 
 get '/connect' do
@@ -59,10 +59,6 @@ get '/connect' do
       player = game.players.find { |player| player.id == player_id }
       halt 400, 'invalid player_id' unless player
     end
-
-    token = params['token']
-    halt 400, 'missing required parameter `token`' unless token.present?
-    halt 403, 'incorrect token' unless token == player.token
   end
 
   request.websocket do |ws|

@@ -91,16 +91,16 @@ class State
         wat!(command, websocket)
       end
     rescue TichuError => e
-      send_error_update(websocket, e.message)
+      send_update(websocket, e.message)
     rescue => e
       STDERR.puts e.inspect
       STDERR.puts e.backtrace
-      send_error_update(websocket, "something bad happened :(")
+      send_global_update("something bad happened :(")
     end
   end
 
   def wat!(command, websocket)
-    send_error_update(websocket, "invalid command #{command} in state #{state}")
+    send_update(websocket, "invalid command #{command} in state #{state}")
   end
 
   def perform_passes!
@@ -167,17 +167,14 @@ class State
     next_turn!(player_index, play.is_a?(Dog) ? 2 : 1)
   end
 
-  def claim_trick!(claiming_player_index, give_to_player_id)
+  def claim_trick!(claiming_player_index, give_to_player_index = 0)
     raise TichuError, "you didn't win the trick" if claiming_player_index != trick_winner
-    if dragon_trick && give_to_player_id && give_to_player_id.size > 0
-      dest_index = players.find_index { |player| player.id == give_to_player_id }
-      raise TichuError, "bad give_to_player_id" unless dest_index
-      raise TichuError, "can't give the trick to your teammate" if dest_index.even? == claiming_player_index.even?
-      players[dest_index].take_trick!(plays)
+    if dragon_trick
+      raise TichuError, "you have to give away the trick" unless [1, 3].include?(give_to_player_index)
     else
-      raise TichuError, "you have to give away the trick" if dragon_trick
-      players[claiming_player_index].take_trick!(plays)
+      raise TichuError, "you can't give away the trick" unless give_to_player_index == 0
     end
+    players[(claiming_player_index + give_to_player_index) % 4].take_trick!(plays)
     next_trick
     @turn = claiming_player_index
     start_turn!
@@ -206,14 +203,18 @@ class State
     out_order == [0, 2] || out_order == [2, 0] || out_order == [1, 3] || out_order == [3, 1]
   end
 
-  def send_global_update
+  def send_global_update(error = nil)
     @conns.each do |ws, player_id|
-      ws.send to_h(for_player: player_id).to_json
+      h = to_h(for_player: player_id)
+      h.merge!(error: error) if error
+      ws.send h.to_json
     end
   end
 
-  def send_error_update(websocket, error)
-    websocket.send to_h(for_player: @conns[websocket]).merge(error: error).to_json
+  def send_update(websocket, error = nil)
+    h = to_h(for_player: @conns[websocket])
+    h.merge!(error: error) if error
+    websocket.send h.to_json
   end
 
   def init_round

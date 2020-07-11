@@ -4,12 +4,11 @@ require_relative 'card'
 require_relative 'error'
 
 class Player
-  attr_reader :name, :id, :token, :hand, :hidden_cards, :cards_to_pass, :possible_plays, :tricks, :plays, :tichu
+  attr_reader :name, :id, :hand, :hidden_cards, :cards_to_pass, :possible_plays, :tricks, :plays, :tichu
 
   def initialize(name)
     @name = name
     @id = State.new_id
-    @token = State.new_id # a secret id that prevents other players from connecting as you
     reset_state!
   end
 
@@ -45,7 +44,6 @@ class Player
 
   def to_h(complete: true)
     h = {
-      id: id,
       name: name,
       hand_size: hand.size,
       tichu: tichu,
@@ -54,8 +52,8 @@ class Player
     }
     if complete
       h[:hand] = Card.serialize(hand)
-      h[:can_call_tichu] = can_call_tichu?
-      h[:can_call_grand_tichu] = can_call_grand_tichu?
+      h[:can_tichu] = can_call_tichu?
+      h[:can_gt] = can_call_grand_tichu?
       h[:possible_plays] = Play.serialize_plays(@possible_plays)
     end
     h

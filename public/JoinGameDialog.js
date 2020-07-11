@@ -10,7 +10,7 @@ function JoinGameDialog(_props) {
     const url = gameCode ? '/join' : '/new'
     axios.post(url, null, { params: { name: name, game_id: gameCode } })
       .then(response => {
-        Connect(response.data.game_id, response.data.player_id, response.data.token)
+        Connect(response.data.game_id, response.data.player_id)
       })
       .catch(error => {
         setError(error.toString())

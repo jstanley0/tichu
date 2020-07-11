@@ -1,4 +1,4 @@
-function Game({game_id, player_id, token}) {
+function Game({game_id, player_id}) {
   const { useState, useEffect } = React
   const { Container, TextField, Button } = MaterialUI
 
@@ -8,7 +8,7 @@ function Game({game_id, player_id, token}) {
   const [ gameState, setGameState ] = useState({})
 
   useEffect(() => {
-    const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}&token=${token}`)
+    const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}`)
     ws.onmessage = (event) => {
       setStatus(event.data)
     }
