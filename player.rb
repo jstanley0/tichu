@@ -1,5 +1,7 @@
+require 'byebug'
 require_relative 'state'
 require_relative 'card'
+require_relative 'error'
 
 class Player
   attr_reader :name, :id, :token, :hand, :hidden_cards, :cards_to_pass, :possible_plays, :tricks, :plays, :tichu
@@ -8,11 +10,19 @@ class Player
     @name = name
     @id = State.new_id
     @token = State.new_id # a secret id that prevents other players from connecting as you
+    reset_state!
   end
 
   def assign_hand!(cards)
+    reset_state!
     @hand = cards[0..7]
     @hidden_cards = cards[8..-1]
+  end
+
+  def reset_state!
+    @hand = []
+    @hidden_cards = []
+    @cards_to_pass = []
     @cards_to_pass = []
     @possible_plays = {}
     @tricks = []
@@ -20,7 +30,7 @@ class Player
     @tichu = 0
   end
 
-  def accept_card(card, _from_player: nil)
+  def accept_card(card, from_player: nil)
     # eh, maybe someday I'll feel like tracking which card came from where?
     @hand << card
   end
@@ -44,13 +54,15 @@ class Player
     }
     if complete
       h[:hand] = Card.serialize(hand)
+      h[:can_call_tichu] = can_call_tichu?
+      h[:can_call_grand_tichu] = can_call_grand_tichu?
       h[:possible_plays] = Play.serialize_plays(@possible_plays)
     end
     h
   end
 
   def uncover_last_6!
-    raise "already uncovered last 6" if @hidden_cards.empty?
+    raise TichuError, "already uncovered last 6" if @hidden_cards.empty?
     @hand.concat(@hidden_cards)
     @hidden_cards = []
   end
@@ -60,21 +72,28 @@ class Player
   end
 
   def pass_cards!(cards)
-    raise "pass_cards! expected 3 cards" unless cards.size == 3
+    raise TichuError, "pass_cards! expected 3 cards" unless cards&.size == 3
+    raise TichuError, "must uncover cards first" unless @hidden_cards.empty?
     cards = Card.deserialize(cards)
     remove_cards!(cards)
     @cards_to_pass = cards
   end
 
+  def can_call_tichu?
+    tichu == 0 && hidden_cards.size == 0 && plays.empty?
+  end
+
   def call_tichu!
-    raise "you have already played a card" if plays.any?
-    raise "you have already called tichu or grand tichu" if tichu != 0
+    raise TichuError, "can't call tichu" unless can_call_tichu?
     @tichu = 100
   end
 
+  def can_call_grand_tichu?
+    hidden_cards.size >= 6
+  end
+
   def call_grand_tichu!
-    raise "you have seen all your cards" if hidden_cards.empty?
-    raise "you have already called tichu or grand tichu" if tichu != 0
+    raise TichuError, "can't call grand tichu" unless can_call_grand_tichu?
     @tichu = 200
   end
 
@@ -88,7 +107,8 @@ class Player
   end
 
   def remove_cards!(cards)
-    raise "you tried to use a card you don't have" unless (cards - hand).empty?
+    raise TichuError, "you tried to use a card more than once" unless cards.uniq.size == cards.size
+    raise TichuError, "you tried to use a card you don't have" unless (cards - hand).empty?
     @hand -= cards
     cards
   end

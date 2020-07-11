@@ -4,12 +4,11 @@ class Card
   QUEEN = 12
   KING = 13
   ACE = 14
-  # dragon is greater than ace but not adjacent to it (can't be part of a straight)
-  # eh, make it 2 greater than ace so a phoenix can't be used to bridge that gap :P
-  DRAGON = 17
-  # these two are just weird, sry
-  PHOENIX = -1
-  DOG = -2
+  # skip ranks so they won't form straights
+  PHOENIX = 16
+  DRAGON = 18
+  # sort low
+  DOG = -1
 
   attr_accessor :suit, :rank
 
@@ -18,12 +17,20 @@ class Card
     @rank = rank
   end
 
+  def eql?(rhs)
+    self.hash == rhs.hash
+  end
+
   def ==(rhs)
-    self.suit == rhs.suit && self.rank == rhs.rank
+    eql?(rhs)
+  end
+
+  def hash
+    @suit * 100 + @rank
   end
 
   def <=>(rhs)
-    (self.suit * 100 + self.rank) <=> (rhs.suit * 100 + rhs.rank)
+    self.hash <=> rhs.hash
   end
 
   def self.deserialize(card_or_array)
@@ -86,7 +93,7 @@ class Card
   end
 
   def self.serialize(cards)
-    cards.map(&:to_s)
+    cards.sort_by(&:rank).map(&:to_s)
   end
 
   def phoenix?
@@ -171,12 +178,12 @@ class Card
     when JACK
       'J'
     else
-      @rank.to_s
+      rank.to_s
     end
   end
 
   def self.rank_from_string(rank_string)
-    case @rank
+    case rank_string
     when 'D'
       DRAGON
     when 'P'
@@ -202,7 +209,7 @@ class Card
   end
 
   def self.from_string(s)
-    suit, rank = s.match(/([rgbk]?)(.+)/)
-    self.class.new(suit_from_string(suit), rank_from_string(rank))
+    suit, rank = s.match(/([rgbk]?)(.+)/).to_a[1..-1]
+    self.new(suit_from_string(suit), rank_from_string(rank))
   end
 end

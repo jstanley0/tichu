@@ -1,4 +1,5 @@
 require_relative 'card'
+require_relative 'error'
 
 class Deck
   # cards that can be wished for, etc.
@@ -13,7 +14,7 @@ class Deck
   ).flatten.freeze
 
   def self.deal!(players)
-    raise "wrong number of players" unless players.size == 4
+    raise TichuError, "wrong number of players" unless players.size == 4
     cards = DECK.shuffle
     players.each do |player|
       player.assign_hand!(cards.shift(14))

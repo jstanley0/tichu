@@ -39,22 +39,31 @@ post '/join' do
   { game_id: game.id, player_id: player.id, token: player.token }.to_json
 end
 
-post '/connect' do
+get '/connect' do
   halt 400, 'this is a websocket endpoint' unless request.websocket?
-  game_id = params['game_id']
+  game_id = params['game_id'].upcase.strip
   halt 400, 'missing required parameter `game_id`' unless game_id.present?
-  game = $games[game_id]
-  halt 400, 'invalid game_id' unless game
+  if game_id == 'TEST'
+    # shortcut to save time when testing this thing
+    game = ($games['TEST'] ||= State.new)
+    halt 400, 'test game is full' if game.players.size == 4
+    player = Player.new("Player #{game.players.size}")
+    player_id = player.id
+    game.add_player!(player)
+  else
+    game = $games[game_id]
+    halt 400, 'invalid game_id' unless game
 
-  player_id = params['player_id']
-  if player_id
-    player = game.players.find { |player| player.id == player_id }
-    halt 400, 'invalid player_id' unless player
+    player_id = params['player_id']
+    if player_id
+      player = game.players.find { |player| player.id == player_id }
+      halt 400, 'invalid player_id' unless player
+    end
+
+    token = params['token']
+    halt 400, 'missing required parameter `token`' unless token.present?
+    halt 403, 'incorrect token' unless token == player.token
   end
-
-  token = params['token']
-  halt 400, 'missing required parameter `token`' unless token.present?
-  halt 403, 'incorrect token' unless token == player.token
 
   request.websocket do |ws|
     ws.onopen do

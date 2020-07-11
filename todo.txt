@@ -1,0 +1,4 @@
+[ ] eliminate Player token; use id for this purpose. don't expose id to other players; they just use index (0 = self)
+[ ] make protocol terser
+[ ] some sort of event log
+[ ] automated player that basically plays randomly

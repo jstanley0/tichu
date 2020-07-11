@@ -1,6 +1,9 @@
 require 'securerandom'
 require 'json'
 require_relative 'play'
+require_relative 'deck'
+require_relative 'card'
+require_relative 'error'
 
 class State
   # state is one of: :joining, :passing, :playing, :over
@@ -17,7 +20,7 @@ class State
   end
 
   def add_player!(player)
-    raise "game is full" if players.size == 4
+    raise TichuError, "game is full" if players.size == 4
     @players << player
 
     if players.size == 4
@@ -29,6 +32,7 @@ class State
 
   def connect!(websocket, player_id = nil)
     @conns[websocket] = player_id
+    websocket.send to_h(for_player: player_id).to_json
   end
 
   def disconnect!(websocket)
@@ -86,14 +90,17 @@ class State
       when :over
         wat!(command, websocket)
       end
+    rescue TichuError => e
+      send_error_update(websocket, e.message)
     rescue => e
-      websocket.send({error: e.message}.to_json)
+      STDERR.puts e.inspect
+      STDERR.puts e.backtrace
+      send_error_update(websocket, "something bad happened :(")
     end
-
   end
 
   def wat!(command, websocket)
-    websocket.send({error: "invalid command #{command} in state #{state}"}.to_json)
+    send_error_update(websocket, "invalid command #{command} in state #{state}")
   end
 
   def perform_passes!
@@ -108,7 +115,7 @@ class State
 
   def start_round!
     @state = :playing
-    @turn = players.find_index { |player| player.cards.find(&:sparrow?) }
+    @turn = players.find_index { |player| player.hand.find(&:sparrow?) }
     start_turn!
   end
 
@@ -141,7 +148,7 @@ class State
   def make_play!(player_index, play, wished_rank)
     cards = Card.deserialize(play)
     play = players[player_index].find_play(cards)
-    raise "invalid play" unless play
+    raise TichuError, "invalid play" unless play
     players[player_index].make_play!(play)
     if players[player_index].hand.empty?
       @out_order << player_index
@@ -150,7 +157,7 @@ class State
 
     if play.cards.any?(&:sparrow?) && wished_rank && !wished_rank.empty?
       chosen_rank = Card.rank_from_string(wished_rank)
-      raise "invalid wished_rank #{wished_rank}" if !chosen_rank || chosen_rank < 2 || chosen_rank > Card::ACE
+      raise TichuError, "invalid wished_rank #{wished_rank}" if !chosen_rank || chosen_rank < 2 || chosen_rank > Card::ACE
       @wish_rank = chosen_rank
     elsif wish_rank
       @wish_rank = nil if play.fulfills_wish?(@wish_rank)
@@ -161,14 +168,14 @@ class State
   end
 
   def claim_trick!(claiming_player_index, give_to_player_id)
-    raise "you didn't win the trick" if claiming_player_index != trick_winner
+    raise TichuError, "you didn't win the trick" if claiming_player_index != trick_winner
     if dragon_trick && give_to_player_id && give_to_player_id.size > 0
       dest_index = players.find_index { |player| player.id == give_to_player_id }
-      raise "bad give_to_player_id" unless dest_index
-      raise "can't give the trick to your teammate" if dest_index.even? == claiming_player_index.even?
+      raise TichuError, "bad give_to_player_id" unless dest_index
+      raise TichuError, "can't give the trick to your teammate" if dest_index.even? == claiming_player_index.even?
       players[dest_index].take_trick!(plays)
     else
-      raise "you have to give away the trick" if dragon_trick
+      raise TichuError, "you have to give away the trick" if dragon_trick
       players[claiming_player_index].take_trick!(plays)
     end
     next_trick
@@ -205,8 +212,12 @@ class State
     end
   end
 
+  def send_error_update(websocket, error)
+    websocket.send to_h(for_player: @conns[websocket]).merge(error: error).to_json
+  end
+
   def init_round
-    raise "not enough players" unless players.size == 4
+    raise TichuError, "not enough players" unless players.size == 4
     Deck.deal!(@players)
     @state = :passing
     @wish_rank = nil
@@ -233,7 +244,7 @@ class State
       scores[out_order[0] % 2] += 200
     else
       loser_index = [0, 1, 2, 3] - out_order
-      raise "there can be only one loser" unless loser_index.size == 1
+      raise TichuError, "there can be only one loser" unless loser_index.size == 1
 
       old_total = scores[0] + scores[1]
       players.each_index do |i|
@@ -245,12 +256,12 @@ class State
           # the hand goes to the opponents
           scores[(i + 1) % 2] += players[i].hand.map(&:points).inject(:+)
         else
-          raise "a non-losing player's hand should be empty at this point" unless players[i].hand.empty?
+          raise TichuError, "a non-losing player's hand should be empty at this point" unless players[i].hand.empty?
           scores[i % 2] += trick_points
         end
       end
       new_total = scores[0] + scores[1]
-      raise "apparently I can't count" unless new_total == old_total + 100
+      raise TichuError, "apparently I can't count" unless new_total == old_total + 100
     end
   end
 
