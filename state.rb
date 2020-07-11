@@ -280,8 +280,8 @@ class State
       end_score: end_score,
       state: state,
       wish_rank: Card.rank_string(wish_rank),
-      turn: turn.is_a?(Numeric) ? players[turn].id : nil,
-      trick_winner: trick_winner ? players[trick_winner].id : nil,
+      turn: turn.is_a?(Numeric) ? rotate_index(turn, for_player) : nil,
+      trick_winner: trick_winner ? rotate_index(trick_winner, for_player) : nil,
       dragon_trick: dragon_trick
     }
   end
@@ -294,8 +294,15 @@ class State
     scores.rotate(player_index(for_player) % 2)
   end
 
+  def rotate_index(index, for_player)
+    (index + player_index(for_player)) % 4
+  end
+
   def player_index(for_player)
-    players.find_index { |p| p.id == for_player } || 0
+    return 0 unless for_player
+    @index ||= {}
+    @index[for_player] ||= players.find_index { |player| player.id == for_player }
+    @index[for_player]
   end
 
   def self.new_id

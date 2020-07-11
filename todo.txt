@@ -1,4 +1,5 @@
-[ ] eliminate Player token; use id for this purpose. don't expose id to other players; they just use index (0 = self)
-[ ] make protocol terser
+[X] eliminate Player token; use id for this purpose. don't expose id to other players; they just use index (0 = self)
+[x] make protocol terser
 [ ] some sort of event log
-[ ] automated player that basically plays randomly
+[.] automated player that basically plays randomly
+[ ] let the VIP shuffle players before the game starts

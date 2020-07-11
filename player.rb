@@ -47,7 +47,7 @@ class Player
       name: name,
       hand_size: hand.size,
       tichu: tichu,
-      points_taken: tricks.map(&:points).inject(:+),
+      points_taken: tricks.map(&:points).inject(:+) || 0,
       passed_cards: cards_to_pass.any?
     }
     if complete
@@ -78,7 +78,7 @@ class Player
   end
 
   def can_call_tichu?
-    tichu == 0 && hidden_cards.size == 0 && plays.empty?
+    hand.size == 14 && tichu == 0 && hidden_cards.size == 0 && plays.empty?
   end
 
   def call_tichu!
@@ -87,7 +87,7 @@ class Player
   end
 
   def can_call_grand_tichu?
-    hidden_cards.size >= 6
+    hand.size <= 8 && hidden_cards.size >= 6
   end
 
   def call_grand_tichu!

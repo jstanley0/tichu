@@ -79,6 +79,7 @@ end
 class Pass < Play
   def self.enumerate(cards, prev_play)
     return [Pass.new([])] if prev_play
+    return []
   end
 end
 
@@ -87,6 +88,7 @@ class Dog < Play
     return [] if prev_play
     dogs = cards.select(&:dog?) # there's only one but a play has an array of cards so
     return [Dog.new(dogs)] if dogs.any?
+    return []
   end
 end
 
@@ -105,7 +107,7 @@ class Single < Play
       else
         card.rank
       end
-      next if prev_play&.rank >= rank
+      next if prev_play && prev_play.rank >= rank
       plays << Single.new([card], rank)
     end
     plays
@@ -120,7 +122,7 @@ class Pair < Play
     with_phoenix_substitution(h) do |hand|
       Card.groups(hand, 2).each do |cards|
         rank = cards[0].rank
-        next if prev_play&.rank >= rank
+        next if prev_play && prev_play.rank >= rank
         plays << Pair.new(cards, rank)
       end
     end
@@ -136,7 +138,7 @@ class Triple < Play
     with_phoenix_substitution(h) do |hand|
       Card.groups(hand, 3).each do |cards|
         rank = cards[0].rank
-        next if prev_play&.rank >= rank
+        next if prev_play && prev_play.rank >= rank
         plays << Triple.new(cards, rank)
       end
     end
@@ -154,7 +156,7 @@ class Straight < Play
     with_phoenix_substitution(h) do |hand|
       Card.sequences(hand, min_size, max_size).each do |cards|
         rank = cards[-1].rank
-        next if prev_play&.rank >= rank
+        next if prev_play && prev_play.rank >= rank
         plays << Straight.new(cards, rank)
       end
     end
@@ -192,7 +194,7 @@ class FullHouse < Play
       combos = trips.product(pairs).reject { |combo| combo[0][0].rank == combo[1][0].rank }
       combos.each do |combo|
         rank = combo[0][0].rank
-        next if prev_play&.rank >= rank
+        next if prev_play && prev_play.rank >= rank
         # when making a full house out of two pairs plus a phoenix, use the phoenix with the higher rank
         if combo[0].any?(&:substituted_phoenix?)
           next if rank < combo[1][0].rank
@@ -210,12 +212,12 @@ class Bomb < Play
     prev_bomb = prev_play&.is_a?(Bomb) && prev_play
     Card.groups(hand, 4).each do |cards|
       rank = cards[0].rank
-      next if prev_bomb&.rank >= rank
+      next if prev_bomb && prev_bomb.rank >= rank
       plays << Bomb.new(cards, rank)
     end
     Card.flush_sequences(hand, 5, 14).each do |cards|
       rank = cards.size * 100 + cards[-1].rank
-      next if prev_bomb&.rank >= rank
+      next if prev_bomb && prev_bomb.rank >= rank
       plays << Bomb.new(cards, rank)
     end
     plays
