@@ -46,7 +46,7 @@ class Card
     groups = []
     hand.group_by(&:rank).each_value do |cards|
       next if cards.size < size
-      groups.concat cards.combination(size)
+      groups.concat cards.combination(size).to_a
     end
     groups
   end

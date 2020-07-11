@@ -22,5 +22,9 @@ class Deck
 
   end
 
+  def self.test_hand
+    DECK.shuffle[0..13]
+  end
+
 end
 
