@@ -4,7 +4,7 @@ require_relative 'card'
 require_relative 'error'
 
 class Player
-  attr_reader :name, :id, :hand, :hidden_cards, :cards_to_pass, :possible_plays, :tricks, :plays, :tichu
+  attr_reader :name, :id, :hand, :hidden_cards, :cards_to_pass, :possible_plays, :points, :plays, :tichu
 
   def initialize(name)
     @name = name
@@ -23,9 +23,9 @@ class Player
     @hidden_cards = []
     @cards_to_pass = []
     @cards_to_pass = []
-    @possible_plays = {}
-    @tricks = []
+    @possible_plays = []
     @plays = []
+    @points = 0
     @tichu = 0
   end
 
@@ -34,8 +34,8 @@ class Player
     @hand << card
   end
 
-  def set_possible_plays!(play_hash)
-    @possible_plays = play_hash
+  def set_possible_plays!(plays)
+    @possible_plays = plays
   end
 
   def find_play(cards)
@@ -47,7 +47,7 @@ class Player
       name: name,
       hand_size: hand.size,
       tichu: tichu,
-      points_taken: tricks.map(&:points).inject(:+) || 0,
+      points_taken: points,
       passed_cards: cards_to_pass.any?
     }
     if complete
@@ -101,7 +101,7 @@ class Player
   end
 
   def take_trick!(trick)
-    @tricks << trick
+    @points += trick.map(&:points).inject(:+)
   end
 
   def remove_cards!(cards)

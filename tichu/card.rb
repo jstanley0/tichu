@@ -32,15 +32,17 @@ class Card
 
   def sequence_number
     # number each card 0 to 55
-    case rank
-    when DOG
-      0
-    when 1
-      1
-    when PHOENIX
-      54
-    when DRAGON
-      55
+    if suit == 0
+      case rank
+      when DOG
+        0
+      when 1
+        1
+      when DRAGON
+        55
+      else # ensure substituted phoenix keeps its card number
+        54
+      end
     else
       2 + (rank - 2) * 4 + suit - 1
     end
@@ -115,7 +117,7 @@ class Card
   end
 
   def self.serialize(cards)
-    cards.sort_by(&:rank).map(&:to_s)
+    cards.map(&:to_s)
   end
 
   def phoenix?
@@ -161,7 +163,7 @@ class Card
 
   def points
     return -25 if phoenix?
-    return 25 if @rank == DRAGON
+    return 25 if dragon?
     return 10 if @rank == 10 || @rank == KING
     return 5 if @rank == 5
     0

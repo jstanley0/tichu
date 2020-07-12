@@ -1,5 +1,6 @@
 require 'securerandom'
 require 'json'
+require 'byebug'
 require_relative 'play'
 require_relative 'deck'
 require_relative 'card'
@@ -7,8 +8,8 @@ require_relative 'error'
 
 class State
   # state is one of: :joining, :passing, :playing, :over
-  attr_reader :id, :state, :players, :plays, :tricks, :wish_rank, :turn,
-              :scores, :out_order, :end_score, :trick_winner, :dragon_trick
+  attr_reader :id, :state, :players, :plays, :wish_rank, :turn, :scores,
+              :out_order, :end_score, :trick_winner, :dragon_trick, :action
 
   def initialize(end_score: 1000)
     @state = :joining
@@ -27,6 +28,7 @@ class State
       init_round
     end
 
+    set_action(player, "joined")
     send_global_update
   end
 
@@ -60,16 +62,20 @@ class State
         case command
         when 'back6'
           player.uncover_last_6!
+          set_action(player, "took remaining cards")
           send_global_update
         when 'pass_cards'
           player.pass_cards!(json['cards'])
+          set_action(player, "passed cards")
           perform_passes! if players.all?(&:passed_cards?)
           send_global_update
         when 'grand_tichu'
           player.call_grand_tichu!
+          set_action(player, "called Grand Tichu")
           send_global_update
         when 'tichu'
           player.call_tichu!
+          set_action(player, "called Tichu")
           send_global_update
         else
           wat!(command, websocket)
@@ -78,11 +84,14 @@ class State
         case command
         when 'tichu'
           player.call_tichu!
+          set_action(player, "called Tichu")
           send_global_update
         when 'claim_trick'
           claim_trick!(player_index, json['to_player'])
+          send_global_update
         when 'play'
           make_play!(player_index, json['cards'], json['wished_rank'])
+          set_action(player, "played #{json['cards'].inspect}")
           send_global_update
         else
           wat!(command, websocket)
@@ -128,6 +137,7 @@ class State
         @trick_winner = @turn
         @dragon_trick = last_frd_play.cards.any?(&:dragon?)
         @turn = :limbo
+        break
       else
         # if the player has gone out, proceed to the next player
         break if players[@turn].hand.any?
@@ -139,7 +149,7 @@ class State
       possible_plays = if @turn == index
         Play.enumerate(player.hand, plays.last, wish_rank)
       else
-        Play.enumerate_bombs(player.hand, plays.last)
+        Bomb.enumerate(player.hand, plays.last)
       end
       player.set_possible_plays!(possible_plays)
     end
@@ -174,14 +184,16 @@ class State
     else
       raise TichuError, "you can't give away the trick" unless give_to_player_index == 0
     end
-    players[(claiming_player_index + give_to_player_index) % 4].take_trick!(plays)
+    recipient_index = (claiming_player_index + give_to_player_index) % 4
+    players[recipient_index].take_trick!(plays)
+    trick_msg = (recipient_index == claiming_player_index) ? "took the trick" : "passed the trick to #{players[recipient_index].name}"
+    set_action(players[claiming_player_index], trick_msg)
     next_trick
     @turn = claiming_player_index
     start_turn!
   end
 
   def next_trick
-    @tricks << plays
     @plays = []
     @trick_winner = nil
     @dragon_trick = false
@@ -195,6 +207,7 @@ class State
       start_turn!
     end
   end
+
   def round_over?
     out_order.size == 3 || one_two_finish?
   end
@@ -209,6 +222,7 @@ class State
       h.merge!(error: error) if error
       ws.send h.to_json
     end
+    @action = nil
   end
 
   def send_update(websocket, error = nil)
@@ -246,10 +260,11 @@ class State
     else
       loser_index = [0, 1, 2, 3] - out_order
       raise "there can be only one loser" unless loser_index.size == 1
+      loser_index = loser_index[0]
 
       old_total = scores[0] + scores[1]
       players.each_index do |i|
-        trick_points = players[i].tricks.map(&:points).inject(:+)
+        trick_points = players[i].points
         if i == loser_index
           # tricks go to whoever went out first
           scores[out_order[0] % 2] += trick_points
@@ -262,6 +277,7 @@ class State
         end
       end
       new_total = scores[0] + scores[1]
+      debugger unless new_total == old_total + 100
       raise "apparently I can't count" unless new_total == old_total + 100
     end
   end
@@ -282,8 +298,15 @@ class State
       wish_rank: Card.rank_string(wish_rank),
       turn: turn.is_a?(Numeric) ? rotate_index(turn, for_player) : nil,
       trick_winner: trick_winner ? rotate_index(trick_winner, for_player) : nil,
-      dragon_trick: dragon_trick
+      dragon_trick: dragon_trick,
+      action: action
     }
+  end
+
+  def set_action(player, action)
+    action_str = "#{player.name} #{action}"
+    puts action_str
+    @action = action_str
   end
 
   def rotate_players(for_player)
@@ -295,7 +318,7 @@ class State
   end
 
   def rotate_index(index, for_player)
-    (index + player_index(for_player)) % 4
+    (index - player_index(for_player)) % 4
   end
 
   def player_index(for_player)

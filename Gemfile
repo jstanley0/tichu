@@ -8,4 +8,4 @@ gem "activesupport"
 
 # used by tichu_bot
 gem "websocket-eventmachine-client"
-gem "awesome_print"
+gem "amazing_print"

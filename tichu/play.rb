@@ -25,10 +25,6 @@ class Play
     plays
   end
 
-  def self.enumerate_bombs(hand, prev_play)
-    {'Bomb' => Bomb.enumerate(hand, prev_play)}
-  end
-
   def tag(player_index)
     @player_index = player_index
     self
@@ -64,7 +60,7 @@ class Play
   end
 
   def points
-    cards.map(&:points).inject(:+)
+    cards.map(&:points).inject(:+) || 0
   end
 
   def match?(cards)
@@ -77,11 +73,11 @@ class Play
   end
 
   def to_h
-    { cards: Card.serialize(cards), rank: rank }
+    Card.serialize(cards)
   end
 
   def self.serialize_plays(enumerated_plays)
-    enumerated_plays.transform_values { |play| play.to_h }
+    enumerated_plays.map(&:to_h)
   end
 end
 

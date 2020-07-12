@@ -5,7 +5,7 @@ require 'json'
 require 'websocket-eventmachine-client'
 require 'active_support'
 require 'active_support/core_ext'
-require 'awesome_print'
+require 'amazing_print'
 
 URL = "ws://localhost:4567/connect?game_id=test&player_id=test"
 
@@ -26,10 +26,12 @@ EM.run do
 
   ws.onclose do |code, reason|
     puts "Disconnected code=#{code} reason=#{reason}"
+    exit
   end
 
   ws.onerror do |error|
     puts "Error: #{error}"
+    exit
   end
 
   ws.onmessage do |msg, _type|
@@ -38,7 +40,7 @@ EM.run do
     if condition.is_a?(Proc)
       if condition.call(data)
         condition = nil
-      else
+      elsif data['error'].blank?
         puts "..."
         next
       end
@@ -47,7 +49,7 @@ EM.run do
     puts "<=== received game state"
     ap data
 
-    break if data['error'].present?
+    exit if data['error'].present?
 
     case data['state']
     when 'passing'
@@ -61,8 +63,12 @@ EM.run do
     when 'playing'
       if data['turn'] == 0
         plays = data['players'][0]['possible_plays']
-        ap plays
-
+        send_command(ws, 'play', cards: plays.sample)
+        condition = ->(data) { data['turn'] != 0 }
+      end
+      if data['turn'] == nil && data['trick_winner'] == 0
+        send_command(ws, 'claim_trick', to_player: data['dragon_trick'] ? 1 : 0)
+        condition = ->(data) { data['turn'] != nil }
       end
     when 'over'
       ws.close
