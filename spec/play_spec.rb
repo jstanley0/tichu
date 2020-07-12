@@ -19,6 +19,8 @@ describe Play do
     expect(Single.enumerate(hand, nil).size).to eq 13
     expect(Single.enumerate(hand, Single.new(Card.deserialize(%w(r4)), 4)).size).to eq 7
     expect(Single.enumerate(hand, Pair.new(Card.deserialize(%w(b4 r4)), 4)).size).to eq 0
+    expect(Single.enumerate([Card.new(0, Card::PHOENIX)], Single.new([Card.new(0, Card::ACE)], Card::ACE)).size).to eq 1
+    expect(Single.enumerate([Card.new(0, Card::PHOENIX)], Single.new([Card.new(0, Card::DRAGON)], Card::DRAGON)).size).to eq 0
   end
 
   it "enumerates Pair" do

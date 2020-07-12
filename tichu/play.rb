@@ -108,7 +108,7 @@ class Single < Play
     hand.each do |card|
       next if card.dog?
       rank = if card.phoenix?
-        if prev_play
+        if prev_play && prev_play.rank < Card::DRAGON
           prev_play.rank + 0.5
         else
           1.5
