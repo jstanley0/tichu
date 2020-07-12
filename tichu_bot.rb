@@ -5,7 +5,7 @@ require 'json'
 require 'websocket-eventmachine-client'
 require 'active_support'
 require 'active_support/core_ext'
-require 'ap'
+require 'awesome_print'
 
 URL = "ws://localhost:4567/connect?game_id=test&player_id=test"
 
