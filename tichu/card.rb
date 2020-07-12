@@ -94,11 +94,11 @@ class Card
     # enumerate all subsequences in the desired size range
     card_sequences = []
     rank_seqs.each do |rank_seq|
-      for size in min_size..max_size
+      for size in min_size..[rank_seq.size, max_size].min
         rank_seq.each_cons(size) do |rank_subseq|
           card_groups = rank_subseq.map { |rank| groups[rank] }
           first_card_group = card_groups.shift
-          card_sequences.concat(first_card_group.product(card_groups))
+          card_sequences.concat(first_card_group.product(*card_groups))
         end
       end
     end

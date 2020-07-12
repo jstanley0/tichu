@@ -14,23 +14,23 @@ describe Card do
     end
 
     it 'finds groups of 4' do
-      expect(Card.groups(hand, 4).first).to match_array Card.deserialize(%w(r2 g2 b2 k2))
+      expect(Card.groups(hand, 4).size).to eq 1
     end
   end
 
   describe "sequences" do
     it 'finds sequences' do
-      expect(Card.sequences(hand, 5, 14)).to eq []
+      expect(Card.sequences(hand, 5, 14).size).to eq 63
     end
 
     it 'finds limited sequences' do
-      expect(Card.sequences(hand, 5, 5)).to eq []
+      expect(Card.sequences(hand, 5, 5).size).to eq 27
     end
   end
 
   describe "flush_sequences" do
     it 'finds flushes' do
-      expect(Card.flush_sequences(hand, 5, 14)).to eq []
+      expect(Card.flush_sequences(hand, 5, 14).size).to eq 3
     end
   end
 end

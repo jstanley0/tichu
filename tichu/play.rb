@@ -22,7 +22,7 @@ class Play
       end
     end
 
-    plays.index_by(&:type)
+    plays
   end
 
   def self.enumerate_bombs(hand, prev_play)
@@ -39,7 +39,7 @@ class Play
   end
 
   def hash
-    Card.hand_signature(cards)
+    @hash ||= Card.hand_signature(cards)
   end
 
   def self.with_phoenix_substitution(hand)
@@ -125,9 +125,9 @@ end
 
 class Pair < Play
   def self.enumerate(h, prev_play)
+    return [] unless prev_play.nil? || prev_play.is_a?(Pair)
+    return [] unless h.size >= 2
     plays = Set.new
-    return plays unless prev_play.nil? || prev_play.is_a?(Pair)
-    return plays unless h.size >= 2
     with_phoenix_substitution(h) do |hand|
       Card.groups(hand, 2).each do |cards|
         rank = cards[0].rank
@@ -141,9 +141,9 @@ end
 
 class Triple < Play
   def self.enumerate(h, prev_play)
+    return [] unless prev_play.nil? || prev_play.is_a?(Triple)
+    return [] unless h.size >= 3
     plays = Set.new
-    return plays unless prev_play.nil? || prev_play.is_a?(Triple)
-    return plays unless h.size >= 3
     with_phoenix_substitution(h) do |hand|
       Card.groups(hand, 3).each do |cards|
         rank = cards[0].rank
@@ -157,9 +157,9 @@ end
 
 class Straight < Play
   def self.enumerate(h, prev_play)
+    return [] unless prev_play.nil? || prev_play.is_a?(Straight)
+    return [] unless h.size >= 5
     plays = Set.new
-    return plays unless prev_play.nil? || prev_play.is_a?(Straight)
-    return plays unless h.size >= 5
     min_size = prev_play&.size || 5
     max_size = prev_play&.size || 14
     with_phoenix_substitution(h) do |hand|
@@ -176,17 +176,21 @@ end
 
 class Ladder < Play
   def self.enumerate(h, prev_play)
+    return [] unless prev_play.nil? || prev_play.is_a?(Ladder)
+    return [] unless h.size >= 4
     plays = Set.new
-    return plays unless prev_play.nil? || prev_play.is_a?(Ladder)
-    return plays unless h.size >= 4
     min_size = prev_play&.size || 4
     max_size = prev_play&.size || 14
     with_phoenix_substitution(h) do |hand|
       pairs = Card.groups(hand, 2)
-      ranks = pairs.map { |cards| cards[0] }
+      ranks = pairs.map { |cards| cards[0] }.uniq(&:rank)
       Card.sequences(ranks, min_size / 2, max_size / 2).each do |half_ladder|
-        play_cards = half_ladder.map(&:rank).map { |rank| pairs.find { |p| p[0].rank == rank } }.flatten
-        plays << Ladder.new(play_cards, play_cards[-1].rank)
+        ladder_groups = half_ladder.map { |card| pairs.select { |p| p[0].rank == card.rank } }
+        first_group = ladder_groups.shift
+        first_group.product(*ladder_groups).map(&:flatten).each do |ladder|
+          rank = ladder[-1].rank
+          plays << Ladder.new(ladder, rank) unless prev_play && prev_play.rank >= rank
+        end
       end
     end
     plays.to_a
@@ -195,9 +199,9 @@ end
 
 class FullHouse < Play
   def self.enumerate(h, prev_play)
+    return [] unless prev_play.nil? || prev_play.is_a?(FullHouse)
+    return [] unless h.size >= 5
     plays = Set.new
-    return plays unless prev_play.nil? || prev_play.is_a?(FullHouse)
-    return plays unless h.size >= 5
     with_phoenix_substitution(h) do |hand|
       trips = Card.groups(hand, 3)
       pairs = Card.groups(hand, 2)
