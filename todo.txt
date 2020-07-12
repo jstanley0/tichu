@@ -3,3 +3,5 @@
 [ ] some sort of event log
 [.] automated player that basically plays randomly
 [ ] let the VIP shuffle players before the game starts
+[.] test card functions
+[ ] test play logic

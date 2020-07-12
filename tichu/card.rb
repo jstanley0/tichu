@@ -35,7 +35,7 @@ class Card
 
   def self.deserialize(card_or_array)
     if card_or_array.is_a?(Array)
-      card_or_array.map { |s| deserialize(s) }
+      card_or_array.map { |s| from_string(s) }
     else
       from_string(card_or_array)
     end
@@ -147,6 +147,10 @@ class Card
 
   def to_s
     "#{suit_string}#{rank_string}"
+  end
+
+  def inspect
+    to_s
   end
 
   def suit_string
