@@ -26,7 +26,29 @@ class Card
   end
 
   def hash
-    @suit * 100 + @rank
+    # a single bit; this way we can bitwise OR card hashes to get a play signature
+    1 << sequence_number
+  end
+
+  def sequence_number
+    # number each card 0 to 55
+    case rank
+    when DOG
+      0
+    when 1
+      1
+    when PHOENIX
+      54
+    when DRAGON
+      55
+    else
+      2 + (rank - 2) * 4 + suit - 1
+    end
+  end
+
+  # :|
+  def self.hand_signature(cards)
+    cards.map(&:hash).inject(:|)
   end
 
   def <=>(rhs)

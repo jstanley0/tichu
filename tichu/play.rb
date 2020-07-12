@@ -1,3 +1,4 @@
+require 'set'
 require_relative 'card'
 
 class Play
@@ -33,6 +34,14 @@ class Play
     self
   end
 
+  def eql?(rhs)
+    hash == rhs.hash
+  end
+
+  def hash
+    Card.hand_signature(cards)
+  end
+
   def self.with_phoenix_substitution(hand)
     phoenix = hand.find(&:phoenix?)
     if phoenix
@@ -59,7 +68,7 @@ class Play
   end
 
   def match?(cards)
-    @cards.sort == cards.sort
+    hash == Card::hand_signature(cards)
   end
 
   def fulfills_wish?(wish_rank)
@@ -116,7 +125,7 @@ end
 
 class Pair < Play
   def self.enumerate(h, prev_play)
-    plays = []
+    plays = Set.new
     return plays unless prev_play.nil? || prev_play.is_a?(Pair)
     return plays unless h.size >= 2
     with_phoenix_substitution(h) do |hand|
@@ -126,13 +135,13 @@ class Pair < Play
         plays << Pair.new(cards, rank)
       end
     end
-    plays
+    plays.to_a
   end
 end
 
 class Triple < Play
   def self.enumerate(h, prev_play)
-    plays = []
+    plays = Set.new
     return plays unless prev_play.nil? || prev_play.is_a?(Triple)
     return plays unless h.size >= 3
     with_phoenix_substitution(h) do |hand|
@@ -142,13 +151,13 @@ class Triple < Play
         plays << Triple.new(cards, rank)
       end
     end
-    plays
+    plays.to_a
   end
 end
 
 class Straight < Play
   def self.enumerate(h, prev_play)
-    plays = []
+    plays = Set.new
     return plays unless prev_play.nil? || prev_play.is_a?(Straight)
     return plays unless h.size >= 5
     min_size = prev_play&.size || 5
@@ -157,16 +166,17 @@ class Straight < Play
       Card.sequences(hand, min_size, max_size).each do |cards|
         rank = cards[-1].rank
         next if prev_play && prev_play.rank >= rank
+        next if cards.map(&:suit).uniq.size == 1  # bombs don't count here
         plays << Straight.new(cards, rank)
       end
     end
-    plays
+    plays.to_a
   end
 end
 
 class Ladder < Play
   def self.enumerate(h, prev_play)
-    plays = []
+    plays = Set.new
     return plays unless prev_play.nil? || prev_play.is_a?(Ladder)
     return plays unless h.size >= 4
     min_size = prev_play&.size || 4
@@ -179,13 +189,13 @@ class Ladder < Play
         plays << Ladder.new(play_cards, play_cards[-1].rank)
       end
     end
-    plays
+    plays.to_a
   end
 end
 
 class FullHouse < Play
   def self.enumerate(h, prev_play)
-    plays = []
+    plays = Set.new
     return plays unless prev_play.nil? || prev_play.is_a?(FullHouse)
     return plays unless h.size >= 5
     with_phoenix_substitution(h) do |hand|
@@ -202,7 +212,7 @@ class FullHouse < Play
         plays << FullHouse.new(combo.flatten, rank)
       end
     end
-    plays
+    plays.to_a
   end
 end
 
