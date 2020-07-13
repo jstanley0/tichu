@@ -41,7 +41,7 @@ describe Play do
     sparrow_hand = Card.deserialize(%w(1 k2 r2 g2 b2 k3 k4 k5 b5 r5 k6 k7 rA gA))
     expect(Straight.enumerate(sparrow_hand, nil).size).to eq 60 # excludes the 3 bombs found in the Card spec
     expect(Straight.enumerate(sparrow_hand, Straight.new(Card.deserialize(%w(1 b2 b3 b4 b5 b6)), 6)).size).to eq 11
-    expect(Straight.enumerate(phoenix_hand, nil).size).to eq 126
+    expect(Straight.enumerate(phoenix_hand, nil).size).to eq 144
   end
 
   it "enumerates Ladder" do

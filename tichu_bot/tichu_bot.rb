@@ -38,7 +38,7 @@ EM.run do
     data = JSON.parse(msg)
 
     if condition.is_a?(Proc)
-      if condition.call(data)
+      if condition.call(data) || data['state'] == 'over'
         condition = nil
       elsif data['error'].blank?
         puts "..."
@@ -63,11 +63,14 @@ EM.run do
     when 'playing'
       if data['turn'] == 0
         plays = data['players'][0]['possible_plays']
-        send_command(ws, 'play', cards: plays.sample)
-        condition = ->(data) { data['turn'] != 0 }
+        play = plays.sample
+        wish_rank = play.include?('1') ? '7' : nil
+        send_command(ws, 'play', cards: play, wish_rank: wish_rank)
+        # don't hang if I dog it to myself
+        condition = ->(data) { data['turn'] != 0 } unless play == ['d'] && data['players'][3]['hand_size'] == 0
       end
       if data['turn'] == nil && data['trick_winner'] == 0
-        send_command(ws, 'claim_trick', to_player: data['dragon_trick'] ? 1 : 0)
+        send_command(ws, 'claim', to_player: data['dragon_trick'] ? 1 : 0)
         condition = ->(data) { data['turn'] != nil }
       end
     when 'over'

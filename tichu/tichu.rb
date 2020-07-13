@@ -70,6 +70,9 @@ get '/connect' do
     end
     ws.onclose do
       game.disconnect!(ws)
+      unless game.any_connections?
+        $games.delete(game_id)
+      end
     end
   end
 end

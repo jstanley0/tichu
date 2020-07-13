@@ -18,6 +18,7 @@ class State
     @players = []
     @end_score = end_score
     @conns = {}
+    @action = []
   end
 
   def add_player!(player)
@@ -28,7 +29,7 @@ class State
       init_round
     end
 
-    set_action(player, "joined")
+    add_action(player, "joined")
     send_global_update
   end
 
@@ -39,6 +40,10 @@ class State
 
   def disconnect!(websocket)
     @conns.delete(websocket)
+  end
+
+  def any_connections?
+    @conns.any?
   end
 
   def message(data, websocket, player_id)
@@ -62,20 +67,20 @@ class State
         case command
         when 'back6'
           player.uncover_last_6!
-          set_action(player, "took remaining cards")
+          add_action(player, "took remaining cards")
           send_global_update
         when 'pass_cards'
           player.pass_cards!(json['cards'])
-          set_action(player, "passed cards")
+          add_action(player, "passed cards")
           perform_passes! if players.all?(&:passed_cards?)
           send_global_update
         when 'grand_tichu'
           player.call_grand_tichu!
-          set_action(player, "called Grand Tichu")
+          add_action(player, "called Grand Tichu")
           send_global_update
         when 'tichu'
           player.call_tichu!
-          set_action(player, "called Tichu")
+          add_action(player, "called Tichu")
           send_global_update
         else
           wat!(command, websocket)
@@ -84,14 +89,13 @@ class State
         case command
         when 'tichu'
           player.call_tichu!
-          set_action(player, "called Tichu")
+          add_action(player, "called Tichu")
           send_global_update
-        when 'claim_trick'
+        when 'claim'
           claim_trick!(player_index, json['to_player'])
           send_global_update
         when 'play'
-          make_play!(player_index, json['cards'], json['wished_rank'])
-          set_action(player, "played #{json['cards'].inspect}")
+          make_play!(player_index, json['cards'], json['wish_rank'])
           send_global_update
         else
           wat!(command, websocket)
@@ -125,11 +129,12 @@ class State
   def start_round!
     @state = :playing
     @turn = players.find_index { |player| player.hand.find(&:sparrow?) }
+    add_action(players[@turn], "has the sparrow")
     start_turn!
   end
 
   def start_turn!
-    last_frd_play = plays.reverse_each.find { |play| !play.is_a?(Pass) }
+    last_frd_play = plays.last
     loop do
       if last_frd_play&.player_index == @turn
         # if a player is in the position of playing over her own play, then she's winning the trick...
@@ -163,7 +168,12 @@ class State
     if players[player_index].hand.empty?
       @out_order << player_index
     end
-    @plays << play.tag(player_index)
+    if play.is_a?(Pass)
+      add_action(players[player_index], "passed")
+    else
+      @plays << play.tag(player_index)
+      add_action(players[player_index], "played #{play.cards.inspect}")
+    end
 
     if play.cards.any?(&:sparrow?) && wished_rank && !wished_rank.empty?
       chosen_rank = Card.rank_from_string(wished_rank)
@@ -187,7 +197,7 @@ class State
     recipient_index = (claiming_player_index + give_to_player_index) % 4
     players[recipient_index].take_trick!(plays)
     trick_msg = (recipient_index == claiming_player_index) ? "took the trick" : "passed the trick to #{players[recipient_index].name}"
-    set_action(players[claiming_player_index], trick_msg)
+    add_action(players[claiming_player_index], trick_msg)
     next_trick
     @turn = claiming_player_index
     start_turn!
@@ -201,6 +211,9 @@ class State
 
   def next_turn!(player_index, offset = 1)
     if round_over?
+      if out_order.size == 3 && out_order[-1] == player_index
+        players[player_index].take_trick!(plays) if plays.any? # if the last card was a dog, plays is empty
+      end
       finish_round!
     else
       @turn = (player_index + offset) % 4
@@ -222,7 +235,7 @@ class State
       h.merge!(error: error) if error
       ws.send h.to_json
     end
-    @action = nil
+    @action = []
   end
 
   def send_update(websocket, error = nil)
@@ -242,12 +255,17 @@ class State
     @trick_winner = nil
     @dragon_trick = false
     @turn = nil
+    add_status "Starting round!"
   end
 
   def finish_round!
+    old_scores = scores.dup
     update_scores!
+    add_status "Round complete! #{team_name(0)}: #{scores[0] - old_scores[0]}  ---  #{team_name(1)}: #{scores[1] - old_scores[1]}"
+
     if scores[0] != scores[1] && (scores[0] >= end_score || scores[1] >= end_score)
       @state = :over
+      add_status "Game over! #{team_name(scores[0] > scores[1] ? 0 : 1)} win! Final score: #{scores.max} to #{scores.min}"
     else
       init_round
     end
@@ -299,14 +317,25 @@ class State
       turn: turn.is_a?(Numeric) ? rotate_index(turn, for_player) : nil,
       trick_winner: trick_winner ? rotate_index(trick_winner, for_player) : nil,
       dragon_trick: dragon_trick,
-      action: action
+      action: action,
+      last_play: last_play(for_player)
     }
   end
 
-  def set_action(player, action)
+  def add_status(message)
+    @action << message
+    puts message
+  end
+
+  def add_action(player, action)
     action_str = "#{player.name} #{action}"
+    @action << action_str
     puts action_str
-    @action = action_str
+  end
+
+  def team_name(index)
+    raise "invalid team index" unless [0, 1].include?(index)
+    "#{players[index].name}/#{players[index + 2].name}"
   end
 
   def rotate_players(for_player)
@@ -319,6 +348,16 @@ class State
 
   def rotate_index(index, for_player)
     (index - player_index(for_player)) % 4
+  end
+
+  def last_play(for_player)
+    play = plays&.last
+    return nil unless play
+    h = { cards: play.to_h }
+    if play.player_index
+      h.merge!(player: rotate_index(play.player_index, for_player))
+    end
+    h
   end
 
   def player_index(for_player)
