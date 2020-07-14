@@ -24,12 +24,12 @@ class State
   def add_player!(player)
     raise TichuError, "game is full" if players.size == 4
     @players << player
+    add_action(player, "joined")
 
     if players.size == 4
       init_round
     end
 
-    add_action(player, "joined")
     send_global_update
   end
 
@@ -295,7 +295,6 @@ class State
         end
       end
       new_total = scores[0] + scores[1]
-      debugger unless new_total == old_total + 100
       raise "apparently I can't count" unless new_total == old_total + 100
     end
   end

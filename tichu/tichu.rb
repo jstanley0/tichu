@@ -46,10 +46,13 @@ get '/connect' do
   if game_id == 'TEST'
     # shortcut to save time when testing this thing
     game = ($games['TEST'] ||= State.new)
-    halt 400, 'test game is full' if game.players.size == 4
-    player = Player.new("Player #{game.players.size}")
+    if game.players.size < 4
+      player = Player.new("Player #{game.players.size}")
+      game.add_player!(player)
+    else
+      player = game.players.first
+    end
     player_id = player.id
-    game.add_player!(player)
   else
     game = $games[game_id]
     halt 400, 'invalid game_id' unless game
