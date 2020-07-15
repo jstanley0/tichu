@@ -1,6 +1,6 @@
 function Game({game_id, player_id}) {
   const { useState, useEffect, useRef } = React
-  const { Container, Grid, Box, Typography, Button, CircularProgress } = MaterialUI
+  const { Container, Box, Typography, Button, CircularProgress } = MaterialUI
 
   const [ socket, setSocket ] = useState()
   const [ gameState, setGameState ] = useState({"state":"connecting"})
@@ -27,36 +27,27 @@ function Game({game_id, player_id}) {
     </Container>
   }
 
-  return <Container>
-    <Grid container spacing='2' className='full_height'>
-      <Grid item xs={3}>
-        <Box height="25%"/>
-      </Grid>
-      <Grid item xs={6}>
-       <Player data={gameState.players[2]} vertical={false}/>
-      </Grid>
-      <Grid item xs={3}>
-        <Typography align='right'>Terrible Tichu</Typography>
-        <Typography variant='h4' align='right' component='h1'>{ gameState.id }</Typography>
-      </Grid>
-      <Grid item xs={3}>
-       <Player data={gameState.players[1]} vertical={true} align='left'/>
-      </Grid>
-      <Grid item xs={6}>
-        <Box height='50%'>
+  return <Container fixed>
+    <div style={{display: 'flex', height: '100%'}}>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        <div style={{height: 80}}/>
+        <Player data={gameState.players[1]} vertical={true} align='left'/>
+      </div>
+      <div style={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
+        <Player data={gameState.players[2]} vertical={false}/>
+        <div style={{flexGrow: 1}}>
           <History data={history}/>
-        </Box>
-      </Grid>
-      <Grid item xs={3}>
-       <Player data={gameState.players[3]} vertical={true} align='right'/>
-      </Grid>
-      <Grid item xs={3}>
-        <Box height="25%"/>
-      </Grid>
-      <Grid item xs={6}>
-       <Player data={gameState.players[0]} orientation='h'/>
-      </Grid>
-    </Grid>
+        </div>
+        <Player data={gameState.players[0]} vertical={false}/>
+      </div>
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+        <div style={{height: 80}}>
+          <Typography align='right'>Terrible Tichu</Typography>
+          <Typography variant='h4' align='right' component='h1'>{ gameState.id }</Typography>
+        </div>
+        <Player data={gameState.players[3]} vertical={true} align='right'/>
+      </div>
+    </div>
   </Container>
 }
 

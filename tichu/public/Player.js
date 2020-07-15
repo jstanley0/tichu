@@ -16,10 +16,10 @@ function Player({data, vertical, align}) {
     <Box width={5} height={5}></Box>
     <div style={{flexGrow: 1, display: 'flex', flexDirection: vertical ? (align === 'right' ? 'row-reverse' : 'row') : 'column'}}>
       <div>
-        <Hand vertical={vertical} align={align} size={data.hand_size}/>
+        <Hand vertical={vertical} align={align} size={14 /*data.hand_size*/}/>
       </div>
       <div>
-        { data.passed_cards || 1 ? <Hand vertical={vertical} align={align} size={3} skew={true}/> : null }
+        { true /* data.passed_cards */? <Hand vertical={vertical} align={align} size={3} skew={true}/> : null }
       </div>
     </div>
   </div>
