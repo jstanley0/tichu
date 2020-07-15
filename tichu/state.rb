@@ -121,6 +121,7 @@ class State
       player.cards_to_pass.each_with_index do |card, j|
         players[(i + j + 1) % 4].accept_card(card, from_player: player.id)
       end
+      player.done_passing_cards!
     end
 
     start_round!
@@ -166,6 +167,8 @@ class State
     raise TichuError, "invalid play" unless play
     players[player_index].make_play!(play)
     if players[player_index].hand.empty?
+      add_action(players[player_index], "has gone out")
+      set_tichu_statuses!(player_index) if @out_order.empty?
       @out_order << player_index
     end
     if play.is_a?(Pass)
@@ -268,6 +271,16 @@ class State
       add_status "Game over! #{team_name(scores[0] > scores[1] ? 0 : 1)} win! Final score: #{scores.max} to #{scores.min}"
     else
       init_round
+    end
+  end
+
+  def set_tichu_statuses!(winning_player_index)
+    players.each_with_index do |player, index|
+      if player.tichu > 0
+        success = (index == winning_player_index)
+        add_action(player, "#{success ? "successfully completed a" : "totally botched that"}#{ player.tichu == 200 ? ' Grand' : '' } Tichu!")
+        player.set_tichu_status(success)
+      end
     end
   end
 

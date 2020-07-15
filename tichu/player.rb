@@ -4,7 +4,7 @@ require_relative 'card'
 require_relative 'error'
 
 class Player
-  attr_reader :name, :id, :hand, :hidden_cards, :cards_to_pass, :possible_plays, :points, :plays, :tichu
+  attr_reader :name, :id, :hand, :hidden_cards, :cards_to_pass, :possible_plays, :points, :plays, :tichu, :tichu_status
 
   def initialize(name)
     @name = name
@@ -27,6 +27,7 @@ class Player
     @plays = []
     @points = 0
     @tichu = 0
+    @tichu_status = nil
   end
 
   def accept_card(card, from_player: nil)
@@ -47,6 +48,7 @@ class Player
       name: name,
       hand_size: hand.size,
       tichu: tichu,
+      tichu_status: tichu_status,
       points_taken: points,
       passed_cards: cards_to_pass.any?
     }
@@ -77,6 +79,10 @@ class Player
     @cards_to_pass = cards
   end
 
+  def done_passing_cards!
+    @cards_to_pass.clear
+  end
+
   def can_call_tichu?
     hand.size == 14 && tichu == 0 && hidden_cards.size == 0 && plays.empty?
   end
@@ -93,6 +99,10 @@ class Player
   def call_grand_tichu!
     raise TichuError, "can't call grand tichu" unless can_call_grand_tichu?
     @tichu = 200
+  end
+
+  def set_tichu_status(success)
+    @tichu_status = success
   end
 
   def make_play!(play)

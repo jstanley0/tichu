@@ -33,14 +33,14 @@ function Game({game_id, player_id}) {
         <Box height="25%"/>
       </Grid>
       <Grid item xs={6}>
-       <Player data={gameState.players[2]} orientation='h'/>
+       <Player data={gameState.players[2]} vertical={false}/>
       </Grid>
       <Grid item xs={3}>
         <Typography align='right'>Terrible Tichu</Typography>
         <Typography variant='h4' align='right' component='h1'>{ gameState.id }</Typography>
       </Grid>
       <Grid item xs={3}>
-       <Player data={gameState.players[1]} orientation='v' align='left'/>
+       <Player data={gameState.players[1]} vertical={true} align='left'/>
       </Grid>
       <Grid item xs={6}>
         <Box height='50%'>
@@ -48,7 +48,7 @@ function Game({game_id, player_id}) {
         </Box>
       </Grid>
       <Grid item xs={3}>
-       <Player data={gameState.players[3]} orientation='v' align='right'/>
+       <Player data={gameState.players[3]} vertical={true} align='right'/>
       </Grid>
       <Grid item xs={3}>
         <Box height="25%"/>

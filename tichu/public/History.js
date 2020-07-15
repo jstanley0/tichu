@@ -14,8 +14,8 @@ function History({data}) {
   return <List>
     {
       data.map((entry, index) => (
-        <React.Fragment>
-          <ListItem key={index}>
+        <React.Fragment key={index}>
+          <ListItem>
             <ListItemText>
               { entry }
             </ListItemText>
