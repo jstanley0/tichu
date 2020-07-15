@@ -1,28 +1,26 @@
 function Player({data, vertical, align}) {
-  const { Grid, Typography, Chip } = MaterialUI
+  const { Typography, Chip, Box } = MaterialUI
 
   if (!data) {
-    return <Typography variant='body1' color='secondary' align={vertical ? align : 'center'}>Waiting...</Typography>
+    return <Typography variant='body1' color='secondary'>Waiting...</Typography>
   }
 
-  return <Grid container>
-    <Grid item xs={12}>
-      <Typography variant='h6' component='span'>
+  return <div style={{display: 'flex', flexDirection: vertical ? 'column' : 'row', alignItems: align === 'right' ? 'flex-end' : 'flex-start'}}>
+    <div>
+      <Typography variant='h6' component='h2'>
         { data.name }
       </Typography>
-      <Typography component='span'>
-        { data.tichu }
-      </Typography>
-      <Typography component='span'>
-        { data.points_taken }
-      </Typography>
-    </Grid>
-    <Grid item xs={vertical ? 6 : 12}>
-      <Hand vertical={vertical} align={align} size={data.hand_size}/>
-    </Grid>
-    { data.passed_cards ? (
-    <Grid item xs={vertical ? 6 : 12}>
-      <Hand vertical={vertical} align={align} size={3} skew={true}/>
-    </Grid>) : null }
-  </Grid>
+      <Chip label={ data.points_taken }/>&ensp;
+      { data.tichu >= 0 ? (<Chip label={ data.tichu === 200 ? 'GT' : 'T' }/>) : null }
+    </div>
+    <Box width={5} height={5}></Box>
+    <div style={{flexGrow: 1, display: 'flex', flexDirection: vertical ? (align === 'right' ? 'row-reverse' : 'row') : 'column'}}>
+      <div>
+        <Hand vertical={vertical} align={align} size={data.hand_size}/>
+      </div>
+      <div>
+        { data.passed_cards || 1 ? <Hand vertical={vertical} align={align} size={3} skew={true}/> : null }
+      </div>
+    </div>
+  </div>
 }
