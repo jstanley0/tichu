@@ -28,7 +28,7 @@ function Game({game_id, player_id}) {
   }
 
   return <Container maxWidth='xl'>
-    <div style={{display: 'flex', height: '100%', minWidth: 1100, minHeight: 750, flexDirection: 'column'}}>
+    <div style={{display: 'flex', height: '100%', minWidth: 1000, minHeight: 750, flexDirection: 'column'}}>
       <div style={{display: 'flex', flexGrow: 1}}>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div style={{flexGrow: 1}}/>
@@ -39,13 +39,13 @@ function Game({game_id, player_id}) {
           <div style={{display: 'flex'}}>
             <div style={{flexGrow: 1}}/>
             <Player data={gameState.players[2]} vertical={false}/>
-            <div style={{flexGrow: 2}}/>
+            <div style={{flexGrow: 1}}/>
           </div>
           <History data={history}/>
         </div>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div style={{height: 0}}>
-            <Typography align='right'>Terrible Tichu</Typography>
+            <Typography align='right'>Touchless Tichu</Typography>
             <Typography variant='h4' align='right' component='h1'>{ gameState.id }</Typography>
           </div>
           <div style={{flexGrow: 1}}/>

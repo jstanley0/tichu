@@ -5,7 +5,7 @@ function Player({data, vertical, align}) {
     <Box width={5} height={5}/>
     <div style={{flexGrow: 1, display: 'flex', flexDirection: vertical ? (align === 'right' ? 'row-reverse' : 'row') : 'column'}}>
       <div>
-        <Hand vertical={vertical} align={align} collapse={true} size={14 /*data.hand_size*/}/>
+        <Hand vertical={vertical} align={align} collapse={true} size={data ? data.hand_size : 0}/>
       </div>
     </div>
   </div>
@@ -15,7 +15,7 @@ function PlayerInfo({data}) {
   const { Typography, Chip } = MaterialUI
   return <div>
       <Typography variant={data ? 'h6' : 'body2'} component='h2'>
-        { data ? data.name : 'Waiting...'}
+        { data ? data.name : 'Waiting for player...'}
       </Typography>
       <Chip label={ data ? data.points_taken : '-'}/>&ensp;
       { data && data.tichu > 0 ? (<Chip label={ data.tichu === 200 ? 'GT' : 'T' }/>) : null }

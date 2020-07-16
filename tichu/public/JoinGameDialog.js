@@ -19,7 +19,7 @@ function JoinGameDialog(_props) {
 
   return <Container maxWidth="xs">
     <Box height="15%"/>
-    <Typography align="center" gutterBottom={true} variant="h2" component="h1">Terrible Tichu</Typography>
+    <Typography align="center" gutterBottom={true} variant="h2" component="h1">Touchless Tichu</Typography>
     <form noValidate>
       <Grid container spacing={3}>
         <Grid item xs={12}>
