@@ -27,25 +27,35 @@ function Game({game_id, player_id}) {
     </Container>
   }
 
-  return <Container fixed>
-    <div style={{display: 'flex', height: '100%'}}>
-      <div style={{display: 'flex', flexDirection: 'column'}}>
-        <div style={{height: 80}}/>
-        <Player data={gameState.players[1]} vertical={true} align='left'/>
-      </div>
-      <div style={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
-        <Player data={gameState.players[2]} vertical={false}/>
-        <div style={{flexGrow: 1}}>
+  return <Container maxWidth='xl'>
+    <div style={{display: 'flex', height: '100%', minWidth: 1100, minHeight: 750, flexDirection: 'column'}}>
+      <div style={{display: 'flex', flexGrow: 1}}>
+        <div style={{display: 'flex', flexDirection: 'column'}}>
+          <div style={{flexGrow: 1}}/>
+          <Player data={gameState.players[1]} vertical={true} align='left'/>
+          <div style={{flexGrow: 1}}/>
+        </div>
+        <div style={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
+          <div style={{display: 'flex'}}>
+            <div style={{flexGrow: 1}}/>
+            <Player data={gameState.players[2]} vertical={false}/>
+            <div style={{flexGrow: 2}}/>
+          </div>
           <History data={history}/>
         </div>
-        <Player data={gameState.players[0]} vertical={false}/>
-      </div>
-      <div style={{display: 'flex', flexDirection: 'column'}}>
-        <div style={{height: 80}}>
-          <Typography align='right'>Terrible Tichu</Typography>
-          <Typography variant='h4' align='right' component='h1'>{ gameState.id }</Typography>
+        <div style={{display: 'flex', flexDirection: 'column'}}>
+          <div style={{height: 0}}>
+            <Typography align='right'>Terrible Tichu</Typography>
+            <Typography variant='h4' align='right' component='h1'>{ gameState.id }</Typography>
+          </div>
+          <div style={{flexGrow: 1}}/>
+          <Player data={gameState.players[3]} vertical={true} align={'right'}/>
+          <div style={{flexGrow: 1}}/>
         </div>
-        <Player data={gameState.players[3]} vertical={true} align='right'/>
+      </div>
+      <div>
+        <Player0 gameState={gameState}/>
+        <Box height={16}/>
       </div>
     </div>
   </Container>

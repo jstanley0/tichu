@@ -11,7 +11,7 @@ function History({data}) {
   }
 
 
-  return <List>
+  return <List style={{margin: 30}}>
     {
       data.map((entry, index) => (
         <React.Fragment key={index}>
