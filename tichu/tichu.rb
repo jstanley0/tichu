@@ -74,7 +74,8 @@ get '/connect' do
     ws.onclose do
       game.disconnect!(ws)
       unless game.any_connections?
-        $games.delete(game_id)
+        # hmm, ideally we'd do this after some kind of timeout
+        # $games.delete(game_id)
       end
     end
   end

@@ -7,6 +7,10 @@ function Player({data, vertical, align}) {
       <div>
         <Hand vertical={vertical} align={align} collapse={true} size={data ? data.hand_size : 0}/>
       </div>
+      { (data && data.passed_cards) ?
+        (<div>
+          <PassSplay vertical={vertical} align={align}/>
+        </div>) : null }
     </div>
   </div>
 }

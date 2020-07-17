@@ -16,14 +16,15 @@ function Game({game_id, player_id}) {
       setGameState(data)
     }
     ws.onerror = (event) => {
-      setHistory(appendHistory([`error: ${event.toString()}`]))
+      window.location.href = '/'
     }
     setSocket(ws)
   }, [])
 
   if (gameState['state'] === 'connecting') {
     return <Container>
-      <CircularProgress/>
+      <Typography>Connecting...</Typography>
+      <History data={history}/>
     </Container>
   }
 
@@ -61,7 +62,7 @@ function Game({game_id, player_id}) {
   </Container>
 }
 
-const MAX_HISTORY = 6
+const MAX_HISTORY = 20
 let idkwid = []
 function appendHistory(entries) {
   idkwid = idkwid.concat(entries)

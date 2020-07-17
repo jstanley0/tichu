@@ -1,29 +1,24 @@
 function History({data}) {
   const { List, ListItem, ListItemText, Divider } = MaterialUI
 
-  // I do not understand this React magic
-  function usePrevious(value) {
-    const ref = useRef();
-    useEffect(() => {
-      ref.current = value;
-    });
-    return ref.current;
-  }
-
-
-  return <List style={{margin: 30}}>
-    {
-      data.map((entry, index) => (
-        <React.Fragment key={index}>
-          <ListItem>
-            <ListItemText>
-              { entry }
-            </ListItemText>
-          </ListItem>
-          <Divider/>
-        </React.Fragment>
-      ))
-    }
-  </List>
+  return <div style={{display: 'flex'}}>
+    <div style={{flexGrow: 1}}/>
+    <div style={{maxHeight: '100%', overflowY: 'scroll'}}>
+      <List style={{margin: 40}}>
+        {
+          data.map((entry, index) => (
+            <React.Fragment key={index}>
+              <ListItem>
+                <ListItemText>
+                  { entry }
+                </ListItemText>
+              </ListItem>
+              <Divider/>
+            </React.Fragment>
+          ))
+        }
+      </List>
+    </div>
+  </div>
 
 }
