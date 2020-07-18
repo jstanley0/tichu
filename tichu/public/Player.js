@@ -57,13 +57,20 @@ function Hand0({gameState}) {
   const { useState } = React
   const { Draggable, Droppable } = ReactBeautifulDnd
 
-  const { hand, setHand } = useState(gameState.hand)
+  const [ hand, setHand ] = useState(gameState.players[0].hand)
 
   return <Droppable droppableId='hand' direction='horizontal'>
     {(provided, snapshot) => (
       <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*70, height: 90, display: 'flex'}} className='hand0'>
-        {(hand || []).map((card, index) => (
-          <FaceCard key={index} card={card}/>
+        {hand.map((card, index) => (
+          <Draggable draggableId={card} index={index}>
+            {(provided, snapshot) => (
+              <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
+                <FaceCard key={card} card={card}/>
+                {provided.placeholder}
+              </div>
+            )}
+          </Draggable>
         ))}
         {provided.placeholder}
       </div>
