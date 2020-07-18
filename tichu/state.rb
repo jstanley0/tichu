@@ -166,24 +166,28 @@ class State
     play = players[player_index].find_play(cards)
     raise TichuError, "invalid play" unless play
     players[player_index].make_play!(play)
-    if players[player_index].hand.empty?
-      add_action(players[player_index], "has gone out")
-      set_tichu_statuses!(player_index) if @out_order.empty?
-      @out_order << player_index
-    end
     if play.is_a?(Pass)
       add_action(players[player_index], "passed")
     else
       @plays << play.tag(player_index)
       add_action(players[player_index], "played #{play.cards.inspect}")
     end
+    if players[player_index].hand.empty?
+      add_action(players[player_index], "has gone out")
+      set_tichu_statuses!(player_index) if @out_order.empty?
+      @out_order << player_index
+    end
 
     if play.cards.any?(&:sparrow?) && wished_rank && !wished_rank.empty?
       chosen_rank = Card.rank_from_string(wished_rank)
       raise TichuError, "invalid wished_rank #{wished_rank}" if !chosen_rank || chosen_rank < 2 || chosen_rank > Card::ACE
       @wish_rank = chosen_rank
+      add_action(players[player_index], "wishes for #{wished_rank}")
     elsif wish_rank
-      @wish_rank = nil if play.fulfills_wish?(@wish_rank)
+      if play.fulfills_wish?(@wish_rank)
+        add_action(players[player_index], "fulfills the wish for #{Card.rank_from_string(wish_rank)}")
+        @wish_rank = nil
+      end
     end
 
     next_trick if play.is_a?(Dog)

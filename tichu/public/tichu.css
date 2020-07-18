@@ -1,3 +1,35 @@
 body {
     background-color: #f9f9f9;
 }
+
+.red-card {
+    color: #b82525;
+}
+
+.green-card {
+    color: #22a126;
+}
+
+.blue-card {
+    color: #2d47cc;
+}
+
+.black-card {
+    color: #2d2f3b;
+}
+
+.special-card {
+    color: #c9cf2b;
+}
+
+.hand0 {
+    border: 1px solid black;
+}
+
+.passTarget {
+    border: 1px dotted black;
+}
+
+.playTarget {
+    border: 1px dashed black;
+}

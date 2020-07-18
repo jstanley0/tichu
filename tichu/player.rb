@@ -49,9 +49,9 @@ class Player
       hand_size: hand.size,
       tichu: tichu,
       tichu_status: tichu_status,
-      points_taken: points,
-      passed_cards: cards_to_pass.any?
+      points_taken: points
     }
+    h[:passed_cards] = cards_to_pass.any? unless cards_to_pass.nil?
     if complete
       h[:hand] = Card.serialize(hand)
       h[:can_tichu] = can_call_tichu?
@@ -68,7 +68,7 @@ class Player
   end
 
   def passed_cards?
-    !cards_to_pass.empty?
+    cards_to_pass&.any?
   end
 
   def pass_cards!(cards)
@@ -80,7 +80,7 @@ class Player
   end
 
   def done_passing_cards!
-    @cards_to_pass.clear
+    @cards_to_pass = nil
   end
 
   def can_call_tichu?

@@ -58,7 +58,7 @@ EM.run do
         condition = ->(data) { data['players'][0]['hand_size'] == 14 }
       elsif !data['players'][0]['passed_cards']
         send_command(ws, 'pass_cards', cards: data['players'][0]['hand'][0..2])
-        condition = ->(data) { data['players'][0]['passed_cards'] == true }
+        condition = ->(data) { !data['players'][0].key?('passed_cards') }
       end
     when 'playing'
       if data['turn'] == 0
