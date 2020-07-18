@@ -9,7 +9,7 @@ function Hand({vertical, size, collapse}) {
 }
 
 function PassSplay({vertical, align}) {
-  return <div style={{display: 'flex', flexDirection: vertical ? 'column' : 'row'}}>
+  return <div style={{display: 'flex', flexDirection: vertical ? 'column' : 'row', height: vertical ? '100%' : 'initial'}}>
     <div style={{flexGrow: 1}}/>
     <Card vertical={vertical} rotate={align === 'left' ? -35 : 35}/>
     <Card vertical={vertical} translateX={vertical ? ((align === 'left') ? 20 : -20) : 0}

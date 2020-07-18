@@ -43,9 +43,17 @@ get '/connect' do
   halt 400, 'this is a websocket endpoint' unless request.websocket?
   game_id = params['game_id'].upcase.strip
   halt 400, 'missing required parameter `game_id`' unless game_id.present?
-  if game_id == 'TEST'
-    # shortcut to save time when testing this thing
-    game = ($games['TEST'] ||= State.new)
+  player_id = params['player_id'].upcase.strip
+  halt 400, 'missing required parameter `player_id`' unless player_id
+
+  game = $games[game_id]
+  if !game && game_id == 'TEST'
+    game = $games[game_id] = State.new(id: 'TEST')
+  end
+  halt 400, 'invalid game_id' unless game
+
+  player = game.players.find { |player| player.id == player_id }
+  if !player && player_id == 'TEST'
     if game.players.size < 4
       player = Player.new("Player #{game.players.size}")
       game.add_player!(player)
@@ -53,16 +61,8 @@ get '/connect' do
       player = game.players.first
     end
     player_id = player.id
-  else
-    game = $games[game_id]
-    halt 400, 'invalid game_id' unless game
-
-    player_id = params['player_id']
-    if player_id
-      player = game.players.find { |player| player.id == player_id }
-      halt 400, 'invalid player_id' unless player
-    end
   end
+  halt 400, 'invalid player_id' unless player
 
   request.websocket do |ws|
     ws.onopen do

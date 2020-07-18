@@ -33,3 +33,7 @@ body {
 .playTarget {
     border: 1px dashed black;
 }
+
+.card-dragover {
+    border-color: cornflowerblue;
+}

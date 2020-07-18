@@ -17,7 +17,7 @@ function Card({vertical, collapse, label, rotate, translateX, translateY}) {
   </MaterialUI.Card>
 }
 
-function FaceCard({card}) {
+function FaceCard({card, dragging}) {
   const { Typography } = MaterialUI
   let color_style, rank_offset = 1, suit
   switch (card[0]) {
@@ -28,7 +28,7 @@ function FaceCard({card}) {
     default: color_style = 'special-card'; suit = ''; rank_offset = 0
   }
   const rank = card.substr(rank_offset)
-  return <MaterialUI.Card variant='outlined' style={{width: 60, height: 84, margin: 2}}>
+  return <MaterialUI.Card variant='elevation' elevation={dragging ? 5 : 1} style={{width: 60, height: 84, margin: 2}}>
     <Typography className={color_style} variant='h4'>{rank}<br/>{suit}</Typography>
   </MaterialUI.Card>
 }

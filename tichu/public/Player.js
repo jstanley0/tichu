@@ -80,6 +80,7 @@ function Player0({gameState, socket}) {
     }
 
     // hoo boy, this is in dire need of refactoring
+    // but the behavior I want (swapping an existing card in the pass area with the source) is not exactly trivial
     switch(destination.droppableId) {
       case 'hand':
         switch(source.droppableId) {
@@ -206,12 +207,12 @@ function Hand0({hand}) {
 
   return <Droppable droppableId='hand' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*70, height: 90, display: 'flex'}} className='hand0'>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*70, height: 90, display: 'flex'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {hand.map((card, index) => (
           <Draggable draggableId={card} index={index} key={card}>
             {(provided, snapshot) => (
               <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
-                <FaceCard key={card} card={card}/>
+                <FaceCard key={card} card={card} dragging={snapshot.isDragging}/>
                 {provided.placeholder}
               </div>
             )}
@@ -229,12 +230,12 @@ function PassHolder({droppableId, caption, card})
 
   return <Droppable droppableId={droppableId} direction='horizontal'>
       {(provided, snapshot) => (
-        <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 70, height: 90}} className='passTarget'>
+        <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 70, height: 90}} className={`passTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
           {caption}
           {card && (<Draggable draggableId={card} index={0}>
             {(provided, snapshot) => (
               <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
-                <FaceCard key={card}/>
+                <FaceCard key={card} dragging={snapshot.isDragging}/>
                 {provided.placeholder}
               </div>
             )}
@@ -262,12 +263,12 @@ function PlayTarget({cards}) {
   const { Draggable, Droppable } = ReactBeautifulDnd
   return <Droppable droppableId='playTarget' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*70, height: 90, margin: 5}} className='playTarget'>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*70, height: 90, margin: 5}} className={`playTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {cards.map((card, index) => (
           <Draggable draggableId={card} index={index}>
             {(provided, snapshot) => (
               <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
-                <FaceCard key={card} card={card}/>
+                <FaceCard key={card} card={card} dragging={snapshot.isDragging}/>
                 {provided.placeholder}
               </div>
             )}

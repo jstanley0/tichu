@@ -11,9 +11,9 @@ class State
   attr_reader :id, :state, :players, :plays, :wish_rank, :turn, :scores,
               :out_order, :end_score, :trick_winner, :dragon_trick, :action
 
-  def initialize(end_score: 1000)
+  def initialize(end_score: 1000, id: nil)
     @state = :joining
-    @id = self.class.new_id
+    @id = id || self.class.new_id
     @scores = [0, 0]
     @players = []
     @end_score = end_score
