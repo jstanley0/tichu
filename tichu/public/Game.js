@@ -55,7 +55,7 @@ function Game({game_id, player_id}) {
         </div>
       </div>
       <div>
-        <Player0 gameState={gameState}/>
+        <Player0 gameState={gameState} socket={socket}/>
         <Box height={16}/>
       </div>
     </div>

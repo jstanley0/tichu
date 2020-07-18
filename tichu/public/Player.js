@@ -48,7 +48,7 @@ function reorderArray(array, source_index, dest_index) {
   return a
 }
 
-function Player0({gameState}) {
+function Player0({gameState, socket}) {
   const { Box } = MaterialUI
   const { useState, useCallback } = React
   const { DragDropContext } = ReactBeautifulDnd
@@ -59,11 +59,13 @@ function Player0({gameState}) {
   const [ card1, setCard1 ] = useState('')
   const [ card2, setCard2 ] = useState('')
 
-  const onDragEnd = useCallback(({source, destination, draggableId}) => {
+  const onDragEnd = (result) => {
+    console.log(result)
+    const {source, destination, draggableId} = result
     if (!destination) {
       return
     }
-    console.log(arguments)
+
     // reorder
     if (destination.droppableId === source.droppableId) {
       switch(destination.droppableId) {
@@ -177,8 +179,7 @@ function Player0({gameState}) {
         setCard2(draggableId)
         break
     }
-    console.log(result)
-  }, [])
+  }
 
   return <div style={{display: 'flex', alignItems: 'flex-end'}}>
     <div style={{flexGrow: 1}}/>
@@ -226,7 +227,7 @@ function PassHolder({droppableId, caption, card})
 {
   const { Draggable, Droppable } = ReactBeautifulDnd
 
-  return  <Droppable droppableId={droppableId} direction='horizontal'>
+  return <Droppable droppableId={droppableId} direction='horizontal'>
       {(provided, snapshot) => (
         <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 70, height: 90}} className='passTarget'>
           {caption}
