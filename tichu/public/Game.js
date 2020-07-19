@@ -1,3 +1,6 @@
+// many sorry for this; I tried useState but it kept getting cleared unexpectedly
+window.tichu_history = []
+
 function Game({game_id, player_id}) {
   const MAX_HISTORY = 20
 
@@ -6,14 +9,12 @@ function Game({game_id, player_id}) {
 
   const [ socket, setSocket ] = useState()
   const [ gameState, setGameState ] = useState({"state":"connecting"})
-  const [ history, setHistory ] = useState([])
 
   const appendHistory = (entries) => {
-    let newHistory = history.concat(entries)
-    if (newHistory.length > MAX_HISTORY) {
-      newHistory.splice(0, newHistory.length - MAX_HISTORY)
+    tichu_history.push(...entries)
+    if (tichu_history.length > MAX_HISTORY) {
+      tichu_history.splice(0, tichu_history.length - MAX_HISTORY)
     }
-    setHistory(newHistory)
   }
 
   useEffect(() => {
@@ -42,7 +43,7 @@ function Game({game_id, player_id}) {
   if (gameState['state'] === 'connecting') {
     return <Container>
       <Typography>Connecting...</Typography>
-      <History data={history}/>
+      <History data={tichu_history}/>
     </Container>
   }
 
@@ -60,7 +61,7 @@ function Game({game_id, player_id}) {
             <Player data={gameState.players[2]} vertical={false} turn={gameState.turn === 2} trickWinner={gameState.trick_winner === 2}/>
             <div style={{flexGrow: 1}}/>
           </div>
-          <History data={history}/>
+          <History data={tichu_history}/>
         </div>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div className='thetitle'>

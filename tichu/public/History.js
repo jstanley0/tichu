@@ -1,5 +1,11 @@
 function History({data}) {
+  const { useEffect, useRef } = React
   const { List, ListItem, ListItemText, Divider } = MaterialUI
+
+  const endRef = useRef(null)
+  useEffect(() => {
+    endRef.current.scrollIntoView({ behavior: "smooth" })
+  }, data)
 
   return <div className="history-box">
     <List>
@@ -16,5 +22,6 @@ function History({data}) {
         ))
       }
     </List>
+    <div ref={endRef}/>
   </div>
 }
