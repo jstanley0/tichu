@@ -250,9 +250,9 @@ function PassTarget({card0, card1, card2}) {
   return <div style={{display: 'flex', margin: 5}}>
     <div style={{flexGrow: 1}}/>
     <PassHolder card={card0} droppableId='passLeft' caption="&#x2190;"/>
-    <Box width={40}/>
+    <Box width={60}/>
     <PassHolder card={card1} droppableId='passAcross' caption="&#x2191;"/>
-    <Box width={40}/>
+    <Box width={60}/>
     <PassHolder card={card2} droppableId='passRight' caption="&#x2192;"/>
     <div style={{flexGrow: 1}}/>
   </div>
