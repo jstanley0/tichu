@@ -1,7 +1,7 @@
-function Player({data, vertical, align}) {
+function Player({data, vertical, align, turn, trickWinner}) {
   const { Box } = MaterialUI
   return <div style={{display: 'flex', flexDirection: vertical ? 'column' : 'row', alignItems: align === 'right' ? 'flex-end' : 'flex-start'}}>
-    <PlayerInfo data={data}/>
+    <PlayerInfo data={data} turn={turn} trickWinner={trickWinner}/>
     <Box width={5} height={5}/>
     <div style={{flexGrow: 1, display: 'flex', flexDirection: vertical ? (align === 'right' ? 'row-reverse' : 'row') : 'column'}}>
       <div>
@@ -15,9 +15,9 @@ function Player({data, vertical, align}) {
   </div>
 }
 
-function PlayerInfo({data}) {
+function PlayerInfo({data, turn, trickWinner}) {
   const { Typography, Chip } = MaterialUI
-  return <div>
+  return <div className={turn ? 'playerinfo-turn' : (trickWinner ? 'playerinfo-trickwinner' : '')}>
       <Typography variant={data ? 'h6' : 'body2'} component='h2'>
         { data ? data.name : 'Waiting for player...'}
       </Typography>
@@ -50,7 +50,7 @@ function reorderArray(array, source_index, dest_index) {
 
 function Player0({gameState, socket}) {
   const { Box } = MaterialUI
-  const { useState, useCallback } = React
+  const { useState, useEffect } = React
   const { DragDropContext } = ReactBeautifulDnd
 
   const [ hand, setHand ] = useState(gameState.players[0].hand)
@@ -58,6 +58,17 @@ function Player0({gameState, socket}) {
   const [ card0, setCard0 ] = useState('')
   const [ card1, setCard1 ] = useState('')
   const [ card2, setCard2 ] = useState('')
+
+  // reconcile hand state with the server
+  useEffect(() => {
+    const client_cards = hand.concat(cards).sort().join()
+    const server_cards = Array.from(gameState.players[0].hand).sort().join()
+    if (client_cards !== server_cards) {
+      console.log('hand updated from server')
+      setHand(gameState.players[0].hand)
+      setCards([])
+    }
+  }, [gameState.players[0].hand])
 
   const onDragEnd = (result) => {
     console.log(result)
@@ -184,11 +195,12 @@ function Player0({gameState, socket}) {
 
   return <div style={{display: 'flex', alignItems: 'flex-end'}}>
     <div style={{flexGrow: 1}}/>
-    <PlayerInfo data={gameState.players[0]}/>
+    <PlayerInfo data={gameState.players[0]} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0}/>
     <Box width={5} height={5}/>
     <DragDropContext onDragEnd={onDragEnd}>
       <div style={{display: 'flex', flexDirection: 'column-reverse'}}>
         <Hand0 hand={hand}/>
+        <ActionBar gameState={gameState} socket={socket} cards={cards} card0={card0} card1={card1} card2={card2}/>
         { gameState.state === 'passing' ?
           (gameState.passed_cards ?
             <PassSplay vertical={false} align='left'/>
@@ -278,4 +290,73 @@ function PlayTarget({cards}) {
       </div>
     )}
   </Droppable>
+}
+
+function ActionBar({gameState, socket, cards, card0, card1, card2}) {
+  const { Button } = MaterialUI
+  const { useMemo, useCallback } = React
+
+  const validPlay = useMemo(() => {
+    // FIXME use a more efficient play representation, so we can test valid plays via hasOwnProperty
+    const cc = Array.from(cards).sort().join()
+    for (let play in gameState.possible_plays) {
+      const ps = Array.from(play).sort().join()
+      if (cc === ps) {
+        return true
+      }
+    }
+    return false
+  }, [cards, gameState.possible_plays])
+
+  function performAction(_event, info) {
+    const h = { command: info.action, ...info.params }
+    socket.send(JSON.stringify(h))
+  }
+
+  let buttons = []
+  switch(gameState.state) {
+  case 'passing':
+    if (gameState.players[0].can_gt) {
+      buttons.push({label: 'Call Grand Tichu', action: 'grand_tichu'})
+    } else if (gameState.players[0].can_tichu) {
+      buttons.push({label: 'Call Tichu', action: 'tichu'})
+    }
+
+    if (gameState.players[0].hand_size === 8) {
+      buttons.push({primary: true, label: 'Take cards', action: 'back6'})
+    }
+    else if (!gameState.players[0].passed_cards && card0 && card1 && card2) {
+      buttons.push({primary: true, label: 'Pass cards', action: 'pass_cards', params: {cards: [card0, card1, card2]}})
+    }
+    break
+
+  case 'playing':
+    if (gameState.players[0].can_tichu) {
+      buttons.push({label: 'Call Tichu', action: 'tichu'})
+    }
+
+    if (validPlay) {
+      buttons.push({primary: true, label: 'Play', action: 'play', params: {cards}})
+    }
+
+    if (gameState.turn == null && gameState.trick_winner === 0) {
+      if (gameState.dragon_trick) {
+        buttons.push({primary: true, label: `Give trick to ${gameState.players[1].name}`, action: 'claim', params: {to_player: 1}})
+        buttons.push({primary: true, label: `Give trick to ${gameState.players[3].name}`, action: 'claim', params: {to_player: 3}})
+      } else {
+        buttons.push({primary: true, label: 'Claim trick', action: 'claim'})
+      }
+    }
+    break
+  }
+
+  return <div style={{display: 'flex', justifyContent: 'center'}}>
+    {
+      buttons.map((button, index) => <Button className='action-button'
+                                                     color={button.primary ? 'primary' : 'default'}
+                                                     onClick={performAction.bind(button)}>
+        {button.label}
+      </Button>)
+    }
+  </div>
 }

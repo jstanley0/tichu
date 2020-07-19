@@ -6,7 +6,7 @@ function History({data}) {
     <div style={{maxHeight: '100%', overflowY: 'scroll'}}>
       <List style={{margin: 40}}>
         {
-          data.map((entry, index) => (
+          (data || []).map((entry, index) => (
             <React.Fragment key={index}>
               <ListItem>
                 <ListItemText>

@@ -27,7 +27,7 @@ end
 
 post '/join' do
   halt 400, 'missing required parameter `name`' unless params['name'].present?
-  game_id = params['game_id']
+  game_id = params['game_id'].upcase.strip
   halt 400, 'missing required parameter `game_id`' unless game_id.present?
   game = $games[game_id]
   halt 400, 'invalid game_id' unless game
@@ -42,6 +42,7 @@ end
 get '/connect' do
   halt 400, 'this is a websocket endpoint' unless request.websocket?
   game_id = params['game_id'].upcase.strip
+  STDERR.puts "Connect request to #{game_id}"
   halt 400, 'missing required parameter `game_id`' unless game_id.present?
   player_id = params['player_id'].upcase.strip
   halt 400, 'missing required parameter `player_id`' unless player_id

@@ -1,5 +1,6 @@
 body {
     background-color: #f9f9f9;
+    position: fixed;
 }
 
 .red-card {
@@ -19,11 +20,19 @@ body {
 }
 
 .special-card {
-    color: #c9cf2b;
+    color: goldenrod;
+}
+
+.card-back {
+    margin: 5px;
+    background-color: #e0e8f0;
 }
 
 .hand0 {
-    border: 1px solid black;
+    #border: 1px solid black;
+    background-color: #f0f0f0;
+    padding: 8px;
+
 }
 
 .passTarget {
@@ -35,5 +44,33 @@ body {
 }
 
 .card-dragover {
-    border-color: cornflowerblue;
+    background-color: #e0e8f0;
+}
+
+.playerinfo-turn {
+    border: 2px solid goldenrod;
+    border-radius: 2px;
+}
+
+.card-rank {
+    font-family: 'Roboto','Helvetica','Arial','sans-serif';
+    font-size: 24px;
+    margin: 4px;
+}
+
+.card-suit {
+    flex-grow: 1;
+    font-size: 40px;
+    text-align: center;
+    vertical-align: bottom;
+}
+
+.thetitle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.action-button {
+    margin: 5px 15px 5px 15px;
 }

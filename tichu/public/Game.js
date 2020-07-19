@@ -1,17 +1,34 @@
 function Game({game_id, player_id}) {
-  const { useState, useEffect, useRef } = React
-  const { Container, Box, Typography, Button, CircularProgress } = MaterialUI
+  const MAX_HISTORY = 20
+
+  const { useState, useEffect, useCallback } = React
+  const { Container, Box, Typography } = MaterialUI
 
   const [ socket, setSocket ] = useState()
   const [ gameState, setGameState ] = useState({"state":"connecting"})
   const [ history, setHistory ] = useState([])
 
+  const appendHistory = useCallback((entries) => {
+    let newHistory = history.concat(entries)
+    if (newHistory.length > MAX_HISTORY) {
+      newHistory.splice(0, newHistory.length - MAX_HISTORY)
+    }
+    setHistory(newHistory)
+  }, [history])
+
   useEffect(() => {
     const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}`)
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      if (data.action && data.action.hasOwnProperty('length')) {
-        setHistory(appendHistory(data.action))
+      let new_action = []
+      if (data.action.hasOwnProperty('length')) {
+        new_action = new_action.concat(data.action)
+      }
+      if (data.error) {
+        new_action.push(data.error)
+      }
+      if (new_action.length) {
+        setHistory(appendHistory(new_action))
       }
       setGameState(data)
     }
@@ -33,24 +50,24 @@ function Game({game_id, player_id}) {
       <div style={{display: 'flex', flexGrow: 1}}>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div style={{flexGrow: 1}}/>
-          <Player data={gameState.players[1]} vertical={true} align='left'/>
+          <Player data={gameState.players[1]} vertical={true} turn={gameState.turn === 1} trickWinner={gameState.trick_winner === 1} align='left'/>
           <div style={{flexGrow: 1}}/>
         </div>
         <div style={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
           <div style={{display: 'flex'}}>
             <div style={{flexGrow: 1}}/>
-            <Player data={gameState.players[2]} vertical={false}/>
+            <Player data={gameState.players[2]} vertical={false} turn={gameState.turn === 2} trickWinner={gameState.trick_winner === 2}/>
             <div style={{flexGrow: 1}}/>
           </div>
           <History data={history}/>
         </div>
         <div style={{display: 'flex', flexDirection: 'column'}}>
-          <div style={{height: 0}}>
+          <div className='thetitle'>
             <Typography align='right'>Touchless Tichu</Typography>
             <Typography variant='h4' align='right' component='h1'>{ gameState.id }</Typography>
           </div>
           <div style={{flexGrow: 1}}/>
-          <Player data={gameState.players[3]} vertical={true} align={'right'}/>
+          <Player data={gameState.players[3]} vertical={true} turn={gameState.turn === 3} trickWinner={gameState.trick_winner === 3} align='right'/>
           <div style={{flexGrow: 1}}/>
         </div>
       </div>
@@ -62,12 +79,3 @@ function Game({game_id, player_id}) {
   </Container>
 }
 
-const MAX_HISTORY = 20
-let idkwid = []
-function appendHistory(entries) {
-  idkwid = idkwid.concat(entries)
-  if (idkwid.length > MAX_HISTORY) {
-    idkwid.splice(0, idkwid.length - MAX_HISTORY)
-  }
-  return idkwid
-}
