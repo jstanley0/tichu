@@ -144,6 +144,7 @@ class State
         # if a player is in the position of playing over her own play, then she's winning the trick...
         # now we wait for her to claim the trick, or for someone to bomb it
         @trick_winner = @turn
+        add_action(players[@turn], "is winning the trick")
         @dragon_trick = last_frd_play.cards.any?(&:dragon?)
         @turn = :limbo
         break

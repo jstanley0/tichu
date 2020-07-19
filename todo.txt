@@ -3,18 +3,23 @@
 [x] some sort of event log
 [x] test play logic
 [x] automated player that basically plays randomly
-[.] test card functions
-[ ] fix action bar
-[ ] show who passed you which cards
-[ ] test error
+[x] fix action bar
+[x] test card functions
 [x] test Player0 PassSplay
-[ ] click card to play/unplay
-[ ] let the VIP shuffle players before the game starts
 [x] history catch-up
+[x] test error
+[x] make validPlay work
 [ ] rich history (i.e. show cards played)
+[ ] show who passed you which cards
+[ ] fix history scroll to bottom on update :rageface:
+[ ] fix passing replacement weirdness
+[ ] fix passing arrows
 [ ] wish modal, wishing
 [ ] bomb button
 [ ] score table
+[ ] click card to play/unplay
+[ ] let the VIP shuffle players before the game starts
+[ ] centered play area of maximum size, as a stepping stone to dynamic card size
 [ ] validPlay optimization
-[ ] centered play area of maximum size, as a stepping stone to
 [ ] dynamic card size
+[ ] server-side history window

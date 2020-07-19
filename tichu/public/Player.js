@@ -48,6 +48,16 @@ function reorderArray(array, source_index, dest_index) {
   return a
 }
 
+function swapWithArray(array, index, card) {
+  const a = Array.from(array)
+  if (card) {
+    a[index] = card
+  } else {
+    a.splice(index, 1)
+  }
+  return a
+}
+
 function Player0({gameState, socket}) {
   const { Box } = MaterialUI
   const { useState, useEffect } = React
@@ -118,35 +128,19 @@ function Player0({gameState, socket}) {
           case 'hand':
             setHand(removeFromArray(hand, source.index))
             break
-          case 'passLeft':
-            setCard0('')
-            break
-          case 'passAcross':
-            setCard1('')
-            break
-          case 'passRight':
-            setCard2('')
-            break
         }
         setCards(insertIntoArray(cards, draggableId, destination.index))
         break
       case 'passLeft':
         switch(source.droppableId) {
           case 'hand':
-            setHand(removeFromArray(hand, source.index))
-            break
-          case 'playTarget':
-            setCards(removeFromArray(cards, source.index))
+            setHand(swapWithArray(hand, source.index, card0))
             break
           case 'passAcross':
-            if (card0) {
-              setCard1(card0)
-            }
+            setCard1(card0)
             break
           case 'passRight':
-            if (card0) {
-              setCard2(card0)
-            }
+            setCard2(card0)
             break
         }
         setCard0(draggableId)
@@ -154,20 +148,13 @@ function Player0({gameState, socket}) {
       case 'passAcross':
         switch(source.droppableId) {
           case 'hand':
-            setHand(removeFromArray(hand, source.index))
-            break
-          case 'playTarget':
-            setCards(removeFromArray(cards, source.index))
+            setHand(swapWithArray(hand, source.index, card1))
             break
           case 'passLeft':
-            if (card1) {
-              setCard0(card1)
-            }
+            setCard0(card1)
             break
           case 'passRight':
-            if (card1) {
-              setCard2(card1)
-            }
+            setCard2(card1)
             break
         }
         setCard1(draggableId)
@@ -175,20 +162,13 @@ function Player0({gameState, socket}) {
       case 'passRight':
         switch(source.droppableId) {
           case 'hand':
-            setHand(removeFromArray(hand, source.index))
-            break
-          case 'playTarget':
-            setCards(removeFromArray(cards, source.index))
+            setHand(swapWithArray(hand, source.index, card2))
             break
           case 'passLeft':
-            if (card2) {
-              setCard0(card2)
-            }
+            setCard0(card2)
             break
           case 'passAcross':
-            if (card2) {
-              setCard1(card2)
-            }
+            setCard1(card2)
             break
         }
         setCard2(draggableId)
@@ -222,7 +202,7 @@ function Hand0({hand}) {
 
   return <Droppable droppableId='hand' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, display: 'flex', justifyContent: 'center'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, display: 'flex'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {hand.map((card, index) => (
           <Draggable draggableId={card} index={index} key={card}>
             {(provided, snapshot) => (
@@ -266,9 +246,9 @@ function PassTarget({card0, card1, card2}) {
   return <div style={{display: 'flex', margin: 5}}>
     <div style={{flexGrow: 1}}/>
     <PassHolder card={card0} droppableId='passLeft' caption="&#x2190;"/>
-    <Box width={10}/>
+    <Box width={40}/>
     <PassHolder card={card1} droppableId='passAcross' caption="&#x2191;"/>
-    <Box width={10}/>
+    <Box width={40}/>
     <PassHolder card={card2} droppableId='passRight' caption="&#x2192;"/>
     <div style={{flexGrow: 1}}/>
   </div>
@@ -278,7 +258,7 @@ function PlayTarget({cards}) {
   const { Draggable, Droppable } = ReactBeautifulDnd
   return <Droppable droppableId='playTarget' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, marginBottom: 5, display: 'flex', justifyContent: 'center'}} className={`playTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, marginBottom: 5, display: 'flex'}} className={`playTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {cards.map((card, index) => (
           <Draggable key={card} draggableId={card} index={index}>
             {(provided, snapshot) => (
@@ -302,14 +282,15 @@ function ActionBar({gameState, socket, cards, card0, card1, card2}) {
   const validPlay = useMemo(() => {
     // FIXME use a more efficient play representation, so we can test valid plays via hasOwnProperty
     const cc = Array.from(cards).sort().join()
-    for (let play in gameState.possible_plays) {
-      const ps = Array.from(play).sort().join()
+    const possible = gameState.players[0].possible_plays
+    for (let i in possible) {
+      const ps = Array.from(possible[i]).sort().join()
       if (cc === ps) {
         return true
       }
     }
     return false
-  }, [cards, gameState.possible_plays])
+  }, [cards, gameState.players[0].possible_plays])
 
   function performAction() {
     const h = { command: this.action, ...this.params }
@@ -339,7 +320,7 @@ function ActionBar({gameState, socket, cards, card0, card1, card2}) {
     }
 
     if (validPlay) {
-      buttons.push({primary: true, label: 'Play', action: 'play', params: {cards}})
+      buttons.push({primary: true, label: cards.length ? 'Play' : 'Pass', action: 'play', params: {cards}})
     }
 
     if (gameState.turn == null && gameState.trick_winner === 0) {
@@ -347,13 +328,13 @@ function ActionBar({gameState, socket, cards, card0, card1, card2}) {
         buttons.push({primary: true, label: `Give trick to ${gameState.players[1].name}`, action: 'claim', params: {to_player: 1}})
         buttons.push({primary: true, label: `Give trick to ${gameState.players[3].name}`, action: 'claim', params: {to_player: 3}})
       } else {
-        buttons.push({primary: true, label: 'Claim trick', action: 'claim'})
+        buttons.push({primary: true, label: 'Claim trick', action: 'claim', params: {to_player: 0}})
       }
     }
     break
   }
 
-  return <div style={{display: 'flex', justifyContent: 'center'}}>
+  return <div style={{display: 'flex', justifyContent: 'center'}} className='action-bar'>
     {
       buttons.map((button, index) => <Button className='action-button'
                                                      key={button.action}
