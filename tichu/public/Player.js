@@ -65,25 +65,25 @@ function Player0({gameState, socket}) {
 
   const [ hand, setHand ] = useState(gameState.players[0].hand)
   const [ cards, setCards ] = useState([])
-  const [ card0, setCard0 ] = useState('')
-  const [ card1, setCard1 ] = useState('')
-  const [ card2, setCard2 ] = useState('')
+  const [ passLeft, setPassLeft ] = useState('')
+  const [ passAcross, setPassAcross ] = useState('')
+  const [ passRight, setPassRight ] = useState('')
 
   // reconcile hand state with the server
   useEffect(() => {
     let client_cards = hand.concat(cards)
-    if (card0) client_cards.push(card0)
-    if (card1) client_cards.push(card1)
-    if (card2) client_cards.push(card2)
+    if (passLeft) client_cards.push(passLeft)
+    if (passAcross) client_cards.push(passAcross)
+    if (passRight) client_cards.push(passRight)
     client_cards = client_cards.sort().join()
     const server_cards = Array.from(gameState.players[0].hand).sort().join()
     if (client_cards !== server_cards) {
       console.log('hand updated from server')
       setHand(gameState.players[0].hand)
       setCards([])
-      setCard0('')
-      setCard1('')
-      setCard2('')
+      setPassLeft('')
+      setPassAcross('')
+      setPassRight('')
     }
   }, [gameState.players[0].hand])
 
@@ -116,13 +116,13 @@ function Player0({gameState, socket}) {
             setCards(removeFromArray(cards, source.index))
             break
           case 'passLeft':
-            setCard0('')
+            setPassLeft('')
             break
           case 'passAcross':
-            setCard1('')
+            setPassAcross('')
             break
           case 'passRight':
-            setCard2('')
+            setPassRight('')
             break
         }
         setHand(insertIntoArray(hand, draggableId, destination.index))
@@ -138,44 +138,44 @@ function Player0({gameState, socket}) {
       case 'passLeft':
         switch(source.droppableId) {
           case 'hand':
-            setHand(swapWithArray(hand, source.index, card0))
+            setHand(swapWithArray(hand, source.index, passLeft))
             break
           case 'passAcross':
-            setCard1(card0)
+            setPassAcross(passLeft)
             break
           case 'passRight':
-            setCard2(card0)
+            setPassRight(passLeft)
             break
         }
-        setCard0(draggableId)
+        setPassLeft(draggableId)
         break
       case 'passAcross':
         switch(source.droppableId) {
           case 'hand':
-            setHand(swapWithArray(hand, source.index, card1))
+            setHand(swapWithArray(hand, source.index, passAcross))
             break
           case 'passLeft':
-            setCard0(card1)
+            setPassLeft(passAcross)
             break
           case 'passRight':
-            setCard2(card1)
+            setPassRight(passAcross)
             break
         }
-        setCard1(draggableId)
+        setPassAcross(draggableId)
         break
       case 'passRight':
         switch(source.droppableId) {
           case 'hand':
-            setHand(swapWithArray(hand, source.index, card2))
+            setHand(swapWithArray(hand, source.index, passRight))
             break
           case 'passLeft':
-            setCard0(card2)
+            setPassLeft(passRight)
             break
           case 'passAcross':
-            setCard1(card2)
+            setPassAcross(passRight)
             break
         }
-        setCard2(draggableId)
+        setPassRight(draggableId)
         break
     }
   }
@@ -191,10 +191,10 @@ function Player0({gameState, socket}) {
           (gameState.players[0].passed_cards ?
             <PassSplay vertical={false} align='left'/>
             : (gameState.players[0].hand_size == 14) ?
-              <PassTarget card0={card0} card1={card1} card2={card2}/>
+              <PassTarget passLeft={passLeft} passAcross={passAcross} passRight={passRight}/>
               : null)
           : (gameState.state == 'playing' ?  <PlayTarget cards={cards}/> : null) }
-          <ActionBar gameState={gameState} socket={socket} cards={cards} card0={card0} card1={card1} card2={card2}/>
+          <ActionBar gameState={gameState} socket={socket} cards={cards} passLeft={passLeft} passAcross={passAcross} passRight={passRight}/>
       </div>
     </DragDropContext>
     <div style={{flexGrow: 1}}/>
@@ -245,15 +245,15 @@ function PassHolder({droppableId, caption, card})
     </Droppable>
 }
 
-function PassTarget({card0, card1, card2}) {
+function PassTarget({passLeft, passAcross, passRight}) {
   const { Box } = MaterialUI
   return <div style={{display: 'flex', margin: 5}}>
     <div style={{flexGrow: 1}}/>
-    <PassHolder card={card0} droppableId='passLeft' caption="&#x2190;"/>
+    <PassHolder card={passLeft} droppableId='passLeft' caption="&#x2190;"/>
     <Box width={60}/>
-    <PassHolder card={card1} droppableId='passAcross' caption="&#x2191;"/>
+    <PassHolder card={passAcross} droppableId='passAcross' caption="&#x2191;"/>
     <Box width={60}/>
-    <PassHolder card={card2} droppableId='passRight' caption="&#x2192;"/>
+    <PassHolder card={passRight} droppableId='passRight' caption="&#x2192;"/>
     <div style={{flexGrow: 1}}/>
   </div>
 }
@@ -279,7 +279,7 @@ function PlayTarget({cards}) {
   </Droppable>
 }
 
-function ActionBar({gameState, socket, cards, card0, card1, card2}) {
+function ActionBar({gameState, socket, cards, passLeft, passAcross, passRight}) {
   const { Button } = MaterialUI
   const { useMemo, useCallback } = React
 
@@ -313,8 +313,8 @@ function ActionBar({gameState, socket, cards, card0, card1, card2}) {
     if (gameState.players[0].hand_size === 8) {
       buttons.push({primary: true, label: 'Take cards', action: 'back6'})
     }
-    else if (!gameState.players[0].passed_cards && card0 && card1 && card2) {
-      buttons.push({primary: true, label: 'Pass cards', action: 'pass_cards', params: {cards: [card0, card1, card2]}})
+    else if (!gameState.players[0].passed_cards && passLeft && passAcross && passRight) {
+      buttons.push({primary: true, label: 'Pass cards', action: 'pass_cards', params: {cards: [passLeft, passAcross, passRight]}})
     }
     break
 

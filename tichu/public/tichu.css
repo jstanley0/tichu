@@ -35,7 +35,9 @@ body {
 }
 
 .passTarget {
-    border: 1px dashed black;
+    border: 2px solid darkgrey;
+    border-radius: 5px;
+    padding: 8px;
 }
 
 .pass-holder-arrow {
