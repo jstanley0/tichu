@@ -17,7 +17,7 @@ function Player({data, vertical, align, turn, trickWinner}) {
 
 function PlayerInfo({data, turn, trickWinner}) {
   const { Typography, Chip } = MaterialUI
-  return <div className={turn ? 'playerinfo-turn' : (trickWinner ? 'playerinfo-trickwinner' : '')}>
+  return <div className={'playerinfo ' + (turn ? 'playerinfo-turn' : (trickWinner ? 'playerinfo-trickwinner' : ''))}>
       <Typography variant={data ? 'h6' : 'body2'} component='h2'>
         { data ? data.name : 'Waiting for player...'}
       </Typography>
@@ -67,6 +67,9 @@ function Player0({gameState, socket}) {
       console.log('hand updated from server')
       setHand(gameState.players[0].hand)
       setCards([])
+      setCard0('')
+      setCard1('')
+      setCard2('')
     }
   }, [gameState.players[0].hand])
 
@@ -83,7 +86,7 @@ function Player0({gameState, socket}) {
         case 'hand':
           setHand(reorderArray(hand, source.index, destination.index))
           break
-        case 'cards':
+        case 'playTarget':
           setCards(reorderArray(cards, source.index, destination.index))
           break
       }
@@ -200,14 +203,14 @@ function Player0({gameState, socket}) {
     <DragDropContext onDragEnd={onDragEnd}>
       <div style={{display: 'flex', flexDirection: 'column-reverse'}}>
         <Hand0 hand={hand}/>
-        <ActionBar gameState={gameState} socket={socket} cards={cards} card0={card0} card1={card1} card2={card2}/>
         { gameState.state === 'passing' ?
-          (gameState.passed_cards ?
+          (gameState.players[0].passed_cards ?
             <PassSplay vertical={false} align='left'/>
-            : (gameState.players[0].hand.size == 14) ?
+            : (gameState.players[0].hand_size == 14) ?
               <PassTarget card0={card0} card1={card1} card2={card2}/>
               : null)
           : (gameState.state == 'playing' ?  <PlayTarget cards={cards}/> : null) }
+          <ActionBar gameState={gameState} socket={socket} cards={cards} card0={card0} card1={card1} card2={card2}/>
       </div>
     </DragDropContext>
     <div style={{flexGrow: 1}}/>
@@ -219,7 +222,7 @@ function Hand0({hand}) {
 
   return <Droppable droppableId='hand' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*70, height: 90, display: 'flex'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, display: 'flex'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {hand.map((card, index) => (
           <Draggable draggableId={card} index={index} key={card}>
             {(provided, snapshot) => (
@@ -242,12 +245,12 @@ function PassHolder({droppableId, caption, card})
 
   return <Droppable droppableId={droppableId} direction='horizontal'>
       {(provided, snapshot) => (
-        <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 70, height: 90}} className={`passTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
-          {caption}
+        <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 64, height: 88}} className={`passTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+          {!card && <div className='pass-holder-arrow'>{caption}</div> }
           {card && (<Draggable draggableId={card} index={0}>
             {(provided, snapshot) => (
               <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
-                <FaceCard key={card} dragging={snapshot.isDragging}/>
+                <FaceCard key={card} card={card} dragging={snapshot.isDragging}/>
                 {provided.placeholder}
               </div>
             )}
@@ -264,9 +267,9 @@ function PassTarget({card0, card1, card2}) {
     <div style={{flexGrow: 1}}/>
     <PassHolder card={card0} droppableId='passLeft' caption="&#x2190;"/>
     <Box width={10}/>
-    <PassHolder card={card1} droppableId='passAcross' caption="&#x2190;"/>
+    <PassHolder card={card1} droppableId='passAcross' caption="&#x2191;"/>
     <Box width={10}/>
-    <PassHolder card={card2} droppableId='passRight' caption="&#x2190;"/>
+    <PassHolder card={card2} droppableId='passRight' caption="&#x2192;"/>
     <div style={{flexGrow: 1}}/>
   </div>
 }
@@ -275,12 +278,12 @@ function PlayTarget({cards}) {
   const { Draggable, Droppable } = ReactBeautifulDnd
   return <Droppable droppableId='playTarget' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*70, height: 90, margin: 5}} className={`playTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, marginBottom: 5, display: 'flex'}} className={`playTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {cards.map((card, index) => (
-          <Draggable draggableId={card} index={index}>
+          <Draggable key={card} draggableId={card} index={index}>
             {(provided, snapshot) => (
               <div ref={provided.innerRef} {...provided.dragHandleProps} {...provided.draggableProps}>
-                <FaceCard key={card} card={card} dragging={snapshot.isDragging}/>
+                <FaceCard card={card} dragging={snapshot.isDragging}/>
                 {provided.placeholder}
               </div>
             )}
@@ -308,8 +311,8 @@ function ActionBar({gameState, socket, cards, card0, card1, card2}) {
     return false
   }, [cards, gameState.possible_plays])
 
-  function performAction(_event, info) {
-    const h = { command: info.action, ...info.params }
+  function performAction() {
+    const h = { command: this.action, ...this.params }
     socket.send(JSON.stringify(h))
   }
 
@@ -353,6 +356,7 @@ function ActionBar({gameState, socket, cards, card0, card1, card2}) {
   return <div style={{display: 'flex', justifyContent: 'center'}}>
     {
       buttons.map((button, index) => <Button className='action-button'
+                                                     key={button.action}
                                                      color={button.primary ? 'primary' : 'default'}
                                                      onClick={performAction.bind(button)}>
         {button.label}

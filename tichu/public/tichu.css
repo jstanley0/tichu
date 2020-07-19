@@ -29,27 +29,35 @@ body {
 }
 
 .hand0 {
-    #border: 1px solid black;
     background-color: #f0f0f0;
     padding: 8px;
 
 }
 
 .passTarget {
-    border: 1px dotted black;
+    border: 1px dashed black;
+}
+
+.pass-holder-arrow {
+    font-size: 24px;
+    margin: 4px;
 }
 
 .playTarget {
-    border: 1px dashed black;
+    background-color: #f0f0f0;
+    padding: 8px;
 }
 
 .card-dragover {
     background-color: #e0e8f0;
 }
 
+.playerinfo {
+    padding: 2px;
+}
+
 .playerinfo-turn {
-    border: 2px solid goldenrod;
-    border-radius: 2px;
+    background-color: gold;
 }
 
 .card-rank {
@@ -67,7 +75,7 @@ body {
 
 .thetitle {
     position: absolute;
-    top: 20px;
+    top: 0px;
     right: 20px;
 }
 

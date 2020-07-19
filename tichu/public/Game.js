@@ -8,18 +8,19 @@ function Game({game_id, player_id}) {
   const [ gameState, setGameState ] = useState({"state":"connecting"})
   const [ history, setHistory ] = useState([])
 
-  const appendHistory = useCallback((entries) => {
+  const appendHistory = (entries) => {
     let newHistory = history.concat(entries)
     if (newHistory.length > MAX_HISTORY) {
       newHistory.splice(0, newHistory.length - MAX_HISTORY)
     }
     setHistory(newHistory)
-  }, [history])
+  }
 
   useEffect(() => {
     const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}`)
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
+      console.log(data)
       let new_action = []
       if (data.action.hasOwnProperty('length')) {
         new_action = new_action.concat(data.action)
@@ -46,7 +47,7 @@ function Game({game_id, player_id}) {
   }
 
   return <Container maxWidth='xl'>
-    <div style={{display: 'flex', height: '100%', minWidth: 1000, minHeight: 750, flexDirection: 'column'}}>
+    <div style={{display: 'flex', height: '100%', minWidth: 1000, minHeight: 720, flexDirection: 'column'}}>
       <div style={{display: 'flex', flexGrow: 1}}>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div style={{flexGrow: 1}}/>
