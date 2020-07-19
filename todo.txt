@@ -17,6 +17,7 @@
 [ ] make play / trick winner indicators more better
 [ ] wish modal, wishing
 [ ] bomb button
+[ ] scores always visible
 [ ] score table
 [ ] click card to play/unplay
 [ ] let the VIP shuffle players before the game starts

@@ -71,7 +71,11 @@ function Player0({gameState, socket}) {
 
   // reconcile hand state with the server
   useEffect(() => {
-    const client_cards = hand.concat(cards).sort().join()
+    let client_cards = hand.concat(cards)
+    if (card0) client_cards.push(card0)
+    if (card1) client_cards.push(card1)
+    if (card2) client_cards.push(card2)
+    client_cards = client_cards.sort().join()
     const server_cards = Array.from(gameState.players[0].hand).sort().join()
     if (client_cards !== server_cards) {
       console.log('hand updated from server')
