@@ -1,7 +1,15 @@
 [X] eliminate Player token; use id for this purpose. don't expose id to other players; they just use index (0 = self)
 [x] make protocol terser
-[?] some sort of event log
-[.] automated player that basically plays randomly
-[ ] let the VIP shuffle players before the game starts
-[.] test card functions
+[x] some sort of event log
 [x] test play logic
+[x] automated player that basically plays randomly
+[.] test card functions
+[ ] let the VIP shuffle players before the game starts
+[ ] history catch-up
+[ ] rich history (i.e. show cards played)
+[ ] wish modal, wishing
+[ ] bomb button
+[ ] score table
+[ ] validPlay optimization
+[ ] centered play area of maximum size, as a stepping stone to
+[ ] dynamic card size
