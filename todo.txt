@@ -7,10 +7,10 @@
 [ ] fix action bar
 [ ] show who passed you which cards
 [ ] test error
-[ ] test Player0 PassSplay
+[x] test Player0 PassSplay
 [ ] click card to play/unplay
 [ ] let the VIP shuffle players before the game starts
-[ ] history catch-up
+[x] history catch-up
 [ ] rich history (i.e. show cards played)
 [ ] wish modal, wishing
 [ ] bomb button

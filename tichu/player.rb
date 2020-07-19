@@ -93,7 +93,7 @@ class Player
   end
 
   def can_call_grand_tichu?
-    hand.size <= 8 && hidden_cards.size >= 6
+    tichu == 0 && hand.size <= 8 && hidden_cards.size >= 6
   end
 
   def call_grand_tichu!

@@ -33,9 +33,12 @@ class State
     send_global_update
   end
 
+  PlayerInfo = Struct.new(:player_id, :next_message)
+
   def connect!(websocket, player_id = nil)
-    @conns[websocket] = player_id
-    websocket.send to_h(for_player: player_id).to_json
+    info = PlayerInfo.new(player_id, 0)
+    @conns[websocket] = info
+    websocket.send to_h(player_info: info).to_json
   end
 
   def disconnect!(websocket)
@@ -170,7 +173,7 @@ class State
       add_action(players[player_index], "passed")
     else
       @plays << play.tag(player_index)
-      add_action(players[player_index], "played #{play.cards.inspect}")
+      add_action(players[player_index], "played ~CARDS:#{play.to_h.to_json}")
     end
     if players[player_index].hand.empty?
       add_action(players[player_index], "has gone out")
@@ -237,16 +240,15 @@ class State
   end
 
   def send_global_update(error = nil)
-    @conns.each do |ws, player_id|
-      h = to_h(for_player: player_id)
+    @conns.each do |ws, info|
+      h = to_h(player_info: info)
       h.merge!(error: error) if error
       ws.send h.to_json
     end
-    @action = []
   end
 
   def send_update(websocket, error = nil)
-    h = to_h(for_player: @conns[websocket])
+    h = to_h(player_info: @conns[websocket])
     h.merge!(error: error) if error
     websocket.send h.to_json
   end
@@ -322,31 +324,37 @@ class State
     end
   end
 
-  def to_h(for_player: nil)
+  def to_h(player_info: nil)
     {
       id: id,
-      scores: rotate_scores(for_player),
-      players: rotate_players(for_player).map { |player| player.to_h(complete: player.id == for_player) },
+      scores: rotate_scores(player_info.player_id),
+      players: rotate_players(player_info.player_id).map { |player| player.to_h(complete: player.id == player_info.player_id) },
       end_score: end_score,
       state: state,
       wish_rank: Card.rank_string(wish_rank),
-      turn: turn.is_a?(Numeric) ? rotate_index(turn, for_player) : nil,
-      trick_winner: trick_winner ? rotate_index(trick_winner, for_player) : nil,
+      turn: turn.is_a?(Numeric) ? rotate_index(turn, player_info.player_id) : nil,
+      trick_winner: trick_winner ? rotate_index(trick_winner, player_info.player_id) : nil,
       dragon_trick: dragon_trick,
-      action: action,
-      last_play: last_play(for_player)
+      action: pending_messages(player_info),
+      last_play: last_play(player_info.player_id)
     }
   end
 
   def add_status(message)
     @action << message
-    puts message
+    puts "#{id}: #{message}"
   end
 
   def add_action(player, action)
     action_str = "#{player.name} #{action}"
     @action << action_str
     puts action_str
+  end
+
+  def pending_messages(player_info)
+    messages = @action[player_info.next_message..-1]
+    player_info.next_message = @action.size
+    messages
   end
 
   def team_name(index)

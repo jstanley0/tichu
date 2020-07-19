@@ -222,7 +222,7 @@ function Hand0({hand}) {
 
   return <Droppable droppableId='hand' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, display: 'flex'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, display: 'flex', justifyContent: 'center'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {hand.map((card, index) => (
           <Draggable draggableId={card} index={index} key={card}>
             {(provided, snapshot) => (
@@ -278,7 +278,7 @@ function PlayTarget({cards}) {
   const { Draggable, Droppable } = ReactBeautifulDnd
   return <Droppable droppableId='playTarget' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, marginBottom: 5, display: 'flex'}} className={`playTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, marginBottom: 5, display: 'flex', justifyContent: 'center'}} className={`playTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {cards.map((card, index) => (
           <Draggable key={card} draggableId={card} index={index}>
             {(provided, snapshot) => (

@@ -26,10 +26,10 @@ function Game({game_id, player_id}) {
         new_action = new_action.concat(data.action)
       }
       if (data.error) {
-        new_action.push(data.error)
+        new_action.push(`~ERROR: ${data.error}`)
       }
       if (new_action.length) {
-        setHistory(appendHistory(new_action))
+        appendHistory(new_action)
       }
       setGameState(data)
     }
