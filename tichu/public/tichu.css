@@ -73,11 +73,19 @@ body {
     margin: 4px;
 }
 
+.card-rank.card-small {
+    font-size: 18px;
+    margin: 1px 3px;
+}
+
 .card-suit {
-    flex-grow: 1;
     font-size: 40px;
     text-align: center;
-    vertical-align: bottom;
+}
+
+.card-suit.card-small {
+    font-size: 28px;
+    margin-top: -6px;
 }
 
 .thetitle {
@@ -91,11 +99,15 @@ body {
 }
 
 .history-box {
-    max-height: 400px;
+    max-height: 500px;
     overflow-y: scroll;
     margin: 40px;
 }
 
 .action-bar {
     min-height: 46px;
+}
+
+.MuiListItemText-root .MuiCard-root {
+    display: inline-block;
 }

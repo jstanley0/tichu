@@ -1,3 +1,4 @@
+done:
 [X] eliminate Player token; use id for this purpose. don't expose id to other players; they just use index (0 = self)
 [x] make protocol terser
 [x] some sort of event log
@@ -9,18 +10,24 @@
 [x] history catch-up
 [x] test error
 [x] make validPlay work
-[ ] rich history (i.e. show cards played)
-[ ] show who passed you which cards
+[x] rich history (i.e. show cards played)
+[x] show who passed you which cards
+
+critical:
+[ ] wish modal, wishing
 [ ] fix history scroll to bottom on update :rageface:
+[ ] scores always visible
+
+important:
+[ ] click card to play/unplay
+[ ] bomb button
+[ ] make play / trick winner indicators more better
+[ ] score table
+[ ] let the VIP shuffle players before the game starts
+
+nice to have:
 [ ] fix passing replacement weirdness
 [ ] fix passing arrows
-[ ] make play / trick winner indicators more better
-[ ] wish modal, wishing
-[ ] bomb button
-[ ] scores always visible
-[ ] score table
-[ ] click card to play/unplay
-[ ] let the VIP shuffle players before the game starts
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size
 [ ] validPlay optimization
 [ ] dynamic card size

@@ -84,7 +84,7 @@ class Player
   end
 
   def can_call_tichu?
-    hand.size == 14 && tichu == 0 && hidden_cards.size == 0 && plays.empty?
+    tichu == 0 && hidden_cards.size == 0 && plays.empty?
   end
 
   def call_tichu!

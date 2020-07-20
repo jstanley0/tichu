@@ -9,7 +9,7 @@ require_relative 'error'
 class State
   # state is one of: :joining, :passing, :playing, :over
   attr_reader :id, :state, :players, :plays, :wish_rank, :turn, :scores,
-              :out_order, :end_score, :trick_winner, :dragon_trick, :action
+              :out_order, :end_score, :trick_winner, :dragon_trick, :log
 
   def initialize(end_score: 1000, id: nil)
     @state = :joining
@@ -18,7 +18,7 @@ class State
     @players = []
     @end_score = end_score
     @conns = {}
-    @action = []
+    @log = []
   end
 
   def add_player!(player)
@@ -34,6 +34,7 @@ class State
   end
 
   PlayerInfo = Struct.new(:player_id, :next_message)
+  LogEntry = Struct.new(:text, :cards, :player_id)
 
   def connect!(websocket, player_id = nil)
     info = PlayerInfo.new(player_id, 0)
@@ -79,11 +80,11 @@ class State
           send_global_update
         when 'grand_tichu'
           player.call_grand_tichu!
-          add_action(player, "called Grand Tichu")
+          add_action(player, "called Grand Tichu!")
           send_global_update
         when 'tichu'
           player.call_tichu!
-          add_action(player, "called Tichu")
+          add_action(player, "called Tichu!")
           send_global_update
         else
           wat!(command, websocket)
@@ -92,7 +93,7 @@ class State
         case command
         when 'tichu'
           player.call_tichu!
-          add_action(player, "called Tichu")
+          add_action(player, "called Tichu!")
           send_global_update
         when 'claim'
           claim_trick!(player_index, json['to_player'])
@@ -125,6 +126,11 @@ class State
         players[(i + j + 1) % 4].accept_card(card, from_player: player.id)
       end
       player.done_passing_cards!
+    end
+
+    players.each_with_index do |player, i|
+      passed_cards = player.hand[-3..-1].rotate(i)
+      add_status("You received", player_id: player.id, cards: Card.serialize(passed_cards))
     end
 
     start_round!
@@ -173,8 +179,8 @@ class State
     if play.is_a?(Pass)
       add_action(players[player_index], "passed")
     else
+      add_action(players[player_index], plays.any? ? 'played' : 'led', cards: play.to_h)
       @plays << play.tag(player_index)
-      add_action(players[player_index], "played ~CARDS:#{play.to_h.to_json}")
     end
     if players[player_index].hand.empty?
       add_action(players[player_index], "has gone out")
@@ -336,26 +342,31 @@ class State
       turn: turn.is_a?(Numeric) ? rotate_index(turn, player_info.player_id) : nil,
       trick_winner: trick_winner ? rotate_index(trick_winner, player_info.player_id) : nil,
       dragon_trick: dragon_trick,
-      action: pending_messages(player_info),
+      log: pending_messages(player_info),
       last_play: last_play(player_info.player_id)
     }
   end
 
-  def add_status(message)
-    @action << message
-    puts "#{id}: #{message}"
+  def add_status(message, cards: nil, player_id: nil)
+    @log << LogEntry.new(message, cards, player_id)
+    puts "#{id} #{player_id}: #{message} #{cards.inspect}"
   end
 
-  def add_action(player, action)
+  def add_action(player, action, cards: nil, player_id: nil)
     action_str = "#{player.name} #{action}"
-    @action << action_str
+    @log << LogEntry.new(action_str, cards, player_id)
     puts action_str
   end
 
   def pending_messages(player_info)
-    messages = @action[player_info.next_message..-1]
-    player_info.next_message = @action.size
-    messages
+    messages = @log[player_info.next_message..-1]
+    player_info.next_message = @log.size
+    messages.select! { |message| message.player_id.nil? || message.player_id == player_info.player_id }
+    messages.map do |message|
+      h = { text: message.text }
+      h[:cards] = message.cards if message.cards.present?
+      h
+    end
   end
 
   def team_name(index)

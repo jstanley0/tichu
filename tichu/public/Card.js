@@ -17,7 +17,7 @@ function Card({vertical, collapse, label, rotate, translateX, translateY}) {
   </MaterialUI.Card>
 }
 
-function FaceCard({card, dragging}) {
+function FaceCard({card, dragging, small}) {
   const { Typography } = MaterialUI
   let color_style, rank_offset = 1, suit
   switch (card[0]) {
@@ -36,10 +36,11 @@ function FaceCard({card, dragging}) {
       case '1': suit = '🐣'; break;
     }
   }
-  return <MaterialUI.Card variant='elevation' elevation={dragging ? 5 : 1} style={{width: 60, height: 84, margin: 2}}>
-    <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
-      { rank ? <div className={`${color_style} card-rank`}>{rank}</div> : null }
-      <div className={`${color_style} card-suit`}>{suit}</div>
-    </div>
+  return <MaterialUI.Card variant='elevation'
+                          className={small ? 'card-small' : 'tichu-card'}
+                          elevation={dragging ? 5 : 1}
+                          style={{width: small ? 45 : 60, height: small ? 63 : 84, margin: 2}}>
+    <div className={`${color_style} card-rank ${small ? 'card-small' : ''}`}>{rank}</div>
+    <div className={`${color_style} card-suit ${small ? 'card-small' : ''}`}>{suit}</div>
   </MaterialUI.Card>
 }

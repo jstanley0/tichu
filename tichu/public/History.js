@@ -14,7 +14,9 @@ function History({data}) {
           <React.Fragment key={index}>
             <ListItem>
               <ListItemText>
-                { entry }
+                { entry.error ? `⚠️ ${entry.error}` : `${entry.text}` }
+                { entry.cards && entry.cards.map((card, index) =>
+                    <FaceCard key={card} card={card} small={true}/>) }
               </ListItemText>
             </ListItem>
             <Divider/>

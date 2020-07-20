@@ -22,15 +22,15 @@ function Game({game_id, player_id}) {
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
       console.log(data)
-      let new_action = []
-      if (data.action.hasOwnProperty('length')) {
-        new_action = new_action.concat(data.action)
+      let new_log = []
+      if (data.log.hasOwnProperty('length')) {
+        new_log = new_log.concat(data.log)
       }
       if (data.error) {
-        new_action.push(`~ERROR: ${data.error}`)
+        new_log.push({error: data.error})
       }
-      if (new_action.length) {
-        appendHistory(new_action)
+      if (new_log.length) {
+        appendHistory(new_log)
       }
       setGameState(data)
     }
