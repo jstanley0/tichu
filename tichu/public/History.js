@@ -1,6 +1,6 @@
 function History({data}) {
   const { useEffect, useRef } = React
-  const { List, ListItem, ListItemText, Divider } = MaterialUI
+  const { List, ListItem, Typography, Divider } = MaterialUI
 
   const endRef = useRef(null)
   useEffect(() => {
@@ -13,11 +13,10 @@ function History({data}) {
         (data || []).map((entry, index) => (
           <React.Fragment key={index}>
             <ListItem>
-              <ListItemText>
-                { entry.error ? `⚠️ ${entry.error}` : `${entry.text}` }
+              <Typography>{ entry.error ? `⚠️ ${entry.error}` : entry.text }</Typography>
+                &ensp;
                 { entry.cards && entry.cards.map((card, index) =>
-                    <FaceCard key={card} card={card} small={true}/>) }
-              </ListItemText>
+                  <FaceCard card={card} small={true}/>) }
             </ListItem>
             <Divider/>
           </React.Fragment>

@@ -75,7 +75,7 @@ body {
 
 .card-rank.card-small {
     font-size: 18px;
-    margin: 1px 3px;
+    margin: 3px;
 }
 
 .card-suit {
@@ -85,7 +85,6 @@ body {
 
 .card-suit.card-small {
     font-size: 28px;
-    margin-top: -6px;
 }
 
 .thetitle {
