@@ -14,7 +14,7 @@ done:
 [x] show who passed you which cards
 
 critical:
-[ ] fix history scroll to bottom on update :rageface: :why:
+[x] fix history scroll to bottom on update :rageface: :why:
 [ ] wish modal, wishing
 [ ] scores always visible
 [ ] wish visible
