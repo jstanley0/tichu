@@ -1,5 +1,6 @@
 // many sorry for this; I tried useState but it kept getting cleared unexpectedly
 window.tichu_history = []
+window.tichu_history_index = 0
 
 function Game({game_id, player_id}) {
   const MAX_HISTORY = 20
@@ -11,7 +12,10 @@ function Game({game_id, player_id}) {
   const [ gameState, setGameState ] = useState({"state":"connecting"})
 
   const appendHistory = (entries) => {
-    tichu_history.push(...entries)
+    entries.forEach((entry) => {
+      entry.id = tichu_history_index++
+      tichu_history.push(entry)
+    })
     if (tichu_history.length > MAX_HISTORY) {
       tichu_history.splice(0, tichu_history.length - MAX_HISTORY)
     }

@@ -345,7 +345,7 @@ function ActionBar({gameState, socket, cards, passLeft, passAcross, passRight}) 
     if (gameState.turn == null && gameState.trick_winner === 0) {
       if (gameState.dragon_trick) {
         buttons.push({primary: true, label: `Give trick to ${gameState.players[1].name}`, action: 'claim', params: {to_player: 1}})
-        buttons.push({primary: true, label: `Give trick to ${gameState.players[3].name}`, action: 'claim', params: {to_player: 3}})
+        buttons.push({primary: true, label: `Give trick to ${gameState.players[3].name}`, action: 'claim', key: 'claimR', params: {to_player: 3}})
       } else {
         buttons.push({primary: true, label: 'Claim trick', action: 'claim', params: {to_player: 0}})
       }
@@ -356,8 +356,8 @@ function ActionBar({gameState, socket, cards, passLeft, passAcross, passRight}) 
   return <div style={{display: 'flex', justifyContent: 'center'}} className='action-bar'>
     {
       buttons.map((button, index) => <Button className='action-button'
-                                                     key={button.action}
-                                                     color={button.primary ? 'primary' : 'default'}
+                                                     key={button.key || button.action}
+                                                     color={button.primary ? 'primary' : 'secondary'}
                                                      onClick={performAction.bind(button)}>
         {button.label}
       </Button>)

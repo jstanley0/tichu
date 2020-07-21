@@ -2,27 +2,32 @@ function History({data}) {
   const { useEffect } = React
   const { List, ListItem, Typography, Divider } = MaterialUI
 
+  function scrollHistory() {
+    console.log('scrolling...')
+    document.getElementById('history-list-end').scrollIntoView()
+  }
+
   useEffect(() => {
     // sometimes it just doesn't want to scroll far enough.
     // wondering if it's because we scroll before the history is fully rendered?
-    setTimeout(() => document.getElementById('history-list-end').scrollIntoView(), 100)
-    setTimeout(() => document.getElementById('history-list-end').scrollIntoView(), 1000)
-    setTimeout(() => document.getElementById('history-list-end').scrollIntoView(), 3000)
-  }, [data])
+    console.log('history change detected')
+    setTimeout(scrollHistory, 100)
+    setTimeout(scrollHistory, 1000)
+  }, [data.length && data[data.length - 1].id])
 
   return <div className="history-box">
     <List>
       {
-        (data || []).map((entry, index) => (
-          <React.Fragment key={index}>
+        data.map((entry) => (
+          <div key={entry.id}>
             <ListItem>
               <Typography>{ entry.error ? `⚠️ ${entry.error}` : entry.text }</Typography>
                 &ensp;
                 { entry.cards && entry.cards.map((card, index) =>
-                  <FaceCard card={card} small={true}/>) }
+                  <FaceCard card={card} key={card} small={true}/>) }
             </ListItem>
             <Divider/>
-          </React.Fragment>
+          </div>
         ))
       }
     </List>
