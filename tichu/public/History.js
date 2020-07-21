@@ -1,11 +1,14 @@
 function History({data}) {
-  const { useEffect, useRef } = React
+  const { useEffect } = React
   const { List, ListItem, Typography, Divider } = MaterialUI
 
-  const endRef = useRef(null)
   useEffect(() => {
-    endRef.current.scrollIntoView({ behavior: "smooth" })
-  }, data)
+    // sometimes it just doesn't want to scroll far enough.
+    // wondering if it's because we scroll before the history is fully rendered?
+    setTimeout(() => document.getElementById('history-list-end').scrollIntoView(), 100)
+    setTimeout(() => document.getElementById('history-list-end').scrollIntoView(), 1000)
+    setTimeout(() => document.getElementById('history-list-end').scrollIntoView(), 3000)
+  }, [data])
 
   return <div className="history-box">
     <List>
@@ -23,6 +26,6 @@ function History({data}) {
         ))
       }
     </List>
-    <div ref={endRef}/>
+    <div id='history-list-end'/>
   </div>
 }

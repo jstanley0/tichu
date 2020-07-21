@@ -14,11 +14,13 @@ done:
 [x] show who passed you which cards
 
 critical:
+[ ] fix history scroll to bottom on update :rageface: :why:
 [ ] wish modal, wishing
-[ ] fix history scroll to bottom on update :rageface:
 [ ] scores always visible
+[ ] wish visible
 
 important:
+[x] preserve local hand order after play
 [ ] click card to play/unplay
 [ ] bomb button
 [ ] make play / trick winner indicators more better
@@ -26,6 +28,7 @@ important:
 [ ] let the VIP shuffle players before the game starts
 
 nice to have:
+[ ] fade at top of history
 [ ] fix passing replacement weirdness
 [ ] fix passing arrows
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size

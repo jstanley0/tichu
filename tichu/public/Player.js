@@ -75,15 +75,27 @@ function Player0({gameState, socket}) {
     if (passLeft) client_cards.push(passLeft)
     if (passAcross) client_cards.push(passAcross)
     if (passRight) client_cards.push(passRight)
-    client_cards = client_cards.sort().join()
-    const server_cards = Array.from(gameState.players[0].hand).sort().join()
-    if (client_cards !== server_cards) {
-      console.log('hand updated from server')
+
+    // new hand, probably (or back 6, which I want to be sorted into the existing 8)
+    if (gameState.players[0].hand.some(card => !client_cards.includes(card))) {
       setHand(gameState.players[0].hand)
       setCards([])
       setPassLeft('')
       setPassAcross('')
       setPassRight('')
+      console.log('refreshed hand from server')
+      return
+    }
+
+    // cards passed or played. remove them from the hand, keeping the player's dragged order intact
+    const extra_cards = client_cards.filter(card => !gameState.players[0].hand.includes(card))
+    if (extra_cards.length) {
+      console.log(`reconciling client cards: removing ${extra_cards.length} extra cards`)
+      if (extra_cards.includes(passLeft)) setPassLeft('')
+      if (extra_cards.includes(passAcross)) setPassAcross('')
+      if (extra_cards.includes(passRight)) setPassRight('')
+      setHand(hand.filter(card => !extra_cards.includes(card)))
+      setCards(cards.filter(card => !extra_cards.includes(card)))
     }
   }, [gameState.players[0].hand])
 
@@ -227,7 +239,10 @@ function PassHolder({droppableId, caption, card})
 {
   const { Draggable, Droppable } = ReactBeautifulDnd
 
-  return <Droppable droppableId={droppableId} direction='horizontal'>
+  // FIXME the code intends to swap with the source if you drag onto a pass holder that already has a card
+  // and it kinda works but it leaves the Draggable in the PassHolder in a bad state, so just disable dropping
+  // on an occupied PassHolder for the moment
+  return <Droppable droppableId={droppableId} isDropDisabled={!!card}>
       {(provided, snapshot) => (
         <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 64, height: 88}} className={`passTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
           {!card && <div className='pass-holder-arrow'>{caption}</div> }
