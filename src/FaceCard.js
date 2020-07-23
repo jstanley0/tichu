@@ -1,24 +1,7 @@
-function Card({vertical, collapse, label, rotate, translateX, translateY}) {
-  const { Box, Typography } = MaterialUI
-  const cm = collapse && !label ? -40 : 2
-  return <MaterialUI.Card variant="outlined" style={{
-    marginRight: vertical ? 2 : cm,
-    marginBottom: vertical ? cm : 2,
-    width: vertical ? 84 : 60,
-    height: vertical ? 60 : 84,
-    transform: rotate ? `rotate(${rotate}deg)` :
-      (translateX ? `translateX(${translateX}px)` :
-        (translateY ? `translateY(${translateY}px)` :
-          null))
-  }}>
-    <Box width={vertical ? 74 : 50} height={vertical ? 50 : 74} className='card-back'>
-      <Typography className='card-back'>{label}</Typography>
-    </Box>
-  </MaterialUI.Card>
-}
+import React from 'react'
+import Card from '@material-ui/core/Card'
 
-function FaceCard({card, dragging, small}) {
-  const { Typography } = MaterialUI
+export default function FaceCard({card, dragging, small}) {
   let color_style, rank_offset = 1, suit
   switch (card[0]) {
     case 'r': color_style = 'red-card'; suit = '♥'; break
@@ -36,11 +19,11 @@ function FaceCard({card, dragging, small}) {
       case '1': suit = '🐣'; break;
     }
   }
-  return <MaterialUI.Card variant='elevation'
+  return <Card variant='elevation'
                           className={small ? 'card-small' : 'tichu-card'}
                           elevation={dragging ? 5 : 1}
                           style={{width: small ? 45 : 60, height: small ? 63 : 84, margin: 2}}>
     <div className={`${color_style} card-rank ${small ? 'card-small' : ''}`}>{rank}</div>
     <div className={`${color_style} card-suit ${small ? 'card-small' : ''}`}>{suit}</div>
-  </MaterialUI.Card>
+  </Card>
 }

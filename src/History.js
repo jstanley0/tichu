@@ -1,7 +1,11 @@
-function History({data}) {
-  const { useEffect } = React
-  const { List, ListItem, Typography, Divider } = MaterialUI
+import React, { useEffect } from 'react'
+import List from "@material-ui/core/List"
+import ListItem from "@material-ui/core/ListItem"
+import Typography from "@material-ui/core/Typography"
+import Divider from "@material-ui/core/Divider"
+import FaceCard from "./FaceCard"
 
+export default function History({data}) {
   function scrollHistory() {
     console.log('scrolling...')
     document.getElementById('history-list-end').scrollIntoView()
@@ -23,7 +27,7 @@ function History({data}) {
             <ListItem>
               <Typography>{ entry.error ? `⚠️ ${entry.error}` : entry.text }</Typography>
                 &ensp;
-                { entry.cards && entry.cards.map((card, index) =>
+                { entry.cards && entry.cards.map((card) =>
                   <FaceCard card={card} key={card} small={true}/>) }
             </ListItem>
             <Divider/>

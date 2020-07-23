@@ -1,12 +1,17 @@
+import React, { useState, useEffect } from 'react'
+import Container from "@material-ui/core/Container"
+import Typography from "@material-ui/core/Typography"
+import Box from "@material-ui/core/Box"
+import Player from "./Player"
+import Player0 from "./Player0"
+import History from "./History"
+
 // many sorry for this; I tried useState but it kept getting cleared unexpectedly
 window.tichu_history = []
 window.tichu_history_index = 0
 
-function Game({game_id, player_id}) {
+export default function Game({game_id, player_id}) {
   const MAX_HISTORY = 20
-
-  const { useState, useEffect, useCallback } = React
-  const { Container, Box, Typography } = MaterialUI
 
   const [ socket, setSocket ] = useState()
   const [ gameState, setGameState ] = useState({"state":"connecting"})
@@ -27,7 +32,7 @@ function Game({game_id, player_id}) {
       const data = JSON.parse(event.data)
       console.log(data)
       let new_log = []
-      if (data.log.hasOwnProperty('length')) {
+      if (data.log.length) {
         new_log = new_log.concat(data.log)
       }
       if (data.error) {
@@ -38,7 +43,7 @@ function Game({game_id, player_id}) {
       }
       setGameState(data)
     }
-    ws.onerror = (event) => {
+    ws.onerror = () => {
       window.location.href = '/'
     }
     setSocket(ws)

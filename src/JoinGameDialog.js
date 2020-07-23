@@ -1,7 +1,14 @@
-function JoinGameDialog(_props) {
-  const { useState } = React
-  const { Box, Typography, Container, TextField, Button, Grid } = MaterialUI
+import React, { useState } from 'react'
+import axios from 'axios'
+import Grid from "@material-ui/core/Grid"
+import Box from "@material-ui/core/Box"
+import Typography from "@material-ui/core/Typography"
+import Container from "@material-ui/core/Container"
+import TextField from '@material-ui/core/TextField'
+import Button from '@material-ui/core/Button'
+import {Connect} from "./index"
 
+export default function JoinGameDialog() {
   const [name, setName] = useState('')
   const [gameCode, setGameCode] = useState('')
   const [error, setError] = useState(null)

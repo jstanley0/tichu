@@ -6,7 +6,7 @@ done:
 [x] automated player that basically plays randomly
 [x] fix action bar
 [x] test card functions
-[x] test Player0 PassSplay
+[x] test MainPlayer PassSplay
 [x] history catch-up
 [x] test error
 [x] make validPlay work
@@ -34,4 +34,6 @@ nice to have:
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size
 [ ] validPlay optimization
 [ ] dynamic card size
-[ ] server-side history window
+
+wontfix:
+[ ] server-side history window -- game history is necessary to drive the score table on the client

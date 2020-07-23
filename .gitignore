@@ -1,0 +1,5 @@
+node_modules
+tichu/tichu.log
+tichu/.byebug_history
+tichu/public/dist
+.idea
