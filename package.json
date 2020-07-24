@@ -6,6 +6,10 @@
   "repository": "git@github.com:jstanley0/tichu.git",
   "author": "Jeremy Stanley <jstanley0@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": "10.x",
+    "yarn": "1.x"
+  },
   "dependencies": {
     "@babel/core": "^7.10.5",
     "@babel/preset-env": "^7.10.4",
@@ -23,5 +27,8 @@
     "eslint": "^7.5.0",
     "eslint-plugin-react": "^7.20.3",
     "webpack-cli": "^3.3.12"
+  },
+  "scripts": {
+    "build": "webpack --mode=production"
   }
 }
