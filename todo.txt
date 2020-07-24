@@ -15,12 +15,12 @@ done:
 
 critical:
 [x] fix history scroll to bottom on update :rageface: :why:
+[x] deploy to heroku
+[x] assets on heroku
+[ ] keepalive for heroku
 [ ] wish modal, wishing
 [ ] scores always visible
 [ ] wish visible
-[ ] deploy to heroku
-[ ] keepalive for heroku
-[ ] assets on heroku (just check in public/dist??)
 
 important:
 [x] preserve local hand order after play
