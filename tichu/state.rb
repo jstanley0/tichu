@@ -349,13 +349,11 @@ class State
 
   def add_status(message, cards: nil, player_id: nil)
     @log << LogEntry.new(message, cards, player_id)
-    puts "#{id} #{player_id}: #{message} #{cards.inspect}"
   end
 
   def add_action(player, action, cards: nil, player_id: nil)
     action_str = "#{player.name} #{action}"
     @log << LogEntry.new(action_str, cards, player_id)
-    puts action_str
   end
 
   def pending_messages(player_info)

@@ -11,13 +11,14 @@ export default function History({data}) {
     document.getElementById('history-list-end').scrollIntoView()
   }
 
+  const lastId = data.length ? data[data.length - 1].id : -1
   useEffect(() => {
     // sometimes it just doesn't want to scroll far enough.
     // wondering if it's because we scroll before the history is fully rendered?
     console.log('history change detected')
     setTimeout(scrollHistory, 100)
     setTimeout(scrollHistory, 1000)
-  }, [data.length && data[data.length - 1].id])
+  }, [lastId])
 
   return <div className="history-box">
     <List>

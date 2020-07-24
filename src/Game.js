@@ -6,7 +6,8 @@ import Player from "./Player"
 import Player0 from "./Player0"
 import History from "./History"
 
-// many sorry for this; I tried useState but it kept getting cleared unexpectedly
+// still haven't quite wrapped my head around how to make this work with useState etc.
+// the history disappears or the key indexes reset to 0 or other weird stuff. so punt for now
 window.tichu_history = []
 window.tichu_history_index = 0
 
@@ -18,11 +19,11 @@ export default function Game({game_id, player_id}) {
 
   const appendHistory = (entries) => {
     entries.forEach((entry) => {
-      entry.id = tichu_history_index++
-      tichu_history.push(entry)
+      entry.id = window.tichu_history_index++
+      window.tichu_history.push(entry)
     })
-    if (tichu_history.length > MAX_HISTORY) {
-      tichu_history.splice(0, tichu_history.length - MAX_HISTORY)
+    if (window.tichu_history.length > MAX_HISTORY) {
+      window.tichu_history.splice(0, window.tichu_history.length - MAX_HISTORY)
     }
   }
 
@@ -47,12 +48,12 @@ export default function Game({game_id, player_id}) {
       window.location.href = '/'
     }
     setSocket(ws)
-  }, [])
+  }, [game_id, player_id])
 
   if (gameState['state'] === 'connecting') {
     return <Container>
       <Typography>Connecting...</Typography>
-      <History data={tichu_history}/>
+      <History data={window.tichu_history}/>
     </Container>
   }
 
@@ -70,7 +71,7 @@ export default function Game({game_id, player_id}) {
             <Player data={gameState.players[2]} vertical={false} turn={gameState.turn === 2} trickWinner={gameState.trick_winner === 2}/>
             <div style={{flexGrow: 1}}/>
           </div>
-          <History data={tichu_history}/>
+          <History data={window.tichu_history}/>
         </div>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div className='thetitle'>
