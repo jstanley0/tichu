@@ -41,7 +41,7 @@ body {
 }
 
 .pass-holder-arrow {
-    font-size: 24px;
+    font-size: 20px;
     margin: 4px;
 }
 
@@ -68,22 +68,14 @@ body {
 }
 
 .card-rank {
-    font-size: 24px;
-    margin: 4px;
-}
-
-.card-rank.card-small {
-    font-size: 18px;
-    margin: 3px;
+    font-size: 19px;
+    margin: 3px 3px 0 3px;
 }
 
 .card-suit {
-    font-size: 40px;
+    margin-top: -2px;
+    font-size: 30px;
     text-align: center;
-}
-
-.card-suit.card-small {
-    font-size: 28px;
 }
 
 .thetitle {

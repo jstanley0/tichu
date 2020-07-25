@@ -1,7 +1,8 @@
 import React from 'react'
 import Card from '@material-ui/core/Card'
+import { cardWidth, cardHeight, cardMargin } from './Dimensions'
 
-export default function FaceCard({card, dragging, small}) {
+export default function FaceCard({card, dragging}) {
   let color_style, rank_offset = 1, suit
   switch (card[0]) {
     case 'r': color_style = 'red-card'; suit = '♥'; break
@@ -20,10 +21,10 @@ export default function FaceCard({card, dragging, small}) {
     }
   }
   return <Card variant='elevation'
-                          className={small ? 'card-small' : 'tichu-card'}
+                          className={'tichu-card'}
                           elevation={dragging ? 5 : 1}
-                          style={{width: small ? 45 : 60, height: small ? 63 : 84, margin: 2}}>
-    <div className={`${color_style} card-rank ${small ? 'card-small' : ''}`}>{rank}</div>
-    <div className={`${color_style} card-suit ${small ? 'card-small' : ''}`}>{suit}</div>
+                          style={{width: cardWidth, height: cardHeight, margin: cardMargin}}>
+    <div className={`${color_style} card-rank`}>{rank}</div>
+    <div className={`${color_style} card-suit`}>{suit}</div>
   </Card>
 }
