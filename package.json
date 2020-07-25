@@ -29,6 +29,7 @@
     "webpack-cli": "^3.3.12"
   },
   "scripts": {
-    "build": "webpack --mode=production"
+    "build": "webpack --mode=production",
+    "dev": "webpack --mode=development --watch"
   }
 }

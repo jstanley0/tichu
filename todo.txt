@@ -17,10 +17,10 @@ critical:
 [x] fix history scroll to bottom on update :rageface: :why:
 [x] deploy to heroku
 [x] assets on heroku
+[x] wish modal, wishing
+[x] wish visible
+[x] scores always visible
 [ ] keepalive for heroku
-[ ] wish modal, wishing
-[ ] scores always visible
-[ ] wish visible
 
 important:
 [x] preserve local hand order after play
@@ -29,6 +29,7 @@ important:
 [ ] make play / trick winner indicators more better
 [ ] score table
 [ ] let the VIP shuffle players before the game starts
+[ ] observer mode
 
 nice to have:
 [ ] fade at top of history

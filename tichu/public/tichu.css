@@ -88,9 +88,25 @@ body {
 }
 
 .thetitle {
-    position: absolute;
-    top: 0px;
-    right: 20px;
+    height: 65px;
+}
+
+.status_box {
+    height: 65px;
+}
+
+.score_box {
+    margin: 5px;
+}
+
+.wish_box {
+    margin: 5px;
+}
+
+.topline {
+    text-align: center;
+    font-size: x-large;
+    font-family: 'Roboto','Helvetica','Arial','sans-serif';
 }
 
 .action-button {

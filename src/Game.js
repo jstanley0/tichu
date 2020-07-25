@@ -5,6 +5,7 @@ import Box from "@material-ui/core/Box"
 import Player from "./Player"
 import Player0 from "./Player0"
 import History from "./History"
+import StatusBox from "./StatusBox"
 
 // still haven't quite wrapped my head around how to make this work with useState etc.
 // the history disappears or the key indexes reset to 0 or other weird stuff. so punt for now
@@ -61,6 +62,7 @@ export default function Game({game_id, player_id}) {
     <div style={{display: 'flex', height: '100%', minWidth: 1000, minHeight: 720, flexDirection: 'column'}}>
       <div style={{display: 'flex', flexGrow: 1}}>
         <div style={{display: 'flex', flexDirection: 'column'}}>
+          <StatusBox wish={gameState.wish_rank} scores={gameState.scores}/>
           <div style={{flexGrow: 1}}/>
           <Player data={gameState.players[1]} vertical={true} turn={gameState.turn === 1} trickWinner={gameState.trick_winner === 1} align='left'/>
           <div style={{flexGrow: 1}}/>
@@ -75,8 +77,8 @@ export default function Game({game_id, player_id}) {
         </div>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div className='thetitle'>
-            <Typography align='right'>Touchless Tichu</Typography>
-            <Typography variant='h4' align='right' component='h1'>{ gameState.id }</Typography>
+            <Typography align='right' variant='overline'>Touchless Tichu</Typography>
+            <div className='topline'>{ gameState.id }</div>
           </div>
           <div style={{flexGrow: 1}}/>
           <Player data={gameState.players[3]} vertical={true} turn={gameState.turn === 3} trickWinner={gameState.trick_winner === 3} align='right'/>

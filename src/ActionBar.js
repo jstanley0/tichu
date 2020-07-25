@@ -1,7 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import Button from '@material-ui/core/Button'
+import WishModal from './WishModal'
 
 export default function ActionBar({gameState, socket, cards, passLeft, passAcross, passRight}) {
+  const [wishing, setWishing] = useState(false)
+
   const validPlay = useMemo(() => {
     // FIXME use a more efficient play representation, so we can test valid plays via hasOwnProperty
     const cc = Array.from(cards).sort().join()
@@ -15,9 +18,23 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
     return false
   }, [cards, gameState.players[0].possible_plays])
 
-  function performAction() {
-    const h = {command: this.action, ...this.params}
+  const handleWish = useCallback((rank) => {
+    const h = {command: 'play', cards, wish_rank: rank}
     socket.send(JSON.stringify(h))
+    setWishing(false)
+  }, [cards, socket])
+
+  const cancelWish = useCallback(() => {
+    setWishing(false)
+  }, [])
+
+  function performAction() {
+    if (this.action === 'wish') {
+      setWishing(true)
+    } else {
+      const h = {command: this.action, ...this.params}
+      socket.send(JSON.stringify(h))
+    }
   }
 
   let buttons = []
@@ -47,7 +64,11 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
       }
 
       if (validPlay) {
-        buttons.push({primary: true, label: cards.length ? 'Play' : 'Pass', action: 'play', params: {cards}})
+        if (cards.includes('1')) {
+          buttons.push({primary: true, label: 'Wish', action: 'wish'})
+        } else {
+          buttons.push({primary: true, label: cards.length ? 'Play' : 'Pass', action: 'play', params: {cards}})
+        }
       }
 
       if (gameState.turn == null && gameState.trick_winner === 0) {
@@ -72,7 +93,8 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
       break
   }
 
-  return <div style={{display: 'flex', justifyContent: 'center'}} className='action-bar'>
+  return <React.Fragment>
+    <div style={{display: 'flex', justifyContent: 'center'}} className='action-bar'>
     {
       buttons.map((button) => <Button className='action-button'
                                       key={button.key || button.action}
@@ -81,5 +103,7 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
         {button.label}
       </Button>)
     }
-  </div>
+    </div>
+    <WishModal open={wishing} onWish={handleWish} onCancel={cancelWish}/>
+  </React.Fragment>
 }

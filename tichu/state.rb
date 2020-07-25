@@ -195,7 +195,7 @@ class State
       add_action(players[player_index], "wishes for #{wished_rank}")
     elsif wish_rank
       if play.fulfills_wish?(@wish_rank)
-        add_action(players[player_index], "fulfills the wish for #{Card.rank_from_string(wish_rank)}")
+        add_action(players[player_index], "fulfilled the wish for #{Card.rank_string(wish_rank)}")
         @wish_rank = nil
       end
     end
