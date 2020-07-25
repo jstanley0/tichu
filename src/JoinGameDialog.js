@@ -20,7 +20,11 @@ export default function JoinGameDialog() {
         Connect(response.data.game_id, response.data.player_id)
       })
       .catch(error => {
-        setError(error.toString())
+        if (error.response?.status === 400 || error.response?.status === 403) {
+          setError(error.response.data)
+        } else {
+          setError(error.toString())
+        }
       })
   }
 

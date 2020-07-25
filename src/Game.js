@@ -1,49 +1,29 @@
 import React, { useState, useEffect } from 'react'
 import Container from "@material-ui/core/Container"
-import Typography from "@material-ui/core/Typography"
 import Box from "@material-ui/core/Box"
 import Player from "./Player"
 import Player0 from "./Player0"
 import History from "./History"
 import StatusBox from "./StatusBox"
-
-// still haven't quite wrapped my head around how to make this work with useState etc.
-// the history disappears or the key indexes reset to 0 or other weird stuff. so punt for now
-window.tichu_history = []
-window.tichu_history_index = 0
+import GlobalHistory from "./GlobalHistory"
 
 export default function Game({game_id, player_id}) {
   const MAX_HISTORY = 20
 
   const [ socket, setSocket ] = useState()
   const [ gameState, setGameState ] = useState({"state":"connecting"})
-
-  const appendHistory = (entries) => {
-    entries.forEach((entry) => {
-      entry.id = window.tichu_history_index++
-      window.tichu_history.push(entry)
-    })
-    if (window.tichu_history.length > MAX_HISTORY) {
-      window.tichu_history.splice(0, window.tichu_history.length - MAX_HISTORY)
-    }
-  }
+  const [ history, setHistory ] = useState([])
 
   useEffect(() => {
     const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}`)
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
       console.log(data)
-      let new_log = []
-      if (data.log.length) {
-        new_log = new_log.concat(data.log)
-      }
-      if (data.error) {
-        new_log.push({error: data.error})
-      }
-      if (new_log.length) {
-        appendHistory(new_log)
-      }
+      setHistory(GlobalHistory.consume(data.log, data.error, MAX_HISTORY))
       setGameState(data)
+    }
+    ws.onclose = () => {
+      setHistory(GlobalHistory.consume([], "You have been disconnected. Reload the page to reconnect.", MAX_HISTORY))
     }
     ws.onerror = () => {
       window.location.href = '/'
@@ -53,8 +33,8 @@ export default function Game({game_id, player_id}) {
 
   if (gameState['state'] === 'connecting') {
     return <Container>
-      <Typography>Connecting...</Typography>
-      <History data={window.tichu_history}/>
+      <em>Connecting...</em>
+      <History data={history}/>
     </Container>
   }
 
@@ -73,12 +53,12 @@ export default function Game({game_id, player_id}) {
             <Player data={gameState.players[2]} vertical={false} turn={gameState.turn === 2} trickWinner={gameState.trick_winner === 2}/>
             <div style={{flexGrow: 1}}/>
           </div>
-          <History data={window.tichu_history}/>
+          <History data={history}/>
         </div>
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div className='thetitle'>
-            <Typography align='right' variant='overline'>Touchless Tichu</Typography>
-            <div className='topline'>{ gameState.id }</div>
+            <div className='overline'>Touchless Tichu</div>
+            <div className='big'>{ gameState.id }</div>
           </div>
           <div style={{flexGrow: 1}}/>
           <Player data={gameState.players[3]} vertical={true} turn={gameState.turn === 3} trickWinner={gameState.trick_winner === 3} align='right'/>

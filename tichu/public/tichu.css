@@ -1,6 +1,7 @@
 body {
     background-color: #f9f9f9;
     position: fixed;
+    font-family: 'Roboto','Helvetica','Arial','sans-serif';
 }
 
 .red-card {
@@ -68,7 +69,6 @@ body {
 }
 
 .card-rank {
-    font-family: 'Roboto','Helvetica','Arial','sans-serif';
     font-size: 24px;
     margin: 4px;
 }
@@ -91,6 +91,25 @@ body {
     height: 65px;
 }
 
+.thetitle div {
+    text-align: right;
+}
+
+.overline {
+    font-size: smaller;
+    letter-spacing: 0.05rem;
+    text-transform: uppercase;
+    line-height: 1.5;
+}
+
+.thetitle .gameId {
+    font-size: x-large;
+}
+
+.big {
+    font-size: x-large;
+}
+
 .status_box {
     height: 65px;
 }
@@ -103,17 +122,12 @@ body {
     margin: 5px;
 }
 
-.topline {
-    text-align: center;
-    font-size: x-large;
-    font-family: 'Roboto','Helvetica','Arial','sans-serif';
-}
-
 .action-button {
     margin: 5px 15px 5px 15px;
 }
 
 .history-box {
+    border-top: 1px solid lightgray;
     max-height: 500px;
     overflow-y: scroll;
     margin: 40px;

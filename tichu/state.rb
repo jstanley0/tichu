@@ -71,11 +71,11 @@ class State
         case command
         when 'back6'
           player.uncover_last_6!
-          add_action(player, "took remaining cards")
+          #add_action(player, "took remaining cards")
           send_global_update
         when 'pass_cards'
           player.pass_cards!(json['cards'])
-          add_action(player, "passed cards")
+          #add_action(player, "passed cards")
           perform_passes! if players.all?(&:passed_cards?)
           send_global_update
         when 'grand_tichu'
