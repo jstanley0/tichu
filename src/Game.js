@@ -38,7 +38,7 @@ export default function Game({game_id, player_id}) {
     </Container>
   }
 
-  return <Container maxWidth='xl'>
+  return <Container maxWidth='lg'>
     <div style={{display: 'flex', height: '100%', minWidth: 1000, minHeight: 720, flexDirection: 'column'}}>
       <div style={{display: 'flex', flexGrow: 1}}>
         <div style={{display: 'flex', flexDirection: 'column'}}>
