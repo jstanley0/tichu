@@ -21,7 +21,7 @@ critical:
 [x] wish visible
 [x] scores always visible
 [x] disconnect message
-[ ] keepalive for heroku
+[x] keepalive for heroku
 
 important:
 [x] preserve local hand order after play
@@ -33,7 +33,6 @@ important:
 [ ] observer mode
 
 nice to have:
-[?] fade at top of history
 [ ] fix passing replacement weirdness
 [ ] fix passing arrows
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size
@@ -41,4 +40,5 @@ nice to have:
 [ ] dynamic card size
 
 wontfix:
+[ ] fade at top of history -- looked a bit weird, fiddly to implement, a plain border works better
 [ ] server-side history window -- game history is necessary to drive the score table on the client

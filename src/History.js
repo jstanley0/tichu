@@ -7,7 +7,6 @@ import FaceCard from "./FaceCard"
 
 export default function History({data}) {
   function scrollHistory() {
-    console.log('scrolling...')
     document.getElementById('history-list-end').scrollIntoView()
   }
 
@@ -15,7 +14,6 @@ export default function History({data}) {
   useEffect(() => {
     // sometimes it just doesn't want to scroll far enough.
     // wondering if it's because we scroll before the history is fully rendered?
-    console.log('history change detected')
     setTimeout(scrollHistory, 100)
     setTimeout(scrollHistory, 1000)
   }, [lastId])

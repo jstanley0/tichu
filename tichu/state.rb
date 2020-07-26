@@ -51,6 +51,8 @@ class State
   end
 
   def message(data, websocket, player_id)
+    return if data == 'ping' # KeepAlive
+
     player_index = players.find_index { |player| player.id == player_id }
     return unless player_index # observers are read-only
 

@@ -6,6 +6,7 @@ import Player0 from "./Player0"
 import History from "./History"
 import StatusBox from "./StatusBox"
 import GlobalHistory from "./GlobalHistory"
+import KeepAlive from "./KeepAlive"
 
 export default function Game({game_id, player_id}) {
   const MAX_HISTORY = 20
@@ -18,7 +19,7 @@ export default function Game({game_id, player_id}) {
     const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}`)
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      console.log(data)
+      KeepAlive.reset(ws)
       setHistory(GlobalHistory.consume(data.log, data.error, MAX_HISTORY))
       setGameState(data)
     }

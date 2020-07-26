@@ -74,9 +74,7 @@ export default function Player0({gameState, socket}) {
     }
   }, [gameState.players[0].hand])
 
-  const onDragEnd = (result) => {
-    console.log(result)
-    const {source, destination, draggableId} = result
+  const onDragEnd = ({source, destination, draggableId} ) => {
     if (!destination) {
       return
     }
