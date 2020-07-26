@@ -39,6 +39,10 @@ post '/join' do
   { game_id: game.id, player_id: player.id }.to_json
 end
 
+get '/ping' do
+  'pong'
+end
+
 get '/connect' do
   halt 400, 'this is a websocket endpoint' unless request.websocket?
   game_id = params['game_id'].upcase.strip
