@@ -25,9 +25,9 @@ critical:
 
 important:
 [x] preserve local hand order after play
+[x] make play / trick winner indicators more better
 [ ] click card to play/unplay
 [ ] bomb button
-[ ] make play / trick winner indicators more better
 [ ] score table
 [ ] let the VIP shuffle players before the game starts
 [ ] observer mode

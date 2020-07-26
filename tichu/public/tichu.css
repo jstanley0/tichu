@@ -59,12 +59,22 @@ body {
     padding: 2px;
 }
 
-.playerinfo-turn {
-    background-color: gold;
+.playerinfo h2 {
+    margin: 4px;
 }
 
-.playerinfo-trickwinner {
-    background-color: lightpink;
+.playerinfo-turn h2 {
+    padding: 2px;
+    border: 2px solid dodgerblue;
+    border-radius: 4px;
+    background-color: aliceblue;
+}
+
+.playerinfo-trickwinner h2 {
+    padding: 2px;
+    border: 2px solid gold;
+    border-radius: 4px;
+    background-color: lightgoldenrodyellow;
 }
 
 .card-rank {
