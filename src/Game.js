@@ -19,7 +19,12 @@ export default function Game({game_id, player_id}) {
     const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}`)
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      KeepAlive.reset(ws)
+      if (data.state === 'over') {
+        KeepAlive.stop()
+        ws.close()
+      } else {
+        KeepAlive.reset(ws)
+      }
       setHistory(GlobalHistory.consume(data.log, data.error, MAX_HISTORY))
       setGameState(data)
     }
