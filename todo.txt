@@ -26,13 +26,14 @@ critical:
 important:
 [x] preserve local hand order after play
 [x] make play / trick winner indicators more better
-[ ] click card to play/unplay
-[ ] bomb button
+[x] click card to play/unplay
+[x] bomb button
 [ ] score table
 [ ] let the VIP shuffle players before the game starts
 [ ] observer mode
 
 nice to have:
+[ ] persistent button positioning in action bar
 [ ] fix passing replacement weirdness
 [ ] fix passing arrows
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size

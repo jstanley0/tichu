@@ -2,7 +2,7 @@ import React, { useMemo, useState, useCallback } from 'react'
 import Button from '@material-ui/core/Button'
 import WishModal from './WishModal'
 
-export default function ActionBar({gameState, socket, cards, passLeft, passAcross, passRight}) {
+export default function ActionBar({gameState, socket, cards, passLeft, passAcross, passRight, selectCards}) {
   const [wishing, setWishing] = useState(false)
 
   const validPlay = useMemo(() => {
@@ -31,6 +31,10 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
   function performAction() {
     if (this.action === 'wish') {
       setWishing(true)
+    } else if (this.action === 'clear_selection') {
+      selectCards([])
+    } else if (this.action === 'load_bomb') {
+      selectCards(this.bomb)
     } else {
       const h = {command: this.action, ...this.params}
       socket.send(JSON.stringify(h))
@@ -61,6 +65,14 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
     case 'playing':
       if (gameState.players[0].can_tichu) {
         buttons.push({label: 'Call Tichu', action: 'tichu'})
+      }
+
+      if (cards.length > 0) {
+        buttons.push({label: 'Clear', action: 'clear_selection'})
+      }
+
+      if (gameState.players[0].bomb) {
+        buttons.push({label: 'Load Bomb', action: 'load_bomb', bomb: gameState.players[0].bomb})
       }
 
       if (validPlay) {

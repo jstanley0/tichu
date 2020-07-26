@@ -45,12 +45,6 @@ body {
     margin: 4px;
 }
 
-.playTarget {
-    border: 2px solid darkgrey;
-    border-radius: 5px;
-    padding: 8px;
-}
-
 .card-dragover {
     background-color: #e0e8f0;
 }

@@ -1,22 +1,15 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import Box from "@material-ui/core/Box"
 import { DragDropContext } from 'react-beautiful-dnd'
 import PlayerInfo from "./PlayerInfo"
 import PassSplay from "./PassSplay"
 import PassTarget from "./PassTarget"
-import PlayTarget from "./PlayTarget"
 import ActionBar from "./ActionBar"
 import Hand0 from "./Hand0"
 
 function insertIntoArray(array, value, index) {
   const a = Array.from(array)
   a.splice(index, 0, value)
-  return a
-}
-
-function removeFromArray(array, index) {
-  const a = Array.from(array)
-  a.splice(index, 1)
   return a
 }
 
@@ -39,14 +32,20 @@ function swapWithArray(array, index, card) {
 
 export default function Player0({gameState, socket}) {
   const [ hand, setHand ] = useState(gameState.players[0].hand)
-  const [ cards, setCards ] = useState([])
+  const [ selection, setSelection ] = useState({})
   const [ passLeft, setPassLeft ] = useState('')
   const [ passAcross, setPassAcross ] = useState('')
   const [ passRight, setPassRight ] = useState('')
 
+  const deselectCards = useCallback((cards) => {
+    let newSelection = {...selection}
+    cards.forEach(card => delete newSelection[card])
+    setSelection(newSelection)
+  }, [selection])
+
   // reconcile hand state with the server
   useEffect(() => {
-    let client_cards = hand.concat(cards)
+    let client_cards = hand
     if (passLeft) client_cards.push(passLeft)
     if (passAcross) client_cards.push(passAcross)
     if (passRight) client_cards.push(passRight)
@@ -54,7 +53,7 @@ export default function Player0({gameState, socket}) {
     // new hand, probably (or back 6, which I want to be sorted into the existing 8)
     if (gameState.players[0].hand.some(card => !client_cards.includes(card))) {
       setHand(gameState.players[0].hand)
-      setCards([])
+      setSelection({})
       setPassLeft('')
       setPassAcross('')
       setPassRight('')
@@ -70,11 +69,11 @@ export default function Player0({gameState, socket}) {
       if (extra_cards.includes(passAcross)) setPassAcross('')
       if (extra_cards.includes(passRight)) setPassRight('')
       setHand(hand.filter(card => !extra_cards.includes(card)))
-      setCards(cards.filter(card => !extra_cards.includes(card)))
+      deselectCards(extra_cards)
     }
   }, [gameState.players[0].hand])
 
-  const onDragEnd = ({source, destination, draggableId} ) => {
+  const onDragEnd = ({source, destination, draggableId}) => {
     if (!destination) {
       return
     }
@@ -85,9 +84,6 @@ export default function Player0({gameState, socket}) {
         case 'hand':
           setHand(reorderArray(hand, source.index, destination.index))
           break
-        case 'playTarget':
-          setCards(reorderArray(cards, source.index, destination.index))
-          break
       }
       return
     }
@@ -97,9 +93,6 @@ export default function Player0({gameState, socket}) {
     switch(destination.droppableId) {
       case 'hand':
         switch(source.droppableId) {
-          case 'playTarget':
-            setCards(removeFromArray(cards, source.index))
-            break
           case 'passLeft':
             setPassLeft('')
             break
@@ -111,14 +104,6 @@ export default function Player0({gameState, socket}) {
             break
         }
         setHand(insertIntoArray(hand, draggableId, destination.index))
-        break
-      case 'playTarget':
-        switch(source.droppableId) {
-          case 'hand':
-            setHand(removeFromArray(hand, source.index))
-            break
-        }
-        setCards(insertIntoArray(cards, draggableId, destination.index))
         break
       case 'passLeft':
         switch(source.droppableId) {
@@ -165,21 +150,41 @@ export default function Player0({gameState, socket}) {
     }
   }
 
+  const toggleSelect = useCallback((card) => {
+    if (gameState.state === 'playing') {
+      let newSelection = {...selection}
+      if (newSelection[card]) {
+        delete newSelection[card]
+      } else {
+        newSelection[card] = 1
+      }
+      setSelection(newSelection)
+    }
+  }, [gameState.state, selection])
+
+  const selectCards = useCallback((cards) => {
+    let newSelection = {}
+    cards.forEach((card) => {
+      newSelection[card] = 1
+    })
+    setSelection(newSelection)
+  }, [selection])
+
   return <div style={{display: 'flex', alignItems: 'flex-end'}}>
     <div style={{flexGrow: 1}}/>
     <PlayerInfo data={gameState.players[0]} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0}/>
     <Box width={5} height={5}/>
     <DragDropContext onDragEnd={onDragEnd}>
       <div style={{display: 'flex', flexDirection: 'column-reverse'}}>
-        <Hand0 hand={hand}/>
+        <Hand0 hand={hand} selection={selection} toggleSelect={toggleSelect}/>
+        <ActionBar gameState={gameState} socket={socket} cards={Object.keys(selection)} passLeft={passLeft} passAcross={passAcross} passRight={passRight} selectCards={selectCards}/>
         { gameState.state === 'passing' ?
           (gameState.players[0].passed_cards ?
             <PassSplay vertical={false} align='left'/>
-            : (gameState.players[0].hand_size == 14) ?
+            : ((gameState.players[0].hand_size === 14) ?
               <PassTarget passLeft={passLeft} passAcross={passAcross} passRight={passRight}/>
-              : null)
-          : (gameState.state == 'playing' ?  <PlayTarget cards={cards}/> : null) }
-          <ActionBar gameState={gameState} socket={socket} cards={cards} passLeft={passLeft} passAcross={passAcross} passRight={passRight}/>
+              : null))
+          : null }
       </div>
     </DragDropContext>
     <div style={{flexGrow: 1}}/>

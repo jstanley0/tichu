@@ -141,7 +141,13 @@ class State
   def start_round!
     @state = :playing
     @turn = players.find_index { |player| player.hand.find(&:sparrow?) }
-    add_action(players[@turn], "has the sparrow")
+    players.each do |player|
+      if player.id == players[@turn].id
+        add_status("You have the sparrow", player_id: player.id)
+      else
+        add_action(players[@turn], "has the sparrow", player_id: player.id)
+      end
+    end
     start_turn!
   end
 
