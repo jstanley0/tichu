@@ -2,7 +2,6 @@ require 'sinatra'
 require 'sinatra-websocket'
 require 'active_support'
 require 'active_support/core_ext'
-require 'byebug'
 
 require_relative 'state'
 require_relative 'player'

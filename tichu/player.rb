@@ -1,4 +1,3 @@
-require 'byebug'
 require_relative 'state'
 require_relative 'card'
 require_relative 'error'
