@@ -172,7 +172,7 @@ export default function Player0({gameState, socket}) {
 
   return <div style={{display: 'flex', alignItems: 'flex-end'}}>
     <div style={{flexGrow: 1}}/>
-    <PlayerInfo data={gameState.players[0]} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0}/>
+    <PlayerInfo data={gameState.players[0]} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0 || gameState.dealer === 0}/>
     <Box width={5} height={5}/>
     <DragDropContext onDragEnd={onDragEnd}>
       <div style={{display: 'flex', flexDirection: 'column-reverse'}}>

@@ -50,13 +50,13 @@ export default function Game({game_id, player_id}) {
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <StatusBox wish={gameState.wish_rank} scores={gameState.scores}/>
           <div style={{flexGrow: 1}}/>
-          <Player data={gameState.players[1]} vertical={true} turn={gameState.turn === 1} trickWinner={gameState.trick_winner === 1} align='left'/>
+          <Player data={gameState.players[1]} vertical={true} turn={gameState.turn === 1} trickWinner={gameState.trick_winner === 1 || gameState.dealer === 1} align='left'/>
           <div style={{flexGrow: 1}}/>
         </div>
         <div style={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
           <div style={{display: 'flex'}}>
             <div style={{flexGrow: 1}}/>
-            <Player data={gameState.players[2]} vertical={false} turn={gameState.turn === 2} trickWinner={gameState.trick_winner === 2} align='left'/>
+            <Player data={gameState.players[2]} vertical={false} turn={gameState.turn === 2} trickWinner={gameState.trick_winner === 2 || gameState.dealer === 2} align='left'/>
             <div style={{flexGrow: 1}}/>
           </div>
           <History data={history}/>
@@ -67,7 +67,7 @@ export default function Game({game_id, player_id}) {
             <div className='big'>{ gameState.id }</div>
           </div>
           <div style={{flexGrow: 1}}/>
-          <Player data={gameState.players[3]} vertical={true} turn={gameState.turn === 3} trickWinner={gameState.trick_winner === 3} align='right'/>
+          <Player data={gameState.players[3]} vertical={true} turn={gameState.turn === 3} trickWinner={gameState.trick_winner === 3 || gameState.dealer === 3} align='right'/>
           <div style={{flexGrow: 1}}/>
         </div>
       </div>
@@ -75,7 +75,7 @@ export default function Game({game_id, player_id}) {
         { gameState.players[0].hasOwnProperty('hand') ?
             <Player0 gameState={gameState} socket={socket}/>
           : <div style={{display: 'flex', justifyContent: 'center'}}>
-              <Player data={gameState.players[0]} vertical={false} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0} align='right'/>
+              <Player data={gameState.players[0]} vertical={false} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0 || gameState.dealer === 0} align='right'/>
             </div> }
         <Box height={16}/>
       </div>

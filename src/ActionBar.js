@@ -43,6 +43,13 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
 
   let buttons = []
   switch (gameState.state) {
+    case 'ready':
+      if (gameState.dealer === 0) {
+        buttons.push({label: 'Rotate Teams', action: 'rotate_teams'})
+        buttons.push({label: 'Deal', action: 'deal'})
+      }
+      break
+
     case 'passing':
       if (gameState.players[0].can_gt) {
         buttons.push({label: 'Call Grand Tichu', action: 'grand_tichu'})

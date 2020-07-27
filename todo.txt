@@ -29,8 +29,8 @@ important:
 [x] click card to play/unplay
 [x] bomb button
 [x] observer mode
+[x] let the VIP shuffle players before the game starts
 [ ] score table
-[ ] let the VIP shuffle players before the game starts
 
 nice to have:
 [ ] persistent button positioning in action bar

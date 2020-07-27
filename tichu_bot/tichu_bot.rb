@@ -52,6 +52,11 @@ EM.run do
     exit if data['error'].present?
 
     case data['state']
+    when 'ready'
+      if data['dealer'] == 0
+        send_command(ws, 'deal')
+        condition = ->(data) { data['state'] != 'ready' }
+      end
     when 'passing'
       if data['players'][0]['hand_size'] == 8
         send_command(ws, 'back6')

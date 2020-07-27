@@ -6,7 +6,7 @@ require_relative 'card'
 require_relative 'error'
 
 class State
-  # state is one of: :joining, :passing, :playing, :over
+  # state is one of: :joining, :ready, :passing, :playing, :over
   attr_reader :id, :state, :players, :plays, :wish_rank, :turn, :scores,
               :out_order, :end_score, :trick_winner, :dragon_trick, :log
 
@@ -26,7 +26,7 @@ class State
     add_action(player, "joined")
 
     if players.size == 4
-      init_round
+      @state = :ready
     end
 
     send_global_update
@@ -66,8 +66,17 @@ class State
       command = json['command']
 
       case state
-      when :joining
-        wat!(command, websocket)
+      when :ready
+        # the VIP chooses teams and starts the round
+        if command == 'rotate_teams' && player_index == 0
+          rotate_teams!
+          send_global_update
+        elsif command == 'deal' && player_index == 0
+          init_round
+          send_global_update
+        else
+          wat!(command, websocket)
+        end
       when :passing
         case command
         when 'back6'
@@ -119,6 +128,11 @@ class State
 
   def wat!(command, websocket)
     send_update(websocket, "invalid command #{command} in state #{state}")
+  end
+
+  def rotate_teams!
+    @index = nil
+    @players = [players[0]] + players[1..3].rotate(-1)
   end
 
   def perform_passes!
@@ -351,7 +365,9 @@ class State
       dragon_trick: dragon_trick,
       log: pending_messages(player_info),
       last_play: last_play(player_info.player_id)
-    }
+    }.tap do |h|
+      h[:dealer] = rotate_index(0, player_info.player_id) if state == :ready
+    end
   end
 
   def add_status(message, cards: nil, player_id: nil)
