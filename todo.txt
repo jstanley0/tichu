@@ -10,10 +10,10 @@ done:
 [x] history catch-up
 [x] test error
 [x] make validPlay work
-[x] rich history (i.e. show cards played)
-[x] show who passed you which cards
 
 critical:
+[x] rich history (i.e. show cards played)
+[x] show who passed you which cards
 [x] fix history scroll to bottom on update :rageface: :why:
 [x] deploy to heroku
 [x] assets on heroku
