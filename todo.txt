@@ -28,14 +28,13 @@ important:
 [x] make play / trick winner indicators more better
 [x] click card to play/unplay
 [x] bomb button
+[x] observer mode
 [ ] score table
 [ ] let the VIP shuffle players before the game starts
-[ ] observer mode
 
 nice to have:
 [ ] persistent button positioning in action bar
-[ ] fix passing replacement weirdness
-[ ] fix passing arrows
+[ ] fix passing arrows when dragging out of a pass thing
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size
 [ ] validPlay optimization
 [ ] dynamic card size
@@ -43,3 +42,4 @@ nice to have:
 wontfix:
 [ ] fade at top of history -- looked a bit weird, fiddly to implement, a plain border works better
 [ ] server-side history window -- game history is necessary to drive the score table on the client
+[ ] fix passing replacement weirdness and re-enable swapping -- meh, too big a hassle for too small a gain

@@ -14,6 +14,9 @@ export default function JoinGameDialog() {
   const [error, setError] = useState(null)
 
   const startGame = () => {
+    if (name.length === 0) {
+      return Connect(gameCode, '')
+    }
     const url = gameCode ? '/join' : '/new'
     axios.post(url, null, { params: { name: name, game_id: gameCode } })
       .then(response => {
@@ -42,9 +45,9 @@ export default function JoinGameDialog() {
         <Grid item xs={12}>
           <Button variant="contained"
                   color="primary"
-                  disabled={name.length === 0}
+                  disabled={name.length === 0 && gameCode.length === 0}
                   onClick={startGame}>
-            {gameCode.length > 0 ? 'Join Game' : 'Start Game'}
+            {gameCode.length > 0 ? (name.length > 0 ? 'Join Game' : 'Watch Game') : 'Start Game'}
           </Button>
         </Grid>
         <Grid item xs={12}>

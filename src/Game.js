@@ -56,7 +56,7 @@ export default function Game({game_id, player_id}) {
         <div style={{flexGrow: 1, display: 'flex', flexDirection: 'column'}}>
           <div style={{display: 'flex'}}>
             <div style={{flexGrow: 1}}/>
-            <Player data={gameState.players[2]} vertical={false} turn={gameState.turn === 2} trickWinner={gameState.trick_winner === 2}/>
+            <Player data={gameState.players[2]} vertical={false} turn={gameState.turn === 2} trickWinner={gameState.trick_winner === 2} align='left'/>
             <div style={{flexGrow: 1}}/>
           </div>
           <History data={history}/>
@@ -72,7 +72,11 @@ export default function Game({game_id, player_id}) {
         </div>
       </div>
       <div>
-        <Player0 gameState={gameState} socket={socket}/>
+        { gameState.players[0].hasOwnProperty('hand') ?
+            <Player0 gameState={gameState} socket={socket}/>
+          : <div style={{display: 'flex', justifyContent: 'center'}}>
+              <Player data={gameState.players[0]} vertical={false} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0} align='right'/>
+            </div> }
         <Box height={16}/>
       </div>
     </div>
