@@ -1,9 +1,10 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import Button from '@material-ui/core/Button'
 import WishModal from './WishModal'
 
 export default function ActionBar({gameState, socket, cards, passLeft, passAcross, passRight, selectCards}) {
   const [wishing, setWishing] = useState(false)
+  const [disabled, setDisabled] = useState(false)
 
   const validPlay = useMemo(() => {
     // FIXME use a more efficient play representation, so we can test valid plays via hasOwnProperty
@@ -28,6 +29,11 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
     setWishing(false)
   }, [])
 
+  // re-enable sending commands when the game state changes
+  useEffect(() => {
+    setDisabled(false)
+  }, [gameState])
+
   function performAction() {
     if (this.action === 'wish') {
       setWishing(true)
@@ -38,6 +44,7 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
     } else {
       const h = {command: this.action, ...this.params}
       socket.send(JSON.stringify(h))
+      setDisabled(true) // prevent further actions until new state is pushed from the server
     }
   }
 
@@ -118,7 +125,8 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
       buttons.map((button) => <Button className='action-button'
                                       key={button.key || button.action}
                                       color={button.primary ? 'primary' : 'secondary'}
-                                      onClick={performAction.bind(button)}>
+                                      onClick={performAction.bind(button)}
+                                      disabled={disabled}>
         {button.label}
       </Button>)
     }
