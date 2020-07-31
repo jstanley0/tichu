@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import Button from '@material-ui/core/Button'
+import Grid from '@material-ui/core/Grid'
 import WishModal from './WishModal'
 
 export default function ActionBar({gameState, socket, cards, passLeft, passAcross, passRight, selectCards}) {
@@ -48,89 +49,71 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
     }
   }
 
-  let buttons = []
-  switch (gameState.state) {
-    case 'ready':
-      if (gameState.dealer === 0) {
-        buttons.push({label: 'Rotate Teams', action: 'rotate_teams'})
-        buttons.push({label: 'Deal', action: 'deal'})
-      }
-      break
-
-    case 'passing':
-      if (gameState.players[0].can_gt) {
-        buttons.push({label: 'Call Grand Tichu', action: 'grand_tichu'})
-      } else if (gameState.players[0].can_tichu) {
-        buttons.push({label: 'Call Tichu', action: 'tichu'})
-      }
-
-      if (gameState.players[0].hand_size === 8) {
-        buttons.push({primary: true, label: 'Take cards', action: 'back6'})
-      } else if (!gameState.players[0].passed_cards && passLeft && passAcross && passRight) {
-        buttons.push({
-          primary: true,
-          label: 'Pass cards',
-          action: 'pass_cards',
-          params: {cards: [passLeft, passAcross, passRight]}
-        })
-      }
-      break
-
-    case 'playing':
-      if (gameState.players[0].can_tichu) {
-        buttons.push({label: 'Call Tichu', action: 'tichu'})
-      }
-
-      if (cards.length > 0) {
-        buttons.push({label: 'Clear', action: 'clear_selection'})
-      }
-
-      if (gameState.players[0].bomb) {
-        buttons.push({label: 'Load Bomb', action: 'load_bomb', bomb: gameState.players[0].bomb})
-      }
-
-      if (validPlay) {
-        if (cards.includes('1')) {
-          buttons.push({primary: true, label: 'Wish', action: 'wish'})
-        } else {
-          buttons.push({primary: true, label: cards.length ? 'Play' : 'Pass', action: 'play', params: {cards}})
-        }
-      }
-
-      if (gameState.turn == null && gameState.trick_winner === 0) {
-        if (gameState.dragon_trick) {
-          buttons.push({
-            primary: true,
-            label: `Give trick to ${gameState.players[1].name}`,
-            action: 'claim',
-            params: {to_player: 1}
-          })
-          buttons.push({
-            primary: true,
-            label: `Give trick to ${gameState.players[3].name}`,
-            action: 'claim',
-            key: 'claimR',
-            params: {to_player: 3}
-          })
-        } else {
-          buttons.push({primary: true, label: 'Claim trick', action: 'claim', params: {to_player: 0}})
-        }
-      }
-      break
+  function leftButtonProps() {
+    if (gameState.state === 'playing' && gameState.turn == null && gameState.trick_winner === 0 && gameState.dragon_trick) {
+      return {label: `Give trick to ${gameState.players[1].name}`, action: 'claim', params: {to_player: 1}}
+    } else if (gameState.players[0].can_gt) {
+      return {label: 'Call Grand Tichu', action: 'grand_tichu'}
+    } else if (gameState.players[0].can_tichu) {
+      return {label: 'Call Tichu', action: 'tichu'}
+    }
   }
 
-  return <React.Fragment>
-    <div style={{display: 'flex', justifyContent: 'center'}} className='action-bar'>
-    {
-      buttons.map((button) => <Button className='action-button'
-                                      key={button.key || button.action}
-                                      color={button.primary ? 'primary' : 'secondary'}
-                                      onClick={performAction.bind(button)}
-                                      disabled={disabled}>
-        {button.label}
-      </Button>)
+  function centerButtonProps() {
+    if (gameState.state === 'ready' && gameState.dealer === 0) {
+      return {label: 'Deal', action: 'deal'}
+    } else if (gameState.state === 'passing') {
+      if (gameState.players[0].hand_size === 8) {
+        return {label: 'Take cards', action: 'back6'}
+      } else if (!gameState.players[0].passed_cards && passLeft && passAcross && passRight) {
+        return {label: 'Pass cards', action: 'pass_cards', params: {cards: [passLeft, passAcross, passRight]}}
+      }
+    } else if (gameState.state === 'playing') {
+      if (gameState.turn == null && gameState.trick_winner === 0 && !gameState.dragon_trick) {
+        return {label: 'Claim trick', action: 'claim', params: {to_player: 0}}
+      } else if (validPlay) {
+        if (cards.includes('1')) {
+          return {label: 'Wish', action: 'wish'}
+        } else {
+          return {label: cards.length ? 'Play' : 'Pass', action: 'play', params: {cards}}
+        }
+      }
     }
+  }
+
+  function rightButtonProps() {
+    if (gameState.state === 'ready' && gameState.dealer === 0) {
+      return {label: 'Rotate teams', action: 'rotate_teams'}
+    } else if (gameState.state === 'playing') {
+      if (gameState.turn == null && gameState.trick_winner === 0 && gameState.dragon_trick) {
+        return {label: `Give trick to ${gameState.players[3].name}`, action: 'claim', params: {to_player: 3}}
+      } else if (cards.length > 0) {
+        return {label: 'Clear', action: 'clear_selection'}
+      } else if (gameState.players[0].bomb) {
+        return {label: 'Bomb', action: 'load_bomb', bomb: gameState.players[0].bomb}
+      }
+    }
+  }
+
+  function renderButton(buttonProps) {
+    if (!buttonProps) {
+      return null
+    }
+    return <div style={{display: 'flex', justifyContent: 'center'}}>
+      <Button color={buttonProps.primary ? 'primary' : 'secondary'}
+              onClick={performAction.bind(buttonProps)}
+              disabled={disabled}>
+        {buttonProps.label}
+      </Button>
     </div>
+  }
+
+  return <div className='action-bar'>
+    <Grid container>
+      <Grid item xs={4}>{ renderButton(leftButtonProps()) }</Grid>
+      <Grid item xs={4}>{ renderButton({primary: true, ...centerButtonProps()}) }</Grid>
+      <Grid item xs={4}>{ renderButton(rightButtonProps()) }</Grid>
+    </Grid>
     <WishModal open={wishing} onWish={handleWish} onCancel={cancelWish}/>
-  </React.Fragment>
+  </div>
 }

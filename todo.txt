@@ -31,9 +31,10 @@ important:
 [x] observer mode
 [x] let the VIP shuffle players before the game starts
 [ ] score table
+[ ] repro and fix passing dragging weirdness
 
 nice to have:
-[ ] persistent button positioning in action bar
+[x] persistent button positioning in action bar
 [ ] fix passing arrows when dragging out of a pass thing
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size
 [ ] validPlay optimization
