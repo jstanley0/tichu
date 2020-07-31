@@ -22,6 +22,7 @@ critical:
 [x] scores always visible
 [x] disconnect message
 [x] keepalive for heroku
+[x] don't allow bombing out of turn when there are no cards on the table
 
 important:
 [x] preserve local hand order after play
@@ -30,8 +31,8 @@ important:
 [x] bomb button
 [x] observer mode
 [x] let the VIP shuffle players before the game starts
+[x] repro and fix passing dragging weirdness
 [ ] score table
-[ ] repro and fix passing dragging weirdness
 
 nice to have:
 [x] persistent button positioning in action bar

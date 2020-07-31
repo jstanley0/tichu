@@ -185,8 +185,10 @@ class State
     players.each_with_index do |player, index|
       possible_plays = if @turn == index
         Play.enumerate(player.hand, plays.last, wish_rank)
-      else
+      elsif plays.last
         Bomb.enumerate(player.hand, plays.last)
+      else
+        []
       end
       player.set_possible_plays!(possible_plays)
     end

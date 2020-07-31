@@ -61,7 +61,7 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
 
   function centerButtonProps() {
     if (gameState.state === 'ready' && gameState.dealer === 0) {
-      return {label: 'Deal', action: 'deal'}
+      return {label: 'Start Game', action: 'deal'}
     } else if (gameState.state === 'passing') {
       if (gameState.players[0].hand_size === 8) {
         return {label: 'Take cards', action: 'back6'}

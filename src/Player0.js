@@ -45,7 +45,7 @@ export default function Player0({gameState, socket}) {
 
   // reconcile hand state with the server
   useEffect(() => {
-    let client_cards = hand
+    let client_cards = [...hand]
     if (passLeft) client_cards.push(passLeft)
     if (passAcross) client_cards.push(passAcross)
     if (passRight) client_cards.push(passRight)
