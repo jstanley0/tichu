@@ -236,7 +236,7 @@ class State
     end
     recipient_index = (claiming_player_index + give_to_player_index) % 4
     players[recipient_index].take_trick!(plays)
-    trick_msg = (recipient_index == claiming_player_index) ? "took the trick" : "passed the trick to #{players[recipient_index].name}"
+    trick_msg = (recipient_index == claiming_player_index) ? "took the trick" : "gave the trick to #{players[recipient_index].name}"
     add_action(players[claiming_player_index], trick_msg)
     next_trick
     @turn = claiming_player_index

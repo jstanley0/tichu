@@ -23,6 +23,9 @@ critical:
 [x] disconnect message
 [x] keepalive for heroku
 [x] don't allow bombing out of turn when there are no cards on the table
+[x] inability to call tichu after passing?!
+[x] invisible button
+[x] make phoenix high card in straight
 
 important:
 [x] preserve local hand order after play
@@ -32,7 +35,11 @@ important:
 [x] observer mode
 [x] let the VIP shuffle players before the game starts
 [x] repro and fix passing dragging weirdness
+[x] "gave" the trick, rather than "passed"
+[x] disconnect message after game ends
+[ ] show cards left behind after round ends
 [ ] score table
+[ ] new game button
 
 nice to have:
 [x] persistent button positioning in action bar

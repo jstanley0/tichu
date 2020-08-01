@@ -96,7 +96,7 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
   }
 
   function renderButton(buttonProps) {
-    if (!buttonProps) {
+    if (!buttonProps || !buttonProps.label) {
       return null
     }
     return <div style={{display: 'flex', justifyContent: 'center'}}>

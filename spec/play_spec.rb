@@ -42,6 +42,8 @@ describe Play do
     expect(Straight.enumerate(sparrow_hand, nil).size).to eq 60 # excludes the 3 bombs found in the Card spec
     expect(Straight.enumerate(sparrow_hand, Straight.new(Card.deserialize(%w(1 b2 b3 b4 b5 b6)), 6)).size).to eq 11
     expect(Straight.enumerate(phoenix_hand, nil).size).to eq 144
+    expect(Straight.enumerate(Card.deserialize(%w(r4 g5 b6 k7 P)), nil).first.rank).to eq 8 # use phoenix as high card
+    expect(Straight.enumerate(Card.deserialize(%w(rJ bQ gK kA P)), nil).first.rank).to eq Card::ACE # allow phoenix to be low card when ace is high
   end
 
   it "enumerates Ladder" do

@@ -163,6 +163,7 @@ class Straight < Play
         rank = cards[-1].rank
         next if prev_play && prev_play.rank >= rank
         next if cards.map(&:suit).uniq.size == 1  # bombs don't count here
+        next if cards[0].substituted_phoenix? && rank < Card::ACE # don't use phoenix as the low card when it can be the high card
         plays << Straight.new(cards, rank)
       end
     end

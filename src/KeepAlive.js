@@ -11,7 +11,7 @@ const MAX_WS_PINGS = 60
 // (but should not start until the game does)
 const HTTP_PING_INTERVAL = 600000
 
-let wsPingIntervalId, httpPingIntervalId, pingCount = 0
+let wsPingIntervalId, httpPingIntervalId, stopped = false, pingCount = 0
 
 function dnr() {
   console.log('KeepAlive: DNR')
@@ -23,6 +23,7 @@ function dnr() {
     clearInterval(httpPingIntervalId)
     httpPingIntervalId = null
   }
+  stopped = true
 }
 
 function setHttpPingInterval() {
@@ -63,6 +64,10 @@ const KeepAlive = {
   stop: () => {
     // the game is over, so stop burning my free dyno hours
     dnr()
+  },
+
+  gameOver: () => {
+    return stopped
   }
 }
 

@@ -42,6 +42,12 @@ get '/ping' do
   'pong'
 end
 
+get '/games' do
+  password = params['password'].strip
+  halt 401 unless ENV['PASSWORD'].present? && password == ENV['PASSWORD']
+  $games.keys.to_json
+end
+
 get '/connect' do
   halt 400, 'this is a websocket endpoint' unless request.websocket?
   game_id = params['game_id'].upcase.strip

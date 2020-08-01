@@ -29,7 +29,11 @@ export default function Game({game_id, player_id}) {
       setGameState(data)
     }
     ws.onclose = () => {
-      setHistory(GlobalHistory.consume([], "You have been disconnected. Reload the page to reconnect.", MAX_HISTORY))
+      if (KeepAlive.gameOver()) {
+        setHistory(GlobalHistory.consume(["Game Over!"], null, MAX_HISTORY))
+      } else {
+        setHistory(GlobalHistory.consume([], "You have been disconnected. Reload the page to reconnect.", MAX_HISTORY))
+      }
     }
     ws.onerror = () => {
       window.location.href = '/'

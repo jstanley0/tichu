@@ -106,8 +106,10 @@ class Player
   end
 
   def make_play!(play)
-    remove_cards!(play.cards)
-    @plays << play
+    if play.cards.any?
+      remove_cards!(play.cards)
+      @plays << play
+    end
   end
 
   def take_trick!(trick)
