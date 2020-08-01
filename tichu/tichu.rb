@@ -93,3 +93,6 @@ get '/connect' do
   end
 end
 
+not_found do
+  '404 Not Found :('
+end
