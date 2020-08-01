@@ -43,7 +43,7 @@ get '/ping' do
 end
 
 get '/games' do
-  password = params['password'].strip
+  password = params['password']&.strip
   halt 401 unless ENV['PASSWORD'].present? && password == ENV['PASSWORD']
   $games.keys.to_json
 end
