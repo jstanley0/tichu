@@ -26,6 +26,7 @@ critical:
 [x] inability to call tichu after passing?!
 [x] invisible button
 [x] make phoenix high card in straight
+[x] fix weirdness when bombing a winning trick
 
 important:
 [x] preserve local hand order after play
@@ -37,6 +38,7 @@ important:
 [x] repro and fix passing dragging weirdness
 [x] "gave" the trick, rather than "passed"
 [x] disconnect message after game ends
+[x] short game option
 [ ] show cards left behind after round ends
 [ ] score table
 [ ] new game button

@@ -29,9 +29,7 @@ export default function Game({game_id, player_id}) {
       setGameState(data)
     }
     ws.onclose = () => {
-      if (KeepAlive.gameOver()) {
-        setHistory(GlobalHistory.consume(["Game Over!"], null, MAX_HISTORY))
-      } else {
+      if (!KeepAlive.gameOver()) {
         setHistory(GlobalHistory.consume([], "You have been disconnected. Reload the page to reconnect.", MAX_HISTORY))
       }
     }

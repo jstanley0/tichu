@@ -202,7 +202,7 @@ class State
     if play.is_a?(Pass)
       add_action(players[player_index], "passed")
     else
-      add_action(players[player_index], plays.any? ? 'played' : 'led', cards: play.to_h)
+      add_action(players[player_index], plays.none? ? 'led' : (play.is_a?(Bomb) ? 'bombed 💣' : 'played'), cards: play.to_h)
       @plays << play.tag(player_index)
     end
     if players[player_index].hand.empty?
@@ -245,18 +245,19 @@ class State
 
   def next_trick
     @plays = []
-    @trick_winner = nil
-    @dragon_trick = false
   end
 
   def next_turn!(player_index, offset = 1)
     if round_over?
+      # the third player to go out automatically wins the trick
       if out_order.size == 3 && out_order[-1] == player_index
         players[player_index].take_trick!(plays) if plays.any? # if the last card was a dog, plays is empty
       end
       finish_round!
     else
       @turn = (player_index + offset) % 4
+      @trick_winner = nil # reset here rather than next_trick so bombing a winning trick unsets this
+      @dragon_trick = false
       start_turn!
     end
   end
@@ -301,6 +302,9 @@ class State
     old_scores = scores.dup
     update_scores!
     add_status "Round complete! #{team_name(0)}: #{scores[0] - old_scores[0]}  ---  #{team_name(1)}: #{scores[1] - old_scores[1]}"
+    players.each do |player|
+      add_status "#{player.name}'s unplayed cards were", cards: Card.serialize(player.hand.sort_by(&:rank)) unless player.hand.empty?
+    end
 
     if scores[0] != scores[1] && (scores[0] >= end_score || scores[1] >= end_score)
       @state = :over
