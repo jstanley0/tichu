@@ -46,6 +46,7 @@ important:
 nice to have:
 [x] persistent button positioning in action bar
 [x] validPlay optimization
+[ ] possible_plays optimization
 [ ] dark theme
 [ ] new game button
 [ ] fix passing arrows when dragging out of a pass thing
