@@ -5,7 +5,7 @@ import FaceCard from "./FaceCard"
 export default function Hand0({hand, selection, toggleSelect}) {
     return <Droppable droppableId='hand' direction='horizontal'>
     {(provided, snapshot) => (
-      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*64, height: 88, display: 'flex'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+      <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 14*66, height: 88, display: 'flex'}} className={`hand0 ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
         {hand.map((card, index) => (
           <Draggable draggableId={card} index={index} key={card}>
             {(provided, snapshot) => (

@@ -4,9 +4,10 @@ import decodeCard from './DecodeCard.js'
 
 export default function FaceCard({card, dragging, small, selected, toggleSelect}) {
   const getStyles = useCallback(() => {
-    const h = {width: small ? 45 : 60, height: small ? 63 : 84, margin: 2}
+    const h = {width: small ? 45 : 60, height: small ? 63 : 84, margin: small ? 2 : 3}
     if (selected) {
       h.border = '2px solid gold'
+      h.margin = 1
     }
     return h
   }, [selected, small])
