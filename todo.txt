@@ -27,6 +27,7 @@ critical:
 [x] invisible button
 [x] make phoenix high card in straight
 [x] fix weirdness when bombing a winning trick
+[x] fix card order in history
 
 important:
 [x] preserve local hand order after play

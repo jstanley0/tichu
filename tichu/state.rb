@@ -202,7 +202,7 @@ class State
     if play.is_a?(Pass)
       add_action(players[player_index], "passed")
     else
-      add_action(players[player_index], plays.none? ? 'led' : (play.is_a?(Bomb) ? 'bombed 💣' : 'played'), cards: play.to_s)
+      add_action(players[player_index], plays.none? ? 'led' : (play.is_a?(Bomb) ? 'bombed 💣' : 'played'), cards: play.to_s(sorted: false))
       @plays << play.tag(player_index)
     end
     if players[player_index].hand.empty?
@@ -421,7 +421,7 @@ class State
   def last_play(for_player)
     play = plays&.last
     return nil unless play
-    h = { cards: play.to_s }
+    h = { cards: play.to_s(sorted: true) }
     if play.player_index
       h.merge!(player: rotate_index(play.player_index, for_player))
     end

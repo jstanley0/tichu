@@ -72,12 +72,12 @@ class Play
     cards.any? { |card| card.normal? && card.rank == wish_rank }
   end
 
-  def to_s
-    Card.serialize(cards, sorted: true)
+  def to_s(sorted:)
+    Card.serialize(cards, sorted: sorted)
   end
 
   def self.serialize_plays(enumerated_plays)
-    enumerated_plays.inject({}) { |h, play| h[play.to_s] = play.type_index; h }
+    enumerated_plays.inject({}) { |h, play| h[play.to_s(sorted: true)] = play.type_index; h }
   end
 
   def type_index
