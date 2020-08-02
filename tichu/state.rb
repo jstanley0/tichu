@@ -243,7 +243,13 @@ class State
     start_turn!
   end
 
+  def clear_trick_winner
+    @trick_winner = nil
+    @dragon_trick = false
+  end
+
   def next_trick
+    clear_trick_winner
     @plays = []
   end
 
@@ -256,8 +262,7 @@ class State
       finish_round!
     else
       @turn = (player_index + offset) % 4
-      @trick_winner = nil # reset here rather than next_trick so bombing a winning trick unsets this
-      @dragon_trick = false
+      clear_trick_winner # do this here in addition to next_trick so bombing a winning trick clears this state
       start_turn!
     end
   end
