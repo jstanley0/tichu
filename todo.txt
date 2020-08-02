@@ -44,11 +44,11 @@ important:
 
 nice to have:
 [x] persistent button positioning in action bar
+[x] validPlay optimization
 [ ] dark theme
 [ ] new game button
 [ ] fix passing arrows when dragging out of a pass thing
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size
-[ ] validPlay optimization
 [ ] dynamic card size
 
 wontfix:

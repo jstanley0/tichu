@@ -31,7 +31,7 @@ function swapWithArray(array, index, card) {
 }
 
 export default function Player0({gameState, socket}) {
-  const [ hand, setHand ] = useState(gameState.players[0].hand)
+  const [ hand, setHand ] = useState(Array.from(gameState.players[0].hand))
   const [ selection, setSelection ] = useState({})
   const [ passLeft, setPassLeft ] = useState('')
   const [ passAcross, setPassAcross ] = useState('')
@@ -44,6 +44,7 @@ export default function Player0({gameState, socket}) {
   }, [selection])
 
   // reconcile hand state with the server
+  const server_cards = Array.from(gameState.players[0].hand)
   useEffect(() => {
     let client_cards = [...hand]
     if (passLeft) client_cards.push(passLeft)
@@ -51,8 +52,8 @@ export default function Player0({gameState, socket}) {
     if (passRight) client_cards.push(passRight)
 
     // new hand, probably (or back 6, which I want to be sorted into the existing 8)
-    if (gameState.players[0].hand.some(card => !client_cards.includes(card))) {
-      setHand(gameState.players[0].hand)
+    if (server_cards.some(card => !client_cards.includes(card))) {
+      setHand(server_cards)
       setSelection({})
       setPassLeft('')
       setPassAcross('')
@@ -62,7 +63,7 @@ export default function Player0({gameState, socket}) {
     }
 
     // cards passed or played. remove them from the hand, keeping the player's dragged order intact
-    const extra_cards = client_cards.filter(card => !gameState.players[0].hand.includes(card))
+    const extra_cards = client_cards.filter(card => !server_cards.includes(card))
     if (extra_cards.length) {
       console.log(`reconciling client cards: removing ${extra_cards.length} extra cards`)
       if (extra_cards.includes(passLeft)) setPassLeft('')
@@ -71,7 +72,7 @@ export default function Player0({gameState, socket}) {
       setHand(hand.filter(card => !extra_cards.includes(card)))
       deselectCards(extra_cards)
     }
-  }, [gameState.players[0].hand])
+  }, [server_cards])
 
   const onDragEnd = ({source, destination, draggableId}) => {
     if (!destination) {

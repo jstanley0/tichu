@@ -74,7 +74,7 @@ export default function Game({game_id, player_id}) {
         </div>
       </div>
       <div>
-        { gameState.players[0].hasOwnProperty('hand') ?
+        { Object.prototype.hasOwnProperty.call(gameState.players[0], 'hand') ?
             <Player0 gameState={gameState} socket={socket}/>
           : <div style={{display: 'flex', justifyContent: 'center'}}>
               <Player data={gameState.players[0]} vertical={false} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0 || gameState.dealer === 0} align='right'/>

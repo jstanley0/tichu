@@ -48,6 +48,24 @@ class Card
     end
   end
 
+  def self.from_sequence_number(n)
+    suit = 0
+    rank = case n
+    when 0
+      DOG
+    when 1
+      1
+    when 54
+      PHOENIX
+    when 55
+      DRAGON
+    else
+      suit = 1 + (n - 2) % 4
+      2 + (n - 2) / 4
+    end
+    Card.new(suit, rank)
+  end
+
   # :|
   def self.hand_signature(cards)
     cards.map(&:hash).inject(:|)
@@ -55,14 +73,6 @@ class Card
 
   def <=>(rhs)
     self.hash <=> rhs.hash
-  end
-
-  def self.deserialize(card_or_array)
-    if card_or_array.is_a?(Array)
-      card_or_array.map { |s| from_string(s) }
-    else
-      from_string(card_or_array)
-    end
   end
 
   # return each group of size having matched rank
@@ -116,8 +126,20 @@ class Card
     sequences
   end
 
-  def self.serialize(cards)
-    cards.map(&:to_s)
+  def self.deserialize(card_string_or_array)
+    if card_string_or_array.is_a?(Array)
+      # test format
+      card_string_or_array.map { |s| from_string(s) }
+    else
+      # compact format
+      card_string_or_array.chars.map { |c| from_char(c) }
+    end
+  end
+
+  def self.serialize(cards, sorted:)
+    c = cards.map(&:to_char)
+    c.sort! if sorted
+    c.join
   end
 
   def phoenix?
@@ -169,6 +191,16 @@ class Card
     0
   end
 
+  # this compact serialization format minimizes size over the wire and allows efficient valid-move testing on the client
+  def to_char
+    ('0'.ord + sequence_number).chr
+  end
+
+  def self.from_char(c)
+    from_sequence_number(c.ord - '0'.ord)
+  end
+
+  # the following is no longer used over the wire but is nice and comprehensible for test purposes
   def to_s
     "#{suit_string}#{rank_string}"
   end

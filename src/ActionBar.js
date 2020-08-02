@@ -8,20 +8,12 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
   const [disabled, setDisabled] = useState(false)
 
   const validPlay = useMemo(() => {
-    // FIXME use a more efficient play representation, so we can test valid plays via hasOwnProperty
-    const cc = Array.from(cards).sort().join()
-    const possible = gameState.players[0].possible_plays
-    for (let i in possible) {
-      const ps = Array.from(possible[i]).sort().join()
-      if (cc === ps) {
-        return true
-      }
-    }
-    return false
+    const cc = Array.from(cards).sort().join('')
+    return Object.prototype.hasOwnProperty.call(gameState.players[0].possible_plays, cc)
   }, [cards, gameState.players[0].possible_plays])
 
   const handleWish = useCallback((rank) => {
-    const h = {command: 'play', cards, wish_rank: rank}
+    const h = {command: 'play', cards: cards.join(''), wish_rank: rank}
     socket.send(JSON.stringify(h))
     setWishing(false)
   }, [cards, socket])
@@ -41,7 +33,7 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
     } else if (this.action === 'clear_selection') {
       selectCards([])
     } else if (this.action === 'load_bomb') {
-      selectCards(this.bomb)
+      selectCards(Array.from(this.bomb))
     } else {
       const h = {command: this.action, ...this.params}
       socket.send(JSON.stringify(h))
@@ -66,7 +58,7 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
       if (gameState.players[0].hand_size === 8) {
         return {label: 'Take cards', action: 'back6'}
       } else if (!gameState.players[0].passed_cards && passLeft && passAcross && passRight) {
-        return {label: 'Pass cards', action: 'pass_cards', params: {cards: [passLeft, passAcross, passRight]}}
+        return {label: 'Pass cards', action: 'pass_cards', params: {cards: [passLeft, passAcross, passRight].join('')}}
       }
     } else if (gameState.state === 'playing') {
       if (gameState.turn == null && gameState.trick_winner === 0 && !gameState.dragon_trick) {
@@ -75,7 +67,7 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
         if (cards.includes('1')) {
           return {label: 'Wish', action: 'wish'}
         } else {
-          return {label: cards.length ? 'Play' : 'Pass', action: 'play', params: {cards}}
+          return {label: cards.length ? 'Play' : 'Pass', action: 'play', params: {cards: cards.join('')}}
         }
       }
     }

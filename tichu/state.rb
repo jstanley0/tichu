@@ -145,7 +145,7 @@ class State
 
     players.each_with_index do |player, i|
       passed_cards = player.hand[-3..-1].rotate(i)
-      add_status("You received", player_id: player.id, cards: Card.serialize(passed_cards))
+      add_status("You received", player_id: player.id, cards: Card.serialize(passed_cards, sorted: false))
     end
 
     start_round!
@@ -202,7 +202,7 @@ class State
     if play.is_a?(Pass)
       add_action(players[player_index], "passed")
     else
-      add_action(players[player_index], plays.none? ? 'led' : (play.is_a?(Bomb) ? 'bombed 💣' : 'played'), cards: play.to_h)
+      add_action(players[player_index], plays.none? ? 'led' : (play.is_a?(Bomb) ? 'bombed 💣' : 'played'), cards: play.to_s)
       @plays << play.tag(player_index)
     end
     if players[player_index].hand.empty?
@@ -303,7 +303,7 @@ class State
     update_scores!
     add_status "Round complete! #{team_name(0)}: #{scores[0] - old_scores[0]}  ---  #{team_name(1)}: #{scores[1] - old_scores[1]}"
     players.each do |player|
-      add_status "#{player.name}'s unplayed cards were", cards: Card.serialize(player.hand.sort_by(&:rank)) unless player.hand.empty?
+      add_status "#{player.name}'s unplayed cards were", cards: Card.serialize(player.hand, sorted: true) unless player.hand.empty?
     end
 
     if scores[0] != scores[1] && (scores[0] >= end_score || scores[1] >= end_score)
@@ -416,7 +416,7 @@ class State
   def last_play(for_player)
     play = plays&.last
     return nil unless play
-    h = { cards: play.to_h }
+    h = { cards: play.to_s }
     if play.player_index
       h.merge!(player: rotate_index(play.player_index, for_player))
     end

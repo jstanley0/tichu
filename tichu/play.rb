@@ -72,12 +72,16 @@ class Play
     cards.any? { |card| card.normal? && card.rank == wish_rank }
   end
 
-  def to_h
-    Card.serialize(cards)
+  def to_s
+    Card.serialize(cards, sorted: true)
   end
 
   def self.serialize_plays(enumerated_plays)
-    enumerated_plays.map(&:to_h)
+    enumerated_plays.inject({}) { |h, play| h[play.to_s] = play.type_index; h }
+  end
+
+  def type_index
+    nil
   end
 end
 
@@ -85,6 +89,10 @@ class Pass < Play
   def self.enumerate(cards, prev_play)
     return [Pass.new([])] if prev_play
     return []
+  end
+
+  def type_index
+    0
   end
 end
 
@@ -94,6 +102,10 @@ class Dog < Play
     dogs = cards.select(&:dog?) # there's only one but a play has an array of cards so
     return [Dog.new(dogs)] if dogs.any?
     return []
+  end
+
+  def type_index
+    1
   end
 end
 
@@ -117,6 +129,10 @@ class Single < Play
     end
     plays
   end
+
+  def type_index
+    2
+  end
 end
 
 class Pair < Play
@@ -133,6 +149,10 @@ class Pair < Play
     end
     plays.to_a
   end
+
+  def type_index
+    3
+  end
 end
 
 class Triple < Play
@@ -148,6 +168,10 @@ class Triple < Play
       end
     end
     plays.to_a
+  end
+
+  def type_index
+    4
   end
 end
 
@@ -168,6 +192,10 @@ class Straight < Play
       end
     end
     plays.to_a
+  end
+
+  def type_index
+    5
   end
 end
 
@@ -192,6 +220,10 @@ class Ladder < Play
     end
     plays.to_a
   end
+
+  def type_index
+    6
+  end
 end
 
 class FullHouse < Play
@@ -215,6 +247,10 @@ class FullHouse < Play
     end
     plays.to_a
   end
+
+  def type_index
+    7
+  end
 end
 
 class Bomb < Play
@@ -232,5 +268,9 @@ class Bomb < Play
       plays << Bomb.new(cards, rank)
     end
     plays
+  end
+
+  def type_index
+    8
   end
 end

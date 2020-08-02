@@ -26,7 +26,7 @@ export default function History({data}) {
             <ListItem>
               <Typography>{ entry.error ? `⚠️ ${entry.error}` : entry.text }</Typography>
                 &ensp;
-                { entry.cards && entry.cards.map((card) =>
+                { entry.cards && Array.from(entry.cards).map((card) =>
                   <FaceCard card={card} key={card} small={true}/>) }
             </ListItem>
             <Divider/>

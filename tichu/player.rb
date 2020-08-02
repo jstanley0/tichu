@@ -52,11 +52,11 @@ class Player
     }
     h[:passed_cards] = cards_to_pass.any? unless cards_to_pass.nil?
     if complete
-      h[:hand] = Card.serialize(hand.sort_by(&:rank))
+      h[:hand] = Card.serialize(hand, sorted: true)
       h[:can_tichu] = can_call_tichu?
       h[:can_gt] = can_call_grand_tichu?
       h[:possible_plays] = Play.serialize_plays(@possible_plays)
-      h[:bomb] = @possible_plays.last.to_h if @possible_plays.last&.is_a?(Bomb)
+      h[:bomb] = @possible_plays.last.to_s if @possible_plays.last&.is_a?(Bomb)
     end
     h
   end
