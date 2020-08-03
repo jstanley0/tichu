@@ -6,7 +6,8 @@ body {
 /* test for aligning things
 div {
     border: 1px dotted blue !important;
-}*/
+}
+*/
 
 .red-card {
     color: #b82525;
@@ -31,6 +32,12 @@ div {
 .card-back {
     margin: 5px;
     background-color: #e0e8f0;
+}
+
+.card-back-label {
+    display: block;
+    padding: 3px;
+    font-size: large;
 }
 
 .hand0 {

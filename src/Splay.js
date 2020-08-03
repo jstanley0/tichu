@@ -7,9 +7,11 @@ export default function Splay({vertical, size, labeled, angle, collapse, flip}) 
     return null
   }
 
+  // okay yeah I need to rewrite this. it'd be easier with square cards
   const dm = (!flip && !vertical) ? 1 : -1
   const am = (flip ? -1 : 1) * (vertical ? 1 : -1)
   const stepAngle = angle / size
+  const y0 = vertical ? -am * (CardDimensions.reg.height - CardDimensions.reg.width) / 2 : 0
   let marginBottom = collapse ? (vertical ? -CardDimensions.reg.height * 0.85 : 0) : (vertical ? CardDimensions.reg.width - CardDimensions.reg.height : 0)
   let marginRight = vertical ? CardDimensions.reg.height - CardDimensions.reg.width : (collapse ? -CardDimensions.reg.width * 0.8 : 0)
   let cards = []
@@ -23,7 +25,7 @@ export default function Splay({vertical, size, labeled, angle, collapse, flip}) 
         marginRight = 0
       }
     }
-    y = (CardDimensions.reg.height / 6) * dm * Math.sin(((i + 0.5) * Math.PI) / size)
+    y = y0 + (CardDimensions.reg.height / 6) * dm * Math.sin(((i + 0.5) * Math.PI) / size)
     const transform = `rotate(${a}deg) translateY(${y}px)`
     cards.push(<div key={i} style={{marginBottom, marginRight, transform}}>
       <CardBack label={(labeled && i === size - 1) ? size : null}/>

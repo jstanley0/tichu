@@ -6,7 +6,7 @@ import CardDimensions from './CardDimensions'
 export default function CardBack({label}) {
   return <Card variant="elevation" elevation={2} style={{...CardDimensions.reg}}>
     <Box width={CardDimensions.reg.width - 10} height={CardDimensions.reg.height - 10} className='card-back'>
-      {label}
+      <span className='card-back-label'>{label}</span>
     </Box>
   </Card>
 }
