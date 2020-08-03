@@ -41,13 +41,12 @@ important:
 [x] disconnect message after game ends
 [x] short game option
 [x] show cards left behind after round ends
-[ ] score table
 
 nice to have:
 [x] persistent button positioning in action bar
 [x] validPlay optimization
-[ ] possible_plays optimization
-[ ] fancier hands for other players
+[x] fancier hands for other players
+[ ] score table
 [ ] dark theme
 [ ] new game button
 [ ] fix passing arrows when dragging out of a pass thing
@@ -58,3 +57,4 @@ wontfix:
 [ ] fade at top of history -- looked a bit weird, fiddly to implement, a plain border works better
 [ ] server-side history window -- game history is necessary to drive the score table on the client
 [ ] fix passing replacement weirdness and re-enable swapping -- meh, too big a hassle for too small a gain
+[ ] possible_plays optimization - meh, this typically happens _once_; building a structure would be more expensive than the linear lookup

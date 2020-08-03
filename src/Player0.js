@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react"
 import Box from "@material-ui/core/Box"
 import { DragDropContext } from 'react-beautiful-dnd'
 import PlayerInfo from "./PlayerInfo"
-import PassSplay from "./PassSplay"
+import Splay from "./Splay"
 import PassTarget from "./PassTarget"
 import ActionBar from "./ActionBar"
 import Hand0 from "./Hand0"
@@ -181,7 +181,7 @@ export default function Player0({gameState, socket}) {
         <ActionBar gameState={gameState} socket={socket} cards={Object.keys(selection)} passLeft={passLeft} passAcross={passAcross} passRight={passRight} selectCards={selectCards}/>
         { gameState.state === 'passing' ?
           (gameState.players[0].passed_cards ?
-            <PassSplay vertical={false} align='left'/>
+            <Splay vertical={false} align='left' size={3} angle={120} flip={true}/>
             : ((gameState.players[0].hand_size === 14) ?
               <PassTarget passLeft={passLeft} passAcross={passAcross} passRight={passRight}/>
               : null))
