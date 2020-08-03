@@ -46,6 +46,7 @@ nice to have:
 [x] persistent button positioning in action bar
 [x] validPlay optimization
 [x] fancier hands for other players
+[ ] clean up fancy-hands code
 [ ] score table
 [ ] dark theme
 [ ] new game button

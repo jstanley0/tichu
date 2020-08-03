@@ -3,6 +3,11 @@ body {
     font-family: 'Roboto','Helvetica','Arial','sans-serif';
 }
 
+/* test for aligning things
+div {
+    border: 1px dotted blue !important;
+}*/
+
 .red-card {
     color: #b82525;
 }

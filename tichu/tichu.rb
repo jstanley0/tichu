@@ -5,6 +5,7 @@ require 'active_support/core_ext'
 
 require_relative 'state'
 require_relative 'player'
+require_relative 'ui_test_state'
 
 $games = {}
 
@@ -56,12 +57,16 @@ get '/connect' do
   player_id = params['player_id'].upcase.strip.presence
 
   game = $games[game_id]
-  if !game && game_id == 'TEST'
-    game = $games[game_id] = State.new(id: 'TEST')
+  if !game
+    if game_id == 'TEST'
+      game = $games[game_id] = State.new(id: 'TEST')
+    elsif game_id == 'UITEST'
+      game = $games[game_id] = UiTestState.new
+    end
   end
   halt 400, 'invalid game_id' unless game
 
-  if player_id
+  if player_id && !game.is_a?(UiTestState)
     player = game.players.find { |player| player.id == player_id }
     if !player && player_id == 'TEST'
       if game.players.size < 4
