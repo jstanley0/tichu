@@ -31,7 +31,7 @@ div {
 
 .card-back {
     margin: 5px;
-    background-color: #e0e8f0;
+    background: linear-gradient(to bottom right, #dde6ee, #baccde);
 }
 
 .card-back-label {
