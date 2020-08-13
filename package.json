@@ -5,7 +5,7 @@
   "main": "tichu/src/index.js",
   "repository": "git@github.com:jstanley0/tichu.git",
   "author": "Jeremy Stanley <jstanley0@gmail.com>",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "engines": {
     "node": "10.x",
     "yarn": "1.x"
