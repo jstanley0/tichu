@@ -41,15 +41,26 @@ important:
 [x] disconnect message after game ends
 [x] short game option
 [x] show cards left behind after round ends
+[x] show what cards you passed
+[ ] turn prompt, maybe chime or something, possibly after several seconds
+[ ] make it noticeable when somebody calls tichu
+[ ] trick point counter
+[ ] player replacement, in some form
 
 nice to have:
 [x] persistent button positioning in action bar
 [x] validPlay optimization
 [x] fancier hands for other players
+[x] score box too small
+[x] title box too small
+[x] randomize teams when all players join
+[x] alternate tichu-fail messages
+[ ] pass undo when someone calls tichu?
 [ ] clean up fancy-hands code
 [ ] score table
 [ ] dark theme
 [ ] new game button
+[ ] fix passing replacement weirdness and re-enable swapping
 [ ] fix passing arrows when dragging out of a pass thing
 [ ] centered play area of maximum size, as a stepping stone to dynamic card size
 [ ] dynamic card size
@@ -57,5 +68,4 @@ nice to have:
 wontfix:
 [ ] fade at top of history -- looked a bit weird, fiddly to implement, a plain border works better
 [ ] server-side history window -- game history is necessary to drive the score table on the client
-[ ] fix passing replacement weirdness and re-enable swapping -- meh, too big a hassle for too small a gain
 [ ] possible_plays optimization - meh, this typically happens _once_; building a structure would be more expensive than the linear lookup

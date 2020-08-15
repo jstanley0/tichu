@@ -26,6 +26,7 @@ class State
     add_action(player, "joined")
 
     if players.size == 4
+      rotate_teams!(rand(3))
       @state = :ready
     end
 
@@ -130,9 +131,9 @@ class State
     send_update(websocket, "invalid command #{command} in state #{state}")
   end
 
-  def rotate_teams!
+  def rotate_teams!(amount = -1)
     @index = nil
-    @players = [players[0]] + players[1..3].rotate(-1)
+    @players = [players[0]] + players[1..3].rotate(amount)
   end
 
   def perform_passes!
@@ -140,6 +141,7 @@ class State
       player.cards_to_pass.each_with_index do |card, j|
         players[(i + j + 1) % 4].accept_card(card, from_player: player.id)
       end
+      add_status("You passed", player_id: player.id, cards: Card.serialize(player.cards_to_pass, sorted: false))
       player.done_passing_cards!
     end
 
@@ -319,11 +321,17 @@ class State
     end
   end
 
+  SUCCESS_MESSAGES = ['successfully completed a %s', 'somehow pulled that one off', 'bagged a %s', "showed everyone how it's done"].freeze
+  FAILURE_MESSAGES = ['failed to complete the %s', 'totally botched that %s', 'FAIL', 'pulled a Clay', ':sadtrombone:'].freeze
+  def tichu_message(success, grand)
+    (success ? SUCCESS_MESSAGES : FAILURE_MESSAGES).sample % (grand ? 'Grand Tichu' : 'Tichu')
+  end
+
   def set_tichu_statuses!(winning_player_index)
     players.each_with_index do |player, index|
       if player.tichu > 0
         success = (index == winning_player_index)
-        add_action(player, "#{success ? "successfully completed a" : "totally botched that"}#{ player.tichu == 200 ? ' Grand' : '' } Tichu!")
+        add_action(player, tichu_message(success, player.tichu == 200))
         player.set_tichu_status(success)
       end
     end
