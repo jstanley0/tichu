@@ -28,6 +28,7 @@ critical:
 [x] make phoenix high card in straight
 [x] fix weirdness when bombing a winning trick
 [x] fix card order in history
+[x] fix scoring when third player goes out with the dragon
 
 important:
 [x] preserve local hand order after play
@@ -42,8 +43,11 @@ important:
 [x] short game option
 [x] show cards left behind after round ends
 [x] show what cards you passed
+[x] make it noticeable when somebody calls tichu
+[x] change label to "Play" when playing the 1 (still show wish dialog as before)
+[ ] make it *more* noticeable when somebody calls tichu
+[ ] deal with simultaneous bombing by teammates
 [ ] turn prompt, maybe chime or something, possibly after several seconds
-[ ] make it noticeable when somebody calls tichu
 [ ] trick point counter
 [ ] player replacement, in some form
 

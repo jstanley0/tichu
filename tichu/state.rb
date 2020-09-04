@@ -91,11 +91,11 @@ class State
           send_global_update
         when 'grand_tichu'
           player.call_grand_tichu!
-          add_action(player, "called Grand Tichu!")
+          add_action(player, "called Grand Tichu! 💥")
           send_global_update
         when 'tichu'
           player.call_tichu!
-          add_action(player, "called Tichu!")
+          add_action(player, "called Tichu! 🎉")
           send_global_update
         else
           wat!(command, websocket)
@@ -104,7 +104,7 @@ class State
         case command
         when 'tichu'
           player.call_tichu!
-          add_action(player, "called Tichu!")
+          add_action(player, "called Tichu! 🎉")
           send_global_update
         when 'claim'
           claim_trick!(player_index, json['to_player'])
@@ -257,9 +257,14 @@ class State
 
   def next_turn!(player_index, offset = 1)
     if round_over?
-      # the third player to go out automatically wins the trick
-      if out_order.size == 3 && out_order[-1] == player_index
-        players[player_index].take_trick!(plays) if plays.any? # if the last card was a dog, plays is empty
+      # handle awarding the last trick after the third player goes out, if there is one (if they went out on a dog, there isn't)
+      if plays.any? && out_order.size == 3 && out_order[-1] == player_index
+        trick_taker = if plays.last.cards.any?(&:dragon?)
+          ([0, 1, 2, 3] - out_order)[0] # give the trick to the player who didn't go out
+        else
+          player_index
+        end
+        players[trick_taker].take_trick!(plays)
       end
       finish_round!
     else

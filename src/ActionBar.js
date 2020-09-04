@@ -65,7 +65,7 @@ export default function ActionBar({gameState, socket, cards, passLeft, passAcros
         return {label: 'Claim trick', action: 'claim', params: {to_player: 0}}
       } else if (validPlay) {
         if (cards.includes('1')) {
-          return {label: 'Wish', action: 'wish'}
+          return {label: 'Play', action: 'wish'}
         } else {
           return {label: cards.length ? 'Play' : 'Pass', action: 'play', params: {cards: cards.join('')}}
         }
