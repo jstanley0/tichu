@@ -45,8 +45,8 @@ important:
 [x] show what cards you passed
 [x] make it noticeable when somebody calls tichu
 [x] change label to "Play" when playing the 1 (still show wish dialog as before)
+[x] deal with simultaneous bombing by teammates
 [ ] make it *more* noticeable when somebody calls tichu
-[ ] deal with simultaneous bombing by teammates
 [ ] turn prompt, maybe chime or something, possibly after several seconds
 [ ] trick point counter
 [ ] player replacement, in some form

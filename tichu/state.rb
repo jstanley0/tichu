@@ -200,6 +200,7 @@ class State
     cards = Card.deserialize(play)
     play = players[player_index].find_play(cards)
     raise TichuError, "invalid play" unless play
+    raise TichuError, "Slow down, cowboy! Your partner just played a bomb!" if simulbombing_partner?(player_index, play)
     players[player_index].make_play!(play)
     if play.is_a?(Pass)
       add_action(players[player_index], "passed")
@@ -280,6 +281,12 @@ class State
 
   def one_two_finish?
     out_order == [0, 2] || out_order == [2, 0] || out_order == [1, 3] || out_order == [3, 1]
+  end
+
+  def simulbombing_partner?(player_index, play)
+    return false unless play.is_a?(Bomb)
+    last_play = @plays&.last
+    last_play.is_a?(Bomb) && last_play.player_index == (player_index + 2) % 4 && Time.now - last_play.ts < 3
   end
 
   def send_global_update(error = nil)
@@ -434,7 +441,7 @@ class State
   def last_play(for_player)
     play = plays&.last
     return nil unless play
-    h = { cards: play.to_s(sorted: true) }
+    h = { type: play.type, ts: play.ts.to_f, cards: play.to_s(sorted: true) }
     if play.player_index
       h.merge!(player: rotate_index(play.player_index, for_player))
     end

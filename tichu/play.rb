@@ -2,7 +2,8 @@ require 'set'
 require_relative 'card'
 
 class Play
-  attr_accessor :cards, :rank, :player_index
+  attr_accessor :cards, :rank
+  attr_reader :player_index, :ts
 
   def initialize(cards, rank = nil)
     @cards = cards
@@ -27,6 +28,7 @@ class Play
 
   def tag(player_index)
     @player_index = player_index
+    @ts = Time.now
     self
   end
 
