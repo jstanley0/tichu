@@ -46,9 +46,10 @@ important:
 [x] make it noticeable when somebody calls tichu
 [x] change label to "Play" when playing the 1 (still show wish dialog as before)
 [x] deal with simultaneous bombing by teammates
+[x] join game with link
+[ ] copy link from game
 [ ] make it *more* noticeable when somebody calls tichu
 [ ] turn prompt, maybe chime or something, possibly after several seconds
-[ ] trick point counter
 [ ] player replacement, in some form
 
 nice to have:
@@ -60,8 +61,8 @@ nice to have:
 [x] randomize teams when all players join
 [x] alternate tichu-fail messages
 [ ] pass undo when someone calls tichu?
-[ ] clean up fancy-hands code
 [ ] score table
+[ ] trick point counter
 [ ] dark theme
 [ ] new game button
 [ ] fix passing replacement weirdness and re-enable swapping
@@ -73,3 +74,4 @@ wontfix:
 [ ] fade at top of history -- looked a bit weird, fiddly to implement, a plain border works better
 [ ] server-side history window -- game history is necessary to drive the score table on the client
 [ ] possible_plays optimization - meh, this typically happens _once_; building a structure would be more expensive than the linear lookup
+[ ] clean up fancy-hands code - meh, it ain't broke

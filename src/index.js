@@ -14,9 +14,13 @@ export function Connect(game_id, player_id) {
   ReactDOM.render(<Game game_id={game_id} player_id={player_id}/>, not_right_side)
 }
 
-const hash_params = location.hash.match(/^#(\w+):(\w*)$/)
+const hash_params = location.hash.match(/^#(\w+)(?::(\w+))?$/)
 if (hash_params) {
-  Connect(hash_params[1], hash_params[2])
+  if (hash_params[2]) {
+    Connect(hash_params[1], hash_params[2])
+  } else {
+    ReactDOM.render(<JoinGameDialog initialGameId={hash_params[1]}/>, not_right_side)
+  }
 } else {
   ReactDOM.render(<JoinGameDialog/>, not_right_side)
 }
