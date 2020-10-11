@@ -55,7 +55,6 @@ export default function JoinGameDialog({initialGameId}) {
         <Grid item xs={12}>
           <Button variant="contained"
                   color="primary"
-                  type="submit"
                   disabled={name.length === 0 && gameCode.length === 0}
                   onClick={startGame}>
             {gameCode.length > 0 ? (name.length > 0 ? 'Join Game' : 'Watch Game') : 'Start Game'}

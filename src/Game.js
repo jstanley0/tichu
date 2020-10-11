@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import Container from "@material-ui/core/Container"
 import Box from "@material-ui/core/Box"
+import IconButton from '@material-ui/core/IconButton'
 import Player from "./Player"
 import Player0 from "./Player0"
 import History from "./History"
@@ -15,6 +16,10 @@ export default function Game({game_id, player_id}) {
   const [ gameState, setGameState ] = useState({"state":"connecting"})
   const [ history, setHistory ] = useState([])
 
+  const appendHistory = useCallback((log, error) => {
+    setHistory(GlobalHistory.consume(log, error, MAX_HISTORY))
+  }, [setHistory])
+
   useEffect(() => {
     const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}`)
     ws.onmessage = (event) => {
@@ -25,12 +30,12 @@ export default function Game({game_id, player_id}) {
       } else {
         KeepAlive.reset(ws)
       }
-      setHistory(GlobalHistory.consume(data.log, data.error, MAX_HISTORY))
+      appendHistory(data.log, data.error)
       setGameState(data)
     }
     ws.onclose = () => {
       if (!KeepAlive.gameOver()) {
-        setHistory(GlobalHistory.consume([], "You have been disconnected. Reload the page to reconnect.", MAX_HISTORY))
+        appendHistory([], "You have been disconnected. Reload the page to reconnect.")
       }
     }
     ws.onerror = () => {
@@ -38,6 +43,12 @@ export default function Game({game_id, player_id}) {
     }
     setSocket(ws)
   }, [game_id, player_id])
+
+  const copyGameCode = useCallback(() => {
+    navigator.clipboard.writeText(`${window.origin}#${game_id}`).then(
+      () => { appendHistory([{text: 'Game link copied!'}]) },
+      () => { appendHistory([], 'Failed to copy link.') })
+  }, [game_id, appendHistory])
 
   if (gameState['state'] === 'connecting') {
     return <Container>
@@ -66,7 +77,14 @@ export default function Game({game_id, player_id}) {
         <div style={{display: 'flex', flexDirection: 'column'}}>
           <div className='thetitle'>
             <div className='overline'>Touchless Tichu</div>
-            <div className='big'>{ gameState.id }</div>
+            <div className='big'>
+              { gameState.id }
+              { navigator.clipboard &&
+                <IconButton size="small" onClick={copyGameCode}>
+                  &#x1f517;
+                </IconButton>
+              }
+            </div>
           </div>
           <div style={{flexGrow: 1}}/>
           <Player data={gameState.players[3]} vertical={true} turn={gameState.turn === 3} trickWinner={gameState.trick_winner === 3 || gameState.dealer === 3} align='right'/>
