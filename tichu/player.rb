@@ -29,6 +29,10 @@ class Player
     @tichu_status = nil
   end
 
+  def rename!(new_name)
+    @name = new_name
+  end
+
   def accept_card(card, from_player: nil)
     # eh, maybe someday I'll feel like tracking which card came from where?
     @hand << card
@@ -42,13 +46,14 @@ class Player
     possible_plays.find { |play| play.match?(cards) }
   end
 
-  def to_h(complete: true)
+  def to_h(complete: true, connected: true)
     h = {
       name: name,
       hand_size: hand.size,
       tichu: tichu,
       tichu_status: tichu_status,
-      points_taken: points
+      points_taken: points,
+      connected: connected
     }
     h[:passed_cards] = cards_to_pass.any? unless cards_to_pass.nil?
     if complete

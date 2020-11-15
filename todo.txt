@@ -47,10 +47,10 @@ important:
 [x] change label to "Play" when playing the 1 (still show wish dialog as before)
 [x] deal with simultaneous bombing by teammates
 [x] join game with link
-[ ] copy link from game
+[x] copy link from game
+[x] player replacement
 [ ] make it *more* noticeable when somebody calls tichu
 [ ] turn prompt, maybe chime or something, possibly after several seconds
-[ ] player replacement, in some form
 
 nice to have:
 [x] persistent button positioning in action bar

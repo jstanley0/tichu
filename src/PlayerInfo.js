@@ -4,7 +4,7 @@ import Chip from "@material-ui/core/Chip"
 
 export default function PlayerInfo({data, turn, trickWinner}) {
     return <div className={'playerinfo ' + (turn ? 'playerinfo-turn' : (trickWinner ? 'playerinfo-trickwinner' : ''))}>
-      <Typography variant={data ? 'h6' : 'body2'} component='h2'>
+      <Typography color={data?.connected ? 'textPrimary' : 'textSecondary'} variant={data ? 'h6' : 'body2'} component='h2'>
         { data ? data.name : 'Waiting for player...'}
       </Typography>
       <Chip label={ data ? data.points_taken : '-'}/>&ensp;

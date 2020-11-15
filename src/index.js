@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import JoinGameDialog from "./JoinGameDialog"
+import StartGameDialog from "./StartGameDialog"
 import Game from "./Game"
 
 const not_right_side = document.getElementById('main')
@@ -14,13 +14,9 @@ export function Connect(game_id, player_id) {
   ReactDOM.render(<Game game_id={game_id} player_id={player_id}/>, not_right_side)
 }
 
-const hash_params = location.hash.match(/^#(\w+)(?::(\w+))?$/)
+const hash_params = location.hash.match(/^#(\w+):?(\w*)$/)
 if (hash_params) {
-  if (hash_params[2]) {
-    Connect(hash_params[1], hash_params[2])
-  } else {
-    ReactDOM.render(<JoinGameDialog initialGameId={hash_params[1]}/>, not_right_side)
-  }
+  Connect(hash_params[1], hash_params[2])
 } else {
-  ReactDOM.render(<JoinGameDialog/>, not_right_side)
+  ReactDOM.render(<StartGameDialog/>, not_right_side)
 }

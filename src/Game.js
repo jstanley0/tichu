@@ -6,6 +6,7 @@ import Player from "./Player"
 import Player0 from "./Player0"
 import History from "./History"
 import StatusBox from "./StatusBox"
+import JoinButton from "./JoinButton"
 import GlobalHistory from "./GlobalHistory"
 import KeepAlive from "./KeepAlive"
 
@@ -24,6 +25,9 @@ export default function Game({game_id, player_id}) {
     const ws = new WebSocket(`${location.origin.replace(/^http/, 'ws')}/connect?game_id=${game_id}&player_id=${player_id}`)
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
+      if (data.player_id) {
+        location.hash = `${data.id}:${data.player_id}`
+      }
       if (data.state === 'over') {
         KeepAlive.stop()
         ws.close()
@@ -42,12 +46,18 @@ export default function Game({game_id, player_id}) {
       window.location.href = '/'
     }
     setSocket(ws)
-  }, [game_id, player_id])
+  }, [game_id, player_id, appendHistory])
 
-  const copyGameCode = useCallback(() => {
-    navigator.clipboard.writeText(`${window.origin}#${game_id}`).then(
-      () => { appendHistory([{text: 'Game link copied!'}]) },
-      () => { appendHistory([], 'Failed to copy link.') })
+  const copyGameLink = useCallback(() => {
+    const link = `${window.origin}/#${game_id}`
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(link).then(
+        () => { appendHistory([{text: 'Game link copied!'}]) },
+        () => { appendHistory([], 'Failed to copy link.') })
+    } else {
+      // clipboard not available (possibly because we are not using SSL)
+      appendHistory([{text: 'Game link:', link}] )
+    }
   }, [game_id, appendHistory])
 
   if (gameState['state'] === 'connecting') {
@@ -78,12 +88,10 @@ export default function Game({game_id, player_id}) {
           <div className='thetitle'>
             <div className='overline'>Touchless Tichu</div>
             <div className='big'>
-              { gameState.id }
-              { navigator.clipboard &&
-                <IconButton size="small" onClick={copyGameCode}>
-                  &#x1f517;
-                </IconButton>
-              }
+              <IconButton size="small" onClick={copyGameLink}>
+                &#x1f517;
+              </IconButton>
+              { gameState.can_join ? <JoinButton socket={socket}/> : null }
             </div>
           </div>
           <div style={{flexGrow: 1}}/>

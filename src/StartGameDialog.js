@@ -10,18 +10,13 @@ import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Checkbox from '@material-ui/core/Checkbox'
 import {Connect} from "./index"
 
-export default function JoinGameDialog({initialGameId}) {
+export default function StartGameDialog() {
   const [name, setName] = useState('')
-  const [gameCode, setGameCode] = useState(initialGameId || '')
   const [error, setError] = useState(null)
   const [shortGame, setShortGame] = useState(false)
 
   const startGame = () => {
-    if (name.length === 0) {
-      return Connect(gameCode, '')
-    }
-    const url = gameCode ? '/join' : '/new'
-    axios.post(url, null, { params: { name: name, game_id: gameCode, end_score: shortGame ? 500 : 1000 } })
+    axios.post('/new', null, { params: { name: name, end_score: shortGame ? 500 : 1000 } })
       .then(response => {
         Connect(response.data.game_id, response.data.player_id)
       })
@@ -44,20 +39,17 @@ export default function JoinGameDialog({initialGameId}) {
     <form noValidate>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <TextField fullWidth label="Name" autoFocus value={name} onChange={event => setName(event.target.value)}/>
+          <TextField fullWidth label="Your Name" autoFocus value={name} onChange={event => setName(event.target.value)}/>
         </Grid>
         <Grid item xs={12}>
-          <TextField fullWidth label="Game code" value={gameCode} onChange={event => setGameCode(event.target.value)}/>
-        </Grid>
-        <Grid item xs={12}>
-          <FormControlLabel control={<Checkbox color="primary" name="shortGame" checked={shortGame} onChange={toggleShortGame}/>} label="Short game (500 points)" disabled={gameCode.length > 0} />
+          <FormControlLabel control={<Checkbox color="primary" name="shortGame" checked={shortGame} onChange={toggleShortGame}/>} label="Short game (500 points)" />
         </Grid>
         <Grid item xs={12}>
           <Button variant="contained"
                   color="primary"
-                  disabled={name.length === 0 && gameCode.length === 0}
+                  disabled={name.length === 0}
                   onClick={startGame}>
-            {gameCode.length > 0 ? (name.length > 0 ? 'Join Game' : 'Watch Game') : 'Start Game'}
+            Start Game
           </Button>
         </Grid>
         <Grid item xs={12}>

@@ -29,8 +29,6 @@ class State
       rotate_teams!(rand(3))
       @state = :ready
     end
-
-    send_global_update
   end
 
   PlayerInfo = Struct.new(:player_id, :next_message)
@@ -43,7 +41,9 @@ class State
   end
 
   def disconnect!(websocket)
+    player_id = @conns[websocket].player_id
     @conns.delete(websocket)
+    send_global_update if player_id.present?
   end
 
   def any_connections?
@@ -53,8 +53,9 @@ class State
   def message(data, websocket, player_id)
     return if data == 'ping' # KeepAlive
 
+    player_id ||= @conns[websocket]&.player_id
     player_index = players.find_index { |player| player.id == player_id }
-    return unless player_index # observers are read-only
+    return observer_message(data, websocket) unless player_index
 
     player = players[player_index]
     unless player
@@ -127,8 +128,62 @@ class State
     end
   end
 
+  def observer_message(data, websocket)
+    begin
+      json = JSON.parse(data)
+      command = json['command']
+      if command == 'join' && state != :over
+        if game_full?
+          send_update(websocket, "game is full")
+        elsif json['name'].blank?
+          send_update(websocket, "must provide name when joining")
+        else
+          join_game!(json['name'], websocket)
+        end
+      else
+        wat!(command, websocket)
+      end
+    rescue => e
+      STDERR.puts e.inspect
+      STDERR.puts e.backtrace
+      send_global_update("something bad happened :(")
+    end
+  end
+
   def wat!(command, websocket)
     send_update(websocket, "invalid command #{command} in state #{state}")
+  end
+
+  def connected_player_ids
+    @conns.values.map { |pi| pi.player_id }.compact.uniq
+  end
+
+  def game_full?
+    connected_player_ids.size == 4
+  end
+
+  def join_game!(name, websocket)
+    if players.size < 4
+      # new player
+      player = Player.new(name)
+      @conns[websocket] = PlayerInfo.new(player.id, @log.size)
+      add_player!(player)
+      send_global_update(new_player_id: player.id)
+    else
+      # replace a player who left the game
+      conn_ids = connected_player_ids
+      players.each do |player|
+        unless conn_ids.include?(player.id)
+          old_name = player.name
+          player.rename!(name)
+          @conns[websocket] = PlayerInfo.new(player.id, @log.size)
+          add_action(player, "stepped in for " + old_name)
+          send_global_update(new_player_id: player.id)
+          return
+        end
+      end
+      send_update(websocket, "somebody apparently beat you to the punch, sry")
+    end
   end
 
   def rotate_teams!(amount = -1)
@@ -289,9 +344,9 @@ class State
     last_play.is_a?(Bomb) && last_play.player_index == (player_index + 2) % 4 && Time.now - last_play.ts < 3
   end
 
-  def send_global_update(error = nil)
+  def send_global_update(error = nil, new_player_id: nil)
     @conns.each do |ws, info|
-      h = to_h(player_info: info)
+      h = to_h(player_info: info, include_player_id: new_player_id == info.player_id)
       h.merge!(error: error) if error
       ws.send h.to_json
     end
@@ -383,11 +438,11 @@ class State
     end
   end
 
-  def to_h(player_info: nil)
+  def to_h(player_info: nil, include_player_id: false)
     {
       id: id,
       scores: rotate_scores(player_info.player_id),
-      players: rotate_players(player_info.player_id).map { |player| player.to_h(complete: player.id == player_info.player_id) },
+      players: rotate_players(player_info.player_id).map { |player| player.to_h(complete: player.id == player_info.player_id, connected: connected_player_ids.include?(player.id)) },
       end_score: end_score,
       state: state,
       wish_rank: Card.rank_string(wish_rank),
@@ -395,8 +450,10 @@ class State
       trick_winner: trick_winner ? rotate_index(trick_winner, player_info.player_id) : nil,
       dragon_trick: dragon_trick,
       log: pending_messages(player_info),
-      last_play: last_play(player_info.player_id)
+      last_play: last_play(player_info.player_id),
+      can_join: player_info.player_id.nil? && !game_full?
     }.tap do |h|
+      h[:player_id] = player_info.player_id if include_player_id
       h[:dealer] = rotate_index(0, player_info.player_id) if state == :ready
     end
   end

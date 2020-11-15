@@ -25,20 +25,6 @@ post '/new' do
   { game_id: game.id, player_id: player.id }.to_json
 end
 
-post '/join' do
-  halt 400, 'missing required parameter `name`' unless params['name'].present?
-  game_id = params['game_id'].upcase.strip
-  halt 400, 'missing required parameter `game_id`' unless game_id.present?
-  game = $games[game_id]
-  halt 400, 'invalid game_id' unless game
-  halt 403, 'game is full' if game.players.size >= 4
-
-  player = Player.new(params['name'])
-  game.add_player!(player)
-
-  { game_id: game.id, player_id: player.id }.to_json
-end
-
 get '/ping' do
   'pong'
 end
