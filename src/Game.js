@@ -71,7 +71,7 @@ export default function Game({game_id, player_id}) {
     <div style={{display: 'flex', height: '100%', minWidth: 1000, minHeight: 720, flexDirection: 'column'}}>
       <div style={{display: 'flex', flexGrow: 1}}>
         <div style={{display: 'flex', flexDirection: 'column'}}>
-          <StatusBox wish={gameState.wish_rank} scores={gameState.scores}/>
+          <StatusBox wish={gameState.wish_rank} scores={gameState.scores} endScore={gameState.end_score}/>
           <div style={{flexGrow: 1}}/>
           <Player data={gameState.players[1]} vertical={true} turn={gameState.turn === 1} trickWinner={gameState.trick_winner === 1 || gameState.dealer === 1} align='left'/>
           <div style={{flexGrow: 1}}/>

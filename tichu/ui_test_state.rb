@@ -31,7 +31,8 @@ class UiTestState
           "tichu" => 100,
           "tichu_status" => nil,
           "points_taken" => 0,
-          "passed_cards" => true
+          "passed_cards" => true,
+          "connected" => true
         },
         {
           "name" => "Bot 1",
@@ -39,7 +40,8 @@ class UiTestState
           "tichu" => 200,
           "tichu_status" => nil,
           "points_taken" => 100,
-          "passed_cards" => true
+          "passed_cards" => true,
+          "connected" => true
         },
         {
           "name" => "Bot 2",
@@ -47,7 +49,8 @@ class UiTestState
           "tichu" => 100,
           "tichu_status" => false,
           "points_taken" => -10,
-          "passed_cards" => true
+          "passed_cards" => true,
+          "connected" => true
         },
         {
           "name" => "Bot 3",
@@ -55,7 +58,8 @@ class UiTestState
           "tichu" => 100,
           "tichu_status" => true,
           "points_taken" => 10,
-          "passed_cards" => true
+          "passed_cards" => true,
+          "connected" => false
         }
       ],
       "end_score" => 1000,

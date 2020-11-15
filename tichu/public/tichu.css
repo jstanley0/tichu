@@ -120,6 +120,12 @@ div {
     line-height: 1.5;
 }
 
+.endscore {
+    font-size: smaller;
+    text-align: right;
+    margin-bottom: 10px;
+}
+
 .thetitle .gameId {
     font-size: x-large;
 }
@@ -154,4 +160,38 @@ div {
 
 .MuiListItemText-root .MuiCard-root {
     display: inline-block;
+}
+
+.tichu-indicator {
+    display: inline-block;
+    border-radius: 20px;
+    padding: 5px 10px 5px 10px;
+    font-weight: bold;
+    margin-top: 2px;
+}
+
+.tichu-score {
+    background-color: #e9e9e9;
+    color: black;
+    font-weight: normal;
+    border: 3px solid #e9e9e9;
+}
+
+.tichu-pending {
+    background-color: white;
+    color: #873bcf;
+    border: 3px solid #873bcf;
+}
+
+.tichu-success {
+    color: white;
+    background-color: #22a126;
+    border: 3px solid #22a126;
+}
+
+.tichu-fail {
+    color: #b82525;
+    background-color: white;
+    border: 3px solid #b82525;
+    border-radius: 2px;
 }
