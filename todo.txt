@@ -51,7 +51,7 @@ important:
 [x] player replacement
 [x] show end-score
 [x] improve tichu indicators
-[ ] make it *more* noticeable when somebody calls tichu
+[x] make it *more* noticeable when somebody calls tichu
 [ ] turn prompt, maybe chime or something, possibly after several seconds
 
 nice to have:

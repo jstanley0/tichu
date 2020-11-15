@@ -162,6 +162,17 @@ div {
     display: inline-block;
 }
 
+@keyframes zoomy {
+    from { opacity: 0; transform: scale(10) rotate(-90deg); }
+    to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes bouncy {
+    0% { transform: scale(1) }
+    50% { transform: scale(2) }
+    100% { transform: scale(1) }
+}
+
 .tichu-indicator {
     display: inline-block;
     border-radius: 20px;
@@ -181,12 +192,16 @@ div {
     background-color: white;
     color: #873bcf;
     border: 3px solid #873bcf;
+    animation-name: zoomy;
+    animation-duration: 1s;
 }
 
 .tichu-success {
     color: white;
     background-color: #22a126;
     border: 3px solid #22a126;
+    animation-name: bouncy;
+    animation-duration: 0.5s;
 }
 
 .tichu-fail {
@@ -194,4 +209,6 @@ div {
     background-color: white;
     border: 3px solid #b82525;
     border-radius: 2px;
+    animation-name: bouncy;
+    animation-duration: 0.5s;
 }
