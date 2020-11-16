@@ -171,7 +171,7 @@ export default function Player0({gameState, socket}) {
     setSelection(newSelection)
   }, [selection])
 
-  return <div style={{display: 'flex', alignItems: 'flex-end'}}>
+  return <div className='player0' style={{display: 'flex', alignItems: 'flex-end'}}>
     <div style={{flexGrow: 1}}/>
     <PlayerInfo data={gameState.players[0]} turn={gameState.turn === 0} trickWinner={gameState.trick_winner === 0 || gameState.dealer === 0}/>
     <Box width={5} height={5}/>
