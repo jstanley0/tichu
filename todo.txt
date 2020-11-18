@@ -62,6 +62,7 @@ nice to have:
 [x] title box too small
 [x] randomize teams when all players join
 [x] alternate tichu-fail messages
+[x] card animations!!
 [ ] pass undo when someone calls tichu?
 [ ] score table
 [ ] trick point counter

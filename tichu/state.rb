@@ -32,7 +32,7 @@ class State
   end
 
   PlayerInfo = Struct.new(:player_id, :next_message)
-  LogEntry = Struct.new(:text, :cards, :player_id)
+  LogEntry = Struct.new(:text, :cards, :player_id, :actor_id)
 
   def connect!(websocket, player_id = nil)
     info = PlayerInfo.new(player_id, 0)
@@ -196,13 +196,13 @@ class State
       player.cards_to_pass.each_with_index do |card, j|
         players[(i + j + 1) % 4].accept_card(card, from_player: player.id)
       end
-      add_status("You passed", player_id: player.id, cards: Card.serialize(player.cards_to_pass, sorted: false))
+      add_status("You passed", recipient_id: player.id, cards: Card.serialize(player.cards_to_pass, sorted: false))
       player.done_passing_cards!
     end
 
     players.each_with_index do |player, i|
       passed_cards = player.hand[-3..-1].rotate(i)
-      add_status("You received", player_id: player.id, cards: Card.serialize(passed_cards, sorted: false))
+      add_status("You received", recipient_id: player.id, cards: Card.serialize(passed_cards, sorted: false))
     end
 
     start_round!
@@ -213,9 +213,9 @@ class State
     @turn = players.find_index { |player| player.hand.find(&:sparrow?) }
     players.each do |player|
       if player.id == players[@turn].id
-        add_status("You have the sparrow", player_id: player.id)
+        add_status("You have the sparrow", recipient_id: player.id)
       else
-        add_action(players[@turn], "has the sparrow", player_id: player.id)
+        add_action(players[@turn], "has the sparrow", recipient_id: player.id)
       end
     end
     start_turn!
@@ -458,13 +458,13 @@ class State
     end
   end
 
-  def add_status(message, cards: nil, player_id: nil)
-    @log << LogEntry.new(message, cards, player_id)
+  def add_status(message, cards: nil, recipient_id: nil)
+    @log << LogEntry.new(message, cards, recipient_id, nil)
   end
 
-  def add_action(player, action, cards: nil, player_id: nil)
+  def add_action(player, action, cards: nil, recipient_id: nil)
     action_str = "#{player.name} #{action}"
-    @log << LogEntry.new(action_str, cards, player_id)
+    @log << LogEntry.new(action_str, cards, recipient_id, player.id)
   end
 
   def pending_messages(player_info)
@@ -474,6 +474,7 @@ class State
     messages.map do |message|
       h = { text: message.text }
       h[:cards] = message.cards if message.cards.present?
+      h[:pi] = rotate_index(player_index(message.actor_id), player_info.player_id) if message.actor_id
       h
     end
   end

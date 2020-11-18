@@ -28,8 +28,12 @@ export default function History({data}) {
               <Typography>{ entry.error ? `⚠️ ${entry.error}` : entry.text }</Typography>
               { entry.link && <>&thinsp;<Link href={entry.link}>{entry.link}</Link></> }
                 &ensp;
-                { entry.cards && Array.from(entry.cards).map((card) =>
-                  <FaceCard card={card} key={card} small={true}/>) }
+                { entry.cards &&
+                  <span className={`history-cards-container from-${entry.pi}`}>
+                    <span className='history-cards'>{ Array.from(entry.cards).map((card) =>
+                      <FaceCard card={card} key={card} small={true}/>) }
+                    </span>
+                  </span> }
             </ListItem>
             <Divider/>
           </div>

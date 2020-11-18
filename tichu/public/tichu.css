@@ -154,6 +154,51 @@ div {
     margin: 40px;
 }
 
+.history-cards {
+    display: flex;
+}
+
+@keyframes from-below {
+    from { opacity: 0; transform: translateY(50%) scaleY(0); }
+    to { opacity: 1; transform: translateY(0%) scaleY(1); }
+}
+
+@keyframes from-left {
+    from { opacity: 0; transform: translate(-150px, -150px); }
+    to { opacity: 1; transform: translate(0, 0); }
+}
+
+@keyframes from-above {
+    from { opacity: 0; transform: translate(50px, -200px); }
+    to { opacity: 1; transform: translate(0, 0); }
+}
+
+@keyframes from-right {
+    from { opacity: 0; transform: translate(400px, -75px); }
+    to { opacity: 1; transform: translate(0, 0); }
+}
+
+.history-cards-container {
+    display: inline-block;
+    animation-duration: 600ms;
+}
+
+.history-cards-container.from-0 {
+    animation-name: from-below;
+}
+
+.history-cards-container.from-1 {
+    animation-name: from-left;
+}
+
+.history-cards-container.from-2 {
+    animation-name: from-above;
+}
+
+.history-cards-container.from-3 {
+    animation-name: from-right;
+}
+
 .action-bar {
     min-height: 46px;
 }
