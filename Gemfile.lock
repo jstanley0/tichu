@@ -81,7 +81,7 @@ DEPENDENCIES
   websocket-eventmachine-client
 
 RUBY VERSION
-   ruby 2.7.1p83
+   ruby 2.7.4p191
 
 BUNDLED WITH
    2.1.4

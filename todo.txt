@@ -29,6 +29,7 @@ critical:
 [x] fix weirdness when bombing a winning trick
 [x] fix card order in history
 [x] fix scoring when third player goes out with the dragon
+[ ] survive a dyno reboot (persist to postgres? intercept SIGTERM and dump state on each game owner?)
 
 important:
 [x] preserve local hand order after play
@@ -53,6 +54,8 @@ important:
 [x] improve tichu indicators
 [x] make it *more* noticeable when somebody calls tichu
 [ ] turn prompt, maybe chime or something, possibly after several seconds
+[ ] let observers see players' cards via some kind of token sent out-of-band
+[ ] let players change their minds about which cards to pass
 
 nice to have:
 [x] persistent button positioning in action bar
