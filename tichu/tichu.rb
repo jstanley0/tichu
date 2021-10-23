@@ -69,6 +69,7 @@ get '/connect' do
       Database.connect do |db|
         game = db.load_game(game_id)
         if game
+          $stderr.puts "loaded game #{game_id} from database"
           $games[game_id] = game
           db.delete_game(game_id) # it's just a snapshot; we'll save it again if we need to restart again
         end
