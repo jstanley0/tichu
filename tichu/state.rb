@@ -46,6 +46,11 @@ class State
     send_global_update if player_id.present?
   end
 
+  def dump
+    @conns = {}
+    Marshal.dump(self)
+  end
+
   def any_connections?
     @conns.any?
   end

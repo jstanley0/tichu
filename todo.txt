@@ -29,7 +29,7 @@ critical:
 [x] fix weirdness when bombing a winning trick
 [x] fix card order in history
 [x] fix scoring when third player goes out with the dragon
-[ ] survive a dyno reboot (persist to postgres? intercept SIGTERM and dump state on each game owner?)
+[x] survive a dyno reboot (intercept SIGTERM and dump game state in Postgres)
 
 important:
 [x] preserve local hand order after play

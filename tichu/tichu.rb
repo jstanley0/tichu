@@ -1,3 +1,6 @@
+at_exit { save_games! } # this has to come before requiring sinatra
+
+require 'multitrap'
 require 'sinatra'
 require 'sinatra-websocket'
 require 'active_support'
@@ -6,8 +9,21 @@ require 'active_support/core_ext'
 require_relative 'state'
 require_relative 'player'
 require_relative 'ui_test_state'
+require_relative 'database'
 
 $games = {}
+$stopping = false
+
+# ensure websocket connections are shut down when Heroku reboots our dyno
+trap('TERM') do
+  $stopping = true
+  EM.stop
+end
+
+# ensure games remain available to save on Ctrl+C
+trap('INT') do
+  $stopping = true
+end
 
 get '/' do
   erb :index
@@ -48,6 +64,15 @@ get '/connect' do
       game = $games[game_id] = State.new(id: 'TEST')
     elsif game_id == 'UITEST'
       game = $games[game_id] = UiTestState.new
+    elsif Database.configured?
+      # reload the game if the server was restarted
+      Database.connect do |db|
+        game = db.load_game(game_id)
+        if game
+          $games[game_id] = game
+          db.delete_game(game_id) # it's just a snapshot; we'll save it again if we need to restart again
+        end
+      end
     end
   end
   halt 400, 'invalid game_id' unless game
@@ -75,10 +100,14 @@ get '/connect' do
     end
     ws.onclose do
       game.disconnect!(ws)
-      unless game.any_connections?
-        # hmm, ideally we'd do this after some kind of timeout
-        STDERR.puts "Deleting game #{game_id}"
-        $games.delete(game_id)
+      unless game.any_connections? || $stopping
+        # use a timer to prevent the game from disappearing while the last player reloads the page
+        EM.add_timer(5) do
+          unless game.any_connections?
+            STDERR.puts "Deleting game #{game_id}"
+            $games.delete(game_id)
+          end
+        end
       end
     end
   end
@@ -86,4 +115,23 @@ end
 
 not_found do
   '404 Not Found :('
+end
+
+def save_games!
+  if $games.empty?
+    $stderr.puts "no active games to save"
+    return
+  end
+
+  unless Database.configured?
+    $stderr.puts "database not configured; unable to save games"
+    return
+  end
+
+  $stderr.puts "saving #{$games.size} games to database"
+  Database.connect do |db|
+    $games.each do |id, game|
+      db.save_game(game)
+    end
+  end
 end

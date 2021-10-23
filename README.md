@@ -12,9 +12,9 @@ Requirements: bundler and yarn
 
 ## Server notes
 
- * There is no matchmaking capability; you simply share a game code out of band. Tichu works best in conjunction with some kind of a web conference anyway.
+ * There is no matchmaking capability; you simply share a game link out of band. Tichu works best in conjunction with some kind of a web conference anyway.
  * There is no authentication. 
- * There is no persistent storage. If you restart the server, you lose any games in progress.
+ * Game state is stored in-memory. You can optionally configure a Postgres database (via ENV.DATABASE_URL) that will be used solely to persist games across a server restart. I added this capability after Heroku rebooted my dyno when I was about to complete a Grand Tichu. 😭
  
 ## Game notes
 
@@ -22,7 +22,7 @@ Requirements: bundler and yarn
 
 ## Copyright
 
-Copyright (C) 2020 Jeremy Stanley
+Copyright (C) 2020-2021 Jeremy Stanley
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -17,7 +17,7 @@ def send_command(websocket, command, opts = {})
 end
 
 EM.run do
-  ws = WebSocket::EventMachine::Client.connect(uri: URL)
+  ws = WebSocket::EventMachine::Client.connect(uri: ARGV.first.presence || URL)
   condition = nil
 
   ws.onopen do

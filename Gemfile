@@ -4,6 +4,8 @@ source "https://rubygems.org"
 gem "sinatra"
 gem "sinatra-websocket"
 gem "activesupport"
+gem "multitrap"
+gem "pg"
 
 gem "rspec", :group => :test
 gem "byebug", :group => :development
