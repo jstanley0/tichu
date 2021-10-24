@@ -14,7 +14,8 @@ Requirements: bundler and yarn
 
  * There is no matchmaking capability; you simply share a game link out of band. Tichu works best in conjunction with some kind of a web conference anyway.
  * There is no authentication. 
- * Game state is stored in-memory. You can optionally configure a Postgres database (via ENV.DATABASE_URL) that will be used solely to persist games across a server restart. I added this capability after Heroku rebooted my dyno when I was about to complete a Grand Tichu. 😭
+ * There is no means to scale beyond one app server. Doing that with a websocket-based game would require some rearchitecting of the backend. I may take that on someday for the challenge, but there hasn't been a need for it yet.
+ * Game state is stored in-memory. You can optionally configure a Postgres database (via ENV.DATABASE_URL) that will be used solely to persist games across a server restart. I added this capability after Heroku rebooted my dyno when I was about to complete a Grand Tichu 😭. Run db/create_database.sql to initialize the data store.
  
 ## Game notes
 

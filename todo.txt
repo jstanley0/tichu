@@ -56,6 +56,7 @@ important:
 [ ] turn prompt, maybe chime or something, possibly after several seconds
 [ ] let observers see players' cards via some kind of token sent out-of-band
 [ ] let players change their minds about which cards to pass
+[ ] reconnect without reloading the page
 
 nice to have:
 [x] persistent button positioning in action bar
