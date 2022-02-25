@@ -1,0 +1,2 @@
+---
+BUNDLE_BUILD__THIN: "--with-cflags=-fms-extensions"
