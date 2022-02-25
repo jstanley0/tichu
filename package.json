@@ -32,5 +32,5 @@
     "build": "webpack --mode=production",
     "dev": "webpack --mode=development --watch"
   },
-  "packageManager": "yarn@1.22.10"
+  "packageManager": "yarn@1.x"
 }
