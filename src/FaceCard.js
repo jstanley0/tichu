@@ -1,15 +1,11 @@
 import React, { useCallback } from 'react'
-import Card from '@material-ui/core/Card'
+import Card from '@mui/material/Card'
 import decodeCard from './DecodeCard.js'
 import CardDimensions from './CardDimensions'
 
 export default function FaceCard({card, dragging, small, selected, toggleSelect}) {
   const getStyles = useCallback(() => {
     const h = small ? { ...CardDimensions.small } : { ...CardDimensions.reg }
-    if (selected) {
-      h.border = '2px solid gold'
-      h.margin = 1
-    }
     return h
   }, [selected, small])
 
@@ -21,7 +17,7 @@ export default function FaceCard({card, dragging, small, selected, toggleSelect}
 
   const { suit, rank, color_style } = decodeCard(card)
   return <Card variant='elevation'
-               className={small ? 'card-small' : 'tichu-card'}
+               className={`tichu-card ${selected ? 'selected' : ''}`}
                elevation={dragging || selected ? 7 : 2}
                style={getStyles()}
                onClick={handleClick}>

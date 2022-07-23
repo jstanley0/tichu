@@ -271,3 +271,89 @@ div {
     animation-duration: 0.5s;
     transition: color 0.5s;
 }
+
+.tichu-card {
+    border: 1px solid transparent;
+    margin: 3px;
+}
+
+.pile {
+    border: 1px solid transparent;
+}
+
+.tichu-card.selected {
+    border: 2px solid gold;
+    padding: -1px -1px;
+    margin: 1px 3px 3px 1px !important;
+}
+
+body.dark {
+    color: #c4c9d4;
+    background-color: #080b12;
+}
+
+.dark .history-box {
+    border-top-color: dimgray;
+}
+
+.dark .tichu-card, .dark .pile {
+    border-color: #303030;
+}
+
+.dark .special-card {
+    color: #e4ba4e;
+}
+
+.dark .black-card {
+    color: #8c90a6;
+}
+
+.dark .green-card {
+    color: #6ce070;
+}
+
+.dark .red-card {
+    color: #dd5555;
+}
+
+.dark .blue-card {
+    color: #4c66e6;
+}
+
+.dark .card-back {
+    background: linear-gradient(to bottom right, #210f57, #1a0040);
+    background: linear-gradient(to bottom right, #26375a, #1e2c48);
+}
+
+.dark .hand0 {
+    background-color: #0f1624;
+}
+
+.dark .card-dragover {
+    background-color: #172136;
+}
+
+.dark .playerinfo-turn h2 {
+    border-color: #005fb3;
+    background-color: #00294d;
+}
+
+.dark .playerinfo-trickwinner h2 {
+    color: black;
+}
+
+.dark .tichu-score {
+    background-color: #26375a;
+    border-color: #26375a;
+    color: #c4c9d4;
+}
+
+.dark .tichu-pending {
+    background-color: #080b12;
+    color: #873bcf;
+}
+
+.dark .tichu-fail {
+    background-color: #080b12;
+    color: #b82525;
+}

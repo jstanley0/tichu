@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react'
-import List from "@material-ui/core/List"
-import ListItem from "@material-ui/core/ListItem"
-import Link from '@material-ui/core/Link'
-import Typography from "@material-ui/core/Typography"
-import Divider from "@material-ui/core/Divider"
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import Link from '@mui/material/Link'
+import Typography from "@mui/material/Typography"
+import Divider from "@mui/material/Divider"
 import FaceCard from "./FaceCard"
 
 export default function History({data}) {

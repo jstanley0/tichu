@@ -67,10 +67,10 @@ nice to have:
 [x] randomize teams when all players join
 [x] alternate tichu-fail messages
 [x] card animations!!
+[x] dark theme
 [ ] pass undo when someone calls tichu?
 [ ] score table
 [ ] trick point counter
-[ ] dark theme
 [ ] new game button
 [ ] fix passing replacement weirdness and re-enable swapping
 [ ] fix passing arrows when dragging out of a pass thing

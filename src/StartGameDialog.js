@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import axios from 'axios'
-import Grid from "@material-ui/core/Grid"
-import Box from "@material-ui/core/Box"
-import Typography from "@material-ui/core/Typography"
-import Container from "@material-ui/core/Container"
-import TextField from '@material-ui/core/TextField'
-import Button from '@material-ui/core/Button'
-import FormControlLabel from '@material-ui/core/FormControlLabel'
-import Checkbox from '@material-ui/core/Checkbox'
+import Grid from "@mui/material/Grid"
+import Box from "@mui/material/Box"
+import Typography from "@mui/material/Typography"
+import Container from "@mui/material/Container"
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
 import {Connect} from "./index"
+import Themer from "./Themer"
 
 export default function StartGameDialog() {
   const [name, setName] = useState('')
@@ -33,29 +34,31 @@ export default function StartGameDialog() {
     setShortGame(!shortGame)
   }
 
-  return <Container maxWidth="xs">
-    <Box height="15%"/>
-    <Typography align="center" gutterBottom={true} variant="h2" component="h1">Touchless Tichu</Typography>
-    <form noValidate>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <TextField fullWidth label="Your Name" autoFocus value={name} onChange={event => setName(event.target.value)}/>
+  return <Themer>
+      <Container maxWidth="xs">
+      <Box height="15%"/>
+      <Typography align="center" gutterBottom={true} variant="h2" component="h1">Touchless Tichu</Typography>
+      <form noValidate>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <TextField fullWidth label="Your Name" autoFocus value={name} onChange={event => setName(event.target.value)}/>
+          </Grid>
+          <Grid item xs={12}>
+            <FormControlLabel control={<Checkbox color="primary" name="shortGame" checked={shortGame} onChange={toggleShortGame}/>} label="Short game (500 points)" />
+          </Grid>
+          <Grid item xs={12}>
+            <Button variant="contained"
+                    color="primary"
+                    disabled={name.length === 0}
+                    onClick={startGame}>
+              Start Game
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            { <Typography color="error">{error}</Typography> }
+          </Grid>
         </Grid>
-        <Grid item xs={12}>
-          <FormControlLabel control={<Checkbox color="primary" name="shortGame" checked={shortGame} onChange={toggleShortGame}/>} label="Short game (500 points)" />
-        </Grid>
-        <Grid item xs={12}>
-          <Button variant="contained"
-                  color="primary"
-                  disabled={name.length === 0}
-                  onClick={startGame}>
-            Start Game
-          </Button>
-        </Grid>
-        <Grid item xs={12}>
-          { <Typography color="error">{error}</Typography> }
-        </Grid>
-      </Grid>
-    </form>
-  </Container>
+      </form>
+    </Container>
+  </Themer>
 }
