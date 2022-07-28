@@ -1,6 +1,5 @@
 import React from 'react'
 import Typography from "@mui/material/Typography"
-import Chip from "@mui/material/Chip"
 import TichuIndicator from "./TichuIndicator"
 
 export default function PlayerInfo({data, turn, trickWinner}) {

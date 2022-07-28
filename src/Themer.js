@@ -24,7 +24,7 @@ export default function Themer({ children }) {
       document.body.classList.add('dark')
     }
     setDarkMode(prefersDarkMode)
-  }, [prefersDarkMode, setDarkMode])
+  }, [darkMode, setDarkMode])
 
   const toggleDarkMode = () => {
     if (darkMode) {

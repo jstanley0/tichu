@@ -7,7 +7,7 @@ export default function FaceCard({card, dragging, small, selected, toggleSelect}
   const getStyles = useCallback(() => {
     const h = small ? { ...CardDimensions.small } : { ...CardDimensions.reg }
     return h
-  }, [selected, small])
+  }, [small])
 
   const handleClick = useCallback(() => {
     if (toggleSelect) {

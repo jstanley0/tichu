@@ -72,7 +72,7 @@ export default function Player0({gameState, socket}) {
       setHand(hand.filter(card => !extra_cards.includes(card)))
       deselectCards(extra_cards)
     }
-  }, [server_cards])
+  }, [server_cards, deselectCards, hand, passAcross, passLeft, passRight])
 
   const onDragEnd = ({source, destination, draggableId}) => {
     if (!destination) {
@@ -169,7 +169,7 @@ export default function Player0({gameState, socket}) {
       newSelection[card] = 1
     })
     setSelection(newSelection)
-  }, [selection])
+  }, [setSelection])
 
   return <div className='player0' style={{display: 'flex', alignItems: 'flex-end'}}>
     <div style={{flexGrow: 1}}/>
