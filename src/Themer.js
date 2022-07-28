@@ -20,11 +20,11 @@ export default function Themer({ children }) {
 
   // initialize .dark on body
   useEffect(() => {
-    if (darkMode) {
+    if (prefersDarkMode) {
       document.body.classList.add('dark')
     }
     setDarkMode(prefersDarkMode)
-  }, [darkMode, setDarkMode])
+  }, [])
 
   const toggleDarkMode = () => {
     if (darkMode) {
