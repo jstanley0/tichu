@@ -29,7 +29,7 @@ export default function JoinButton({socket}) {
     </Button>
     <Dialog open={modalOpen} onClose={handleClose}>
       <DialogTitle>Join Game</DialogTitle>
-      <DialogContent>
+      <DialogContent dividers>
         <TextField label="Your Name" autoFocus value={name} onChange={event => setName(event.target.value)}/>
       </DialogContent>
       <DialogActions>

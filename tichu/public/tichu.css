@@ -297,7 +297,11 @@ body.dark {
 }
 
 .dark .tichu-card, .dark .pile {
-    border-color: #303030;
+    border-color: #343434;
+}
+
+.dark .tichu-card.selected {
+    border-color: #c8981e;
 }
 
 .dark .special-card {

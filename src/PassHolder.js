@@ -1,6 +1,7 @@
 import React from "react"
 import { Draggable, Droppable } from 'react-beautiful-dnd'
 import FaceCard from "./FaceCard"
+import CardDimensions from "./CardDimensions"
 
 export default function PassHolder({droppableId, caption, card})
 {
@@ -9,7 +10,10 @@ export default function PassHolder({droppableId, caption, card})
   // on an occupied PassHolder for the moment
   return <Droppable droppableId={droppableId} isDropDisabled={!!card}>
       {(provided, snapshot) => (
-        <div ref={provided.innerRef} {...provided.droppableProps} style={{width: 64, height: 88}} className={`passTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
+        <div ref={provided.innerRef}
+             {...provided.droppableProps}
+             style={{width: CardDimensions.regAreaWidth(1), height: CardDimensions.regAreaHeight(1)}}
+             className={`passTarget ${snapshot.isDraggingOver ? 'card-dragover' : ''}`}>
           {!card && <div className='pass-holder-arrow'>{caption}</div> }
           {card && (<Draggable draggableId={card} index={0}>
             {(provided, snapshot) => (
