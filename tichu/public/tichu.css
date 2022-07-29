@@ -241,7 +241,7 @@ div {
 }
 
 .tichu-pending {
-    background-color: white;
+    background-color: transparent;
     color: #873bcf;
     border: 3px solid #873bcf;
     animation-name: spin-down;
@@ -264,7 +264,7 @@ div {
 
 .tichu-fail {
     color: #b82525;
-    background-color: white;
+    background-color: transparent;
     border: 3px solid #b82525;
     border-radius: 2px;
     animation-name: bounce;
@@ -289,7 +289,7 @@ div {
 
 body.dark {
     color: #c4c9d4;
-    background-color: #080b12;
+    background-color: #0f1624;
 }
 
 .dark .history-box {
@@ -330,7 +330,7 @@ body.dark {
 }
 
 .dark .hand0 {
-    background-color: #0f1624;
+    background-color: #121a2b;
 }
 
 .dark .card-dragover {
@@ -343,21 +343,11 @@ body.dark {
 }
 
 .dark .playerinfo-trickwinner h2 {
-    color: black;
+    background-color: #595926;
 }
 
 .dark .tichu-score {
     background-color: #26375a;
     border-color: #26375a;
     color: #c4c9d4;
-}
-
-.dark .tichu-pending {
-    background-color: #080b12;
-    color: #873bcf;
-}
-
-.dark .tichu-fail {
-    background-color: #080b12;
-    color: #b82525;
 }
