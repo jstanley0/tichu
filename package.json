@@ -7,7 +7,7 @@
   "author": "Jeremy Stanley <jstanley0@gmail.com>",
   "license": "GPL-3.0",
   "engines": {
-    "node": "18.x",
+    "node": "16.x",
     "yarn": "1.x"
   },
   "dependencies": {
