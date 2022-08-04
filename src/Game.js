@@ -11,6 +11,7 @@ import JoinButton from "./JoinButton"
 import Themer, { DarkModeContext } from "./Themer"
 import GlobalHistory from "./GlobalHistory"
 import KeepAlive from "./KeepAlive"
+import playNotificationSound from "./notification"
 
 export default function Game({game_id, player_id}) {
   const MAX_HISTORY = 20
@@ -49,6 +50,13 @@ export default function Game({game_id, player_id}) {
     }
     setSocket(ws)
   }, [game_id, player_id, appendHistory])
+
+  const [ turnNotification, setTurnNotification ] = useState(false)
+  useEffect(() => {
+    if (gameState.turn === 0 && turnNotification) {
+      playNotificationSound()
+    }
+  }, [gameState.turn])
 
   const copyGameLink = useCallback(() => {
     const link = `${window.origin}/#${game_id}`
@@ -91,6 +99,11 @@ export default function Game({game_id, player_id}) {
             <div className='thetitle'>
               <div className='overline'>Touchless Tichu</div>
               <div className='big'>
+                <Tooltip title='Toggle turn notification sound'>
+                  <IconButton size="small" onClick={() => setTurnNotification(!turnNotification)}>
+                    { turnNotification ? '🔔' : '🔕' }
+                  </IconButton>
+                </Tooltip>
                 <DarkModeContext.Consumer>
                   {({darkMode, toggleDarkMode}) => (
                     <Tooltip title='Toggle dark mode'>
