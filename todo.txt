@@ -53,7 +53,8 @@ important:
 [x] show end-score
 [x] improve tichu indicators
 [x] make it *more* noticeable when somebody calls tichu
-[ ] turn prompt, maybe chime or something, possibly after several seconds
+[x] turn prompt, maybe chime or something
+[ ] investigate delaying chime if noises become confusing over zoom
 [ ] let observers see players' cards via some kind of token sent out-of-band
 [ ] let players change their minds about which cards to pass
 [ ] reconnect without reloading the page

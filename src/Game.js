@@ -51,12 +51,19 @@ export default function Game({game_id, player_id}) {
     setSocket(ws)
   }, [game_id, player_id, appendHistory])
 
-  const [ turnNotification, setTurnNotification ] = useState(false)
+  const [ turnNotification, setTurnNotification ] = useState(
+    localStorage.getItem("bell") === "on"
+  )
+
+  useEffect(() => {
+    localStorage.setItem("bell", turnNotification ? "on" : "off")
+  }, [turnNotification])
+
   useEffect(() => {
     if (gameState.turn === 0 && turnNotification) {
       playNotificationSound()
     }
-  }, [gameState.turn])
+  }, [gameState.turn])  // eslint-disable-line react-hooks/exhaustive-deps
 
   const copyGameLink = useCallback(() => {
     const link = `${window.origin}/#${game_id}`
