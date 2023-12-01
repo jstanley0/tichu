@@ -17,7 +17,7 @@
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@mui/material": "^5",
-    "axios": "^0",
+    "axios": "^1",
     "babel-loader": "^8",
     "react": "^17",
     "react-beautiful-dnd": "^13",
