@@ -7,8 +7,8 @@
   "author": "Jeremy Stanley <jstanley0@gmail.com>",
   "license": "GPL-3.0",
   "engines": {
-    "node": "16.x",
-    "yarn": "1.x"
+    "node": "^20",
+    "yarn": "^4"
   },
   "dependencies": {
     "@babel/core": "^7",
@@ -33,6 +33,5 @@
   "scripts": {
     "build": "webpack --mode=production",
     "dev": "webpack --mode=development --watch"
-  },
-  "packageManager": "yarn@1.x"
+  }
 }

@@ -1,4 +1,4 @@
-ruby "3.1.2"
+ruby "4.0.2"
 source "https://rubygems.org"
 
 gem "sinatra"
@@ -6,6 +6,8 @@ gem "sinatra-websocket"
 gem "activesupport"
 gem "multitrap"
 gem "pg"
+gem "rackup"
+gem "puma"
 
 gem "rspec", :group => :test
 gem "byebug", :group => :development
