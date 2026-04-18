@@ -2,7 +2,8 @@
 # to facilitate testing
 
 require 'json'
-require 'websocket-eventmachine-client'
+require 'faye/websocket'
+require 'eventmachine'
 require 'active_support'
 require 'active_support/core_ext'
 require 'amazing_print'
@@ -17,25 +18,25 @@ def send_command(websocket, command, opts = {})
 end
 
 EM.run do
-  ws = WebSocket::EventMachine::Client.connect(uri: ARGV.first.presence || URL)
+  ws = Faye::WebSocket::Client.new(ARGV.first.presence || URL)
   condition = nil
 
-  ws.onopen do
+  ws.on :open do
     puts "Connected"
   end
 
-  ws.onclose do |code, reason|
-    puts "Disconnected code=#{code} reason=#{reason}"
+  ws.on :close do |event|
+    puts "Disconnected code=#{event.code} reason=#{event.reason}"
     exit
   end
 
-  ws.onerror do |error|
-    puts "Error: #{error}"
+  ws.on :error do |event|
+    puts "Error: #{event.inspect}"
     exit
   end
 
-  ws.onmessage do |msg, _type|
-    data = JSON.parse(msg)
+  ws.on :message do |event|
+    data = JSON.parse(event.data)
 
     if condition.is_a?(Proc)
       if condition.call(data) || data['state'] == 'over'

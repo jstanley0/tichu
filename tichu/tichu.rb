@@ -2,7 +2,7 @@ at_exit { save_games! } # this has to come before requiring sinatra
 
 require 'multitrap'
 require 'sinatra'
-require 'sinatra-websocket'
+require 'faye/websocket'
 require 'active_support'
 require 'active_support/core_ext'
 
