@@ -3,11 +3,11 @@ a pandemic-friendly tichu game playable over the web
 
 ## Setup
 
-Requirements: bundler and yarn
+Requirements: bundler and npm
 
  * install backend dependencies with `bundle install`
- * install frontend dependencies with `yarn`
- * compile assets with `yarn build`
+ * install frontend dependencies with `npm install`
+ * compile assets with `npm run build`
  * start with `rackup`
 
 ## Server notes
