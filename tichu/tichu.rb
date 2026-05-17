@@ -52,7 +52,8 @@ get '/games' do
 end
 
 get '/connect' do
-  halt 400, 'this is a websocket endpoint' unless request.websocket?
+  halt 400, 'this is a websocket endpoint' unless Faye::WebSocket.websocket?(request.env)
+
   game_id = params['game_id'].upcase.strip
   STDERR.puts "Connect request to #{game_id}"
   halt 400, 'missing required parameter `game_id`' unless game_id.present?
@@ -92,26 +93,31 @@ get '/connect' do
     halt 400, 'invalid player_id' unless player
   end
 
-  request.websocket do |ws|
-    ws.onopen do
-      game.connect!(ws, player_id)
-    end
-    ws.onmessage do |msg|
-      game.message(msg, ws, player_id)
-    end
-    ws.onclose do
-      game.disconnect!(ws)
-      unless game.any_connections? || $stopping
-        # use a timer to prevent the game from disappearing while the last player reloads the page
-        EM.add_timer(5) do
-          unless game.any_connections?
-            STDERR.puts "Deleting game #{game_id}"
-            $games.delete(game_id)
-          end
+  ws = Faye::WebSocket.new(request.env)
+
+  ws.on :open do
+    game.connect!(ws, player_id)
+  end
+
+  ws.on :message do |event|
+    game.message(event.data, ws, player_id)
+  end
+
+  ws.on :close do
+    game.disconnect!(ws)
+    unless game.any_connections? || $stopping
+      # use a timer to prevent the game from disappearing while the last player reloads the page
+      EM.add_timer(5) do
+        unless game.any_connections?
+          STDERR.puts "Deleting game #{game_id}"
+          $games.delete(game_id)
         end
       end
     end
   end
+
+  ws.rack_response
+  [200, {}, []] # sinatra dislikes faye's response, so just pretend everything is fine
 end
 
 not_found do

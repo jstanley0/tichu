@@ -8,7 +8,7 @@ require 'active_support'
 require 'active_support/core_ext'
 require 'amazing_print'
 
-URL = "ws://localhost:4567/connect?game_id=test&player_id=test"
+URL = "ws://localhost:9292/connect?game_id=test&player_id=test"
 
 def send_command(websocket, command, opts = {})
   h = { 'command' => command }.merge(opts)
