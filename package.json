@@ -10,14 +10,14 @@
     "node": "^24"
   },
   "dependencies": {
-    "@babel/core": "^7",
-    "@babel/preset-env": "^7",
-    "@babel/preset-react": "^7",
+    "@babel/core": "^8",
+    "@babel/preset-env": "^8",
+    "@babel/preset-react": "^8",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@mui/material": "^5",
     "axios": "^1",
-    "babel-loader": "^8",
+    "babel-loader": "^10",
     "react": "^17",
     "react-beautiful-dnd": "^13",
     "react-dom": "^17",
